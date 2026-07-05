@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllBrands } from "@/lib/api/brands";
 import { siteConfig } from "@/lib/config/site";
+import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { BrandCard } from "./_components/brand-card";
 
@@ -70,10 +71,10 @@ export default async function BrandsPage() {
       position: index + 1,
       item: {
         "@type": "Brand",
-        name: brand.name,
-        alternateName: brand.nameEn,
+        name: brand.persianName,
+        alternateName: brand.englishName,
         url: `${siteConfig.url}/brands/${brand.slug}`,
-        ...(brand.logoUrl ? { logo: brand.logoUrl } : {}),
+        ...(brand.iconUrl ? { logo: brand.iconUrl } : {}),
       },
     })),
   };
@@ -88,7 +89,7 @@ export default async function BrandsPage() {
         <nav aria-label="مسیر ناوبری" className="mb-6 text-sm text-muted-foreground">
           <ol className="flex items-center gap-2">
             <li>
-              <Link href="/" className="transition-colors hover:text-foreground">
+              <Link href={ROUTES.home} className="transition-colors hover:text-foreground">
                 خانه
               </Link>
             </li>

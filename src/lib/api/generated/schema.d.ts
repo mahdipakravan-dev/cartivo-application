@@ -174,6 +174,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/parts/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search purchasable parts across the whole catalog
+         * @description The core catalog search: filters by compatible car ids, compatible car brand ids, part-brand ids, parent category ids, category position, and a min/max price range. Only active, priced, leaf parts are returned.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/parts/cars/{carId}/top-level": {
         parameters: {
             query?: never;
@@ -232,7 +252,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List active cars with pagination */
+        /** List active cars with pagination and filters */
         get: operations["list"];
         put?: never;
         post?: never;
@@ -268,6 +288,26 @@ export interface paths {
         };
         /** List active brands with pagination and filters */
         get: operations["listActiveBrands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/brand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a brand detail by id or slug
+         * @description Exactly one of id or slug must be provided
+         */
+        get: operations["getByIdOrSlug"];
         put?: never;
         post?: never;
         delete?: never;
@@ -555,6 +595,24 @@ export interface components {
             bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
             description?: string;
             imageUrls?: string[];
+        };
+        /** @description Car brand representation returned to the customer-facing site/app - public fields only */
+        BrandFrontofficeResponse: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            id?: number;
+            /** @example Toyota */
+            englishName?: string;
+            /** @example تویوتا */
+            persianName?: string;
+            /** @example toyota */
+            slug?: string;
+            /** @example http://localhost:8080/files/uploads/abc123.jpg */
+            iconUrl?: string;
+            /** @example JP */
+            countryCode?: string;
         };
     };
     responses: never;
@@ -1068,6 +1126,91 @@ export interface operations {
             };
         };
     };
+    search: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Only parts compatible with at least one of these car ids
+                 * @example [
+                 *       1,
+                 *       2
+                 *     ]
+                 */
+                carIds?: number[];
+                /**
+                 * @description Only parts compatible with at least one car of one of these brand ids
+                 * @example [
+                 *       1
+                 *     ]
+                 */
+                brandIds?: number[];
+                /**
+                 * @description Only parts manufactured by one of these part-brand ids
+                 * @example [
+                 *       3
+                 *     ]
+                 */
+                partBrandIds?: number[];
+                /**
+                 * @description Only parts whose parent category id is one of these
+                 * @example [
+                 *       5
+                 *     ]
+                 */
+                parentPartIds?: number[];
+                /**
+                 * @description Only parts whose parent category has this position
+                 * @example EXTERIOR
+                 */
+                positionType?: "INTERIOR" | "EXTERIOR";
+                /**
+                 * @description Minimum price in Rial, inclusive
+                 * @example 100000
+                 */
+                minPrice?: number;
+                /**
+                 * @description Maximum price in Rial, inclusive
+                 * @example 5000000
+                 */
+                maxPrice?: number;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of matching parts with computed price */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
     listTopLevel: {
         parameters: {
             query?: {
@@ -1241,6 +1384,41 @@ export interface operations {
         parameters: {
             query?: {
                 /**
+                 * @description Filter by brand id (exact match)
+                 * @example 1
+                 */
+                brandId?: number;
+                /**
+                 * @description Filter by brand slug (exact match)
+                 * @example toyota
+                 */
+                brandSlug?: string;
+                /**
+                 * @description Filter by model (case-insensitive partial match)
+                 * @example Corolla
+                 */
+                model?: string;
+                /**
+                 * @description Filter by trim level (case-insensitive partial match)
+                 * @example GLX
+                 */
+                trimLevel?: string;
+                /**
+                 * @description Filter by body type (exact match)
+                 * @example SEDAN
+                 */
+                bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
+                /**
+                 * @description Filter by minimum manufacture year (inclusive)
+                 * @example 2018
+                 */
+                yearFrom?: number;
+                /**
+                 * @description Filter by maximum manufacture year (inclusive)
+                 * @example 2023
+                 */
+                yearTo?: number;
+                /**
                  * @description Page number, zero-based
                  * @example 0
                  */
@@ -1365,6 +1543,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
+    getByIdOrSlug: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Brand ID
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * @description Brand slug
+                 * @example toyota
+                 */
+                slug?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Brand found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandFrontofficeResponse"];
+                };
+            };
+            /** @description Neither id nor slug was provided */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Brand not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

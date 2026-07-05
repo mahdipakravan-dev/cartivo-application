@@ -11,7 +11,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.cartivo.ir",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/**/*',
+      }
     ],
+    dangerouslyAllowLocalIP: true,
   },
 
   // هدرهای امنیتی پایه (مکمل تنظیمات وب‌سرور)

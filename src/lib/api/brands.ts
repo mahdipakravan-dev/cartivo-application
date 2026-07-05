@@ -1,47 +1,85 @@
 import { apiClient } from "./client";
-import type { BrandFrontDto } from "./types";
+import type {
+  BrandFrontofficeResponse,
+  CarFrontofficeDetailResponse,
+  PaginatedResult,
+  PageResponse,
+} from "./types";
 
-/**
- * Fetcher دامنه‌ی «برند» — فقط در سمت سرور (RSC / build) اجرا می‌شود.
- *
- * استراتژی کش: `force-cache` + tag تا صفحه‌ی /brands به‌صورت SSG ساخته شود
- * و بعداً بتوان با `revalidateTag("brands")` (مثلاً از یک Route Handler که
- * بک‌اند بعد از تغییر برندها صدا می‌زند) آن را به‌روز کرد.
- */
+function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T> {
+  return {
+    items: (page.content ?? fallback) as T[],
+    totalElements: page.totalElements ?? 0,
+    totalPages: page.totalPages ?? 0,
+    page: page.page ?? 0,
+    size: page.size ?? 0,
+    hasNext: page.hasNext ?? false,
+    hasPrevious: page.hasPrevious ?? false,
+  };
+}
 
-/** داده‌ی جایگزین برای زمانی که بک‌اند در build در دسترس نیست (DX در dev/CI) */
-const FALLBACK_BRANDS: BrandFrontDto[] = [
-  { id: 1, name: "سایپا", nameEn: "SAIPA", slug: "saipa", modelCount: 12, logoUrl: null, description: "قطعات یدکی محصولات سایپا از پراید تا شاهین" },
-  { id: 2, name: "ایران‌خودرو", nameEn: "IKCO", slug: "ikco", modelCount: 15, logoUrl: null, description: "قطعات یدکی سمند، دنا، تارا، پژو ۲۰۶ و…" },
-  { id: 3, name: "ام‌وی‌ام", nameEn: "MVM", slug: "mvm", modelCount: 8, logoUrl: null, description: "قطعات یدکی محصولات مدیران‌خودرو" },
-  { id: 4, name: "کیا", nameEn: "Kia", slug: "kia", modelCount: 10, logoUrl: null, description: "قطعات اورجینال و آفتر‌مارکت کیا" },
-  { id: 5, name: "هیوندای", nameEn: "Hyundai", slug: "hyundai", modelCount: 11, logoUrl: null, description: "قطعات اورجینال و آفتر‌مارکت هیوندای" },
-  { id: 6, name: "رنو", nameEn: "Renault", slug: "renault", modelCount: 6, logoUrl: null, description: "قطعات تندر ۹۰، ساندرو و مگان" },
-];
+/** Fetch active brands with pagination. */
+export async function getBrands(
+  params?: { page?: number; size?: number; sort?: string },
+): Promise<PaginatedResult<BrandFrontofficeResponse>> {
+  const { data, error } = await apiClient.GET("/api/frontoffice/brands", {
+    params: {
+      query: {
+        page: params?.page ?? 0,
+        size: params?.size ?? 20,
+        ...(params?.sort ? { sortBy: params.sort } : {}),
+      },
+    },
+    cache: "force-cache",
+    next: { tags: ["brands"] },
+  });
 
-/**
- * دریافت همه‌ی برندها برای صفحه‌ی SSG شده‌ی /brands.
- * چون تعداد برندها محدود است، با size بزرگ همه را یک‌جا می‌گیریم؛
- * صفحه‌بندی واقعی برای لیست‌های بزرگ (قطعات) استفاده می‌شود.
- */
-export async function getAllBrands(): Promise<BrandFrontDto[]> {
+  if (error || !data) throw new Error("Failed to fetch brands");
+  return parsePage<BrandFrontofficeResponse>(data);
+}
+
+/** Fetch all brands (for /brands page and sitemap). */
+export async function getAllBrands(): Promise<BrandFrontofficeResponse[]> {
   try {
-    const { data, error } = await apiClient.GET("/api/v1/front/brands", {
-      params: { query: { page: 0, size: 200, sort: ["name,asc"] } },
+    const result = await getBrands({ page: 0, size: 200 });
+    return result.items;
+  } catch {
+    return [];
+  }
+}
+
+/** Fetch a single brand by slug. */
+export async function getBrandBySlug(
+  slug: string,
+): Promise<BrandFrontofficeResponse | null> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/brand", {
+      params: { query: { slug } },
       cache: "force-cache",
       next: { tags: ["brands"] },
     });
 
-    if (error || !data) {
-      throw new Error("API error while fetching brands");
-    }
-    return data.content;
+    if (error || !data) return null;
+    return data as BrandFrontofficeResponse;
   } catch {
-    // در build بدون بک‌اند (مثلاً CI) پروژه نباید بشکند.
-    // در production واقعی، لاگ/مانیتورینگ اضافه کنید و fallback را حذف کنید.
-    if (process.env.NODE_ENV === "production" && process.env.CI !== "true") {
-      console.warn("[brands] backend unavailable at build time — using fallback data");
-    }
-    return FALLBACK_BRANDS;
+    return null;
+  }
+}
+
+/** Fetch cars filtered by brand slug. */
+export async function getCarsByBrand(
+  brandSlug: string,
+): Promise<PaginatedResult<CarFrontofficeDetailResponse>> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/cars", {
+      params: { query: { brandSlug, page: 0, size: 50 } },
+      cache: "force-cache",
+      next: { tags: ["cars", `cars:${brandSlug}`] },
+    });
+
+    if (error || !data) throw new Error("Failed to fetch cars");
+    return parsePage<CarFrontofficeDetailResponse>(data);
+  } catch {
+    return { items: [], totalElements: 0, totalPages: 0, page: 0, size: 0, hasNext: false, hasPrevious: false };
   }
 }

@@ -1,26 +1,35 @@
 import type { components } from "./generated/schema";
 
 /**
- * نام‌های کوتاه (Type Aliases) روی تایپ‌های تولیدشده از Swagger.
- * بقیه‌ی کد فقط از این فایل import می‌کند تا اگر ساختار generated
- * تغییر کرد، فقط همین‌جا اصلاح شود.
+ * Type aliases derived from the OpenAPI-generated schema.
+ * Run `npm run openapi` after backend changes to stay in sync.
  */
-export type BrandFrontDto = components["schemas"]["BrandFrontDto"];
-export type PageBrandFrontDto = components["schemas"]["PageBrandFrontDto"];
+export type CustomerFrontofficeResponse =
+  components["schemas"]["CustomerFrontofficeResponse"];
+export type CustomerFrontofficeUpdateRequest =
+  components["schemas"]["CustomerFrontofficeUpdateRequest"];
+export type PageResponse = components["schemas"]["PageResponse"];
+export type BrandFrontofficeResponse =
+  components["schemas"]["BrandFrontofficeResponse"];
+export type CarFrontofficeDetailResponse =
+  components["schemas"]["CarFrontofficeDetailResponse"];
+export type PartFrontofficeResponse =
+  components["schemas"]["PartFrontofficeResponse"];
 
 /**
- * ساختار عمومی Page در Spring Data — برای endpoint هایی که هنوز
- * در schema تولیدشده نیامده‌اند یا برای کدهای generic صفحه‌بندی.
+ * Generic paginated result — maps PageResponse.content to a concrete type.
  */
-export interface SpringPage<T> {
-  content: T[];
+export interface PaginatedResult<T> {
+  items: T[];
   totalElements: number;
   totalPages: number;
-  /** شماره‌ی صفحه‌ی فعلی (zero-based) */
-  number: number;
+  page: number;
   size: number;
-  first: boolean;
-  last: boolean;
-  numberOfElements: number;
-  empty: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }
+
+/** @deprecated Use BrandFrontofficeResponse instead */
+export type BrandFrontDto = BrandFrontofficeResponse;
+/** @deprecated Use PaginatedResult<BrandFrontofficeResponse> instead */
+export type PageBrandFrontDto = PaginatedResult<BrandFrontofficeResponse>;

@@ -10,7 +10,7 @@
 :root {
   --radius: 0.625rem;
 
-  --background: oklch(1 0 0);
+  --background: #FBFCFD;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -81,6 +81,29 @@
 
   /* فونت وزیرمتن از طریق next/font تزریق می‌شود (متغیر --font-vazirmatn) */
   --font-sans: var(--font-vazirmatn), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 @layer base {
