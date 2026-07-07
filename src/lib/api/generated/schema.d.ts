@@ -262,7 +262,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/frontoffice/cars/{id}": {
+    "/api/frontoffice/cars/detail": {
         parameters: {
             query?: never;
             header?: never;
@@ -308,6 +308,23 @@ export interface paths {
          * @description Exactly one of id or slug must be provided
          */
         get: operations["getByIdOrSlug"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/brand-parts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active part brands with pagination and filters */
+        get: operations["list_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -589,8 +606,6 @@ export interface components {
             brand?: string;
             model?: string;
             trimLevel?: string;
-            /** Format: int32 */
-            manufactureYear?: number;
             /** @enum {string} */
             bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
             description?: string;
@@ -613,6 +628,8 @@ export interface components {
             iconUrl?: string;
             /** @example JP */
             countryCode?: string;
+            /** Format: int32 */
+            carCount?: number;
         };
     };
     responses: never;
@@ -1409,16 +1426,6 @@ export interface operations {
                  */
                 bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
                 /**
-                 * @description Filter by minimum manufacture year (inclusive)
-                 * @example 2018
-                 */
-                yearFrom?: number;
-                /**
-                 * @description Filter by maximum manufacture year (inclusive)
-                 * @example 2023
-                 */
-                yearTo?: number;
-                /**
                  * @description Page number, zero-based
                  * @example 0
                  */
@@ -1458,15 +1465,20 @@ export interface operations {
     };
     getById_2: {
         parameters: {
-            query?: never;
-            header?: never;
-            path: {
+            query?: {
                 /**
-                 * @description Car ID
+                 * @description Brand ID
                  * @example 1
                  */
-                id: number;
+                id?: number;
+                /**
+                 * @description Brand slug
+                 * @example toyota
+                 */
+                slug?: string;
             };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1592,6 +1604,67 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_1: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Filter by english name (case-insensitive partial match)
+                 * @example Bosch
+                 */
+                englishName?: string;
+                /**
+                 * @description Filter by persian name (case-insensitive partial match)
+                 * @example بوش
+                 */
+                persianName?: string;
+                /**
+                 * @description Filter by slug (case-insensitive partial match)
+                 * @example bosch
+                 */
+                slug?: string;
+                /**
+                 * @description Filter by ISO country code (exact match)
+                 * @example DE
+                 */
+                countryCode?: string;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of active part brands */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
                 };
             };
         };

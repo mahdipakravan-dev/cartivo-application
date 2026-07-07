@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { Package } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
 
 interface ProductCardProps {
   part: PartFrontofficeResponse;
   brandSlug: string;
+  carId?: number;
 }
 
-export function ProductCard({ part, brandSlug }: ProductCardProps) {
+export function ProductCard({ part, brandSlug, carId }: ProductCardProps) {
+  const href = carId
+    ? ROUTES.partsPart(brandSlug, String(carId), String(part.id))
+    : `/parts/${brandSlug}/${part.id}`;
+
   return (
     <Link
-      href={`/brands/${brandSlug}/parts/${part.id}`}
+      href={href}
       className="group block rounded-2xl border border-slate-100 bg-white p-5 shadow-sm shadow-slate-100/50 transition-all duration-300 hover:-translate-y-1 hover:border-slate-200 hover:shadow-lg hover:shadow-slate-200/60"
       aria-label={part.name}
     >

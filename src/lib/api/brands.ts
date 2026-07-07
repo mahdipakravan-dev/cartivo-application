@@ -1,4 +1,5 @@
 import { apiClient } from "./client";
+import { apiFetch } from "./fetch";
 import type {
   BrandFrontofficeResponse,
   CarFrontofficeDetailResponse,
@@ -18,6 +19,10 @@ function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T
   };
 }
 
+// ---------------------------------------------------------------------------
+// SSR functions (Server Components)
+// ---------------------------------------------------------------------------
+
 /** Fetch active brands with pagination. */
 export async function getBrands(
   params?: { page?: number; size?: number; sort?: string },
@@ -27,7 +32,7 @@ export async function getBrands(
       query: {
         page: params?.page ?? 0,
         size: params?.size ?? 20,
-        ...(params?.sort ? { sortBy: params.sort } : {}),
+        ...params,
       },
     },
     cache: "force-cache",
@@ -66,7 +71,7 @@ export async function getBrandBySlug(
   }
 }
 
-/** Fetch cars filtered by brand slug. */
+/** Fetch cars filtered by brand slug (SSR). */
 export async function getCarsByBrand(
   brandSlug: string,
 ): Promise<PaginatedResult<CarFrontofficeDetailResponse>> {
@@ -81,5 +86,43 @@ export async function getCarsByBrand(
     return parsePage<CarFrontofficeDetailResponse>(data);
   } catch {
     return { items: [], totalElements: 0, totalPages: 0, page: 0, size: 0, hasNext: false, hasPrevious: false };
+  }
+}
+
+/** Fetch a single car by ID (SSR). */
+export async function getCarByIdOrSlug(
+  id: number,
+): Promise<CarFrontofficeDetailResponse | null> {
+  try {
+    const query = isNaN(+id) ? { slug: id } : { id }
+    const { data, error } = await apiClient.GET("/api/frontoffice/cars/detail", {
+      params: { query },
+      cache: "force-cache",
+      next: { tags: ["cars", `car:${id}`] },
+    });
+
+    if (error || !data) return null;
+    return data as CarFrontofficeDetailResponse;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// CSR functions (Client Components)
+// ---------------------------------------------------------------------------
+
+/** Fetch cars filtered by brand slug (CSR). */
+export async function fetchCarsByBrand(
+  brandSlug: string,
+): Promise<CarFrontofficeDetailResponse[]> {
+  try {
+    const data = await apiFetch<{ content?: CarFrontofficeDetailResponse[] }>(
+      "/api/frontoffice/cars",
+      { params: { brandSlug, page: 0, size: 50 } }
+    );
+    return data.content ?? [];
+  } catch {
+    return [];
   }
 }

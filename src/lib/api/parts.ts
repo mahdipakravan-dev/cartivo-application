@@ -50,8 +50,6 @@ export async function searchParts(
     if (params.sortBy) query.sortBy = params.sortBy;
     if (params.sortDir) query.sortDir = params.sortDir;
 
-
-
     const { data, error } = await apiClient.GET("/api/frontoffice/parts/search", {
       params: { query },
       cache: "no-store",
@@ -61,5 +59,22 @@ export async function searchParts(
     return parsePage<PartFrontofficeResponse>(data);
   } catch {
     return { items: [], totalElements: 0, totalPages: 0, page: 0, size: 20, hasNext: false, hasPrevious: false };
+  }
+}
+
+/** Fetch a single part by ID (SSR). */
+export async function getPartById(
+  id: number,
+): Promise<PartFrontofficeResponse | null> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/parts/{id}", {
+      params: { path: { id } },
+      cache: "no-store",
+    });
+
+    if (error || !data) return null;
+    return data as PartFrontofficeResponse;
+  } catch {
+    return null;
   }
 }

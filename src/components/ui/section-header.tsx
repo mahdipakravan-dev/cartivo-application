@@ -4,17 +4,11 @@ import { cn } from "@/lib/utils";
 
 interface SectionHeaderProps {
   title: string;
-  /** Link target for the "see all" button. Omit to hide the button. */
   href?: string;
-  /** Text for the "see all" link */
   linkText?: string;
   className?: string;
 }
 
-/**
- * Reusable section header with title on the right and an animated
- * "see all" link on the left — matches the brands page pattern.
- */
 export function SectionHeader({
   title,
   href,
@@ -23,10 +17,7 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
-      <h2
-        className="text-xl font-bold sm:text-2xl"
-        style={{ color: "#536175" }}
-      >
+      <h2 className="text-xl font-bold sm:text-2xl" style={{ color: "#536175" }}>
         {title}
       </h2>
 

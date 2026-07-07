@@ -36,22 +36,46 @@ function BrandItem({ brand }: { brand: BrandFrontofficeResponse }) {
   );
 }
 
-export async function BrandsSection() {
-  const { items: brands } = await getBrands({ size: 20 });
+/** Static fallback for brands that fit in one row */
+function StaticBrands({ brands }: { brands: BrandFrontofficeResponse[] }) {
+  return (
+    <div className="mt-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide sm:flex-wrap sm:justify-start sm:gap-5">
+        {brands.map((brand) => (
+          <BrandItem key={brand.id} brand={brand} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
-  if (brands.length === 0) return null;
+export async function BrandsSection() {
+  const { items: brands } = await getBrands({ size: 50, sort: "persianName" });
+  const brandItems = brands.filter(item => item.carCount && item.carCount > 0)
+
+  if (brandItems.length === 0) return null;
+
+  // If 8 or fewer brands, show static grid (fits one row)
+  if (brandItems.length <= 8) {
+    return (
+      <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
+          <StaticBrands brands={brandItems} />
+        </div>
+      </section>
+    );
+  }
+
+  // More than 8 brands — use infinite marquee
+  const { BrandMarquee } = await import("@/components/sections/brand-marquee");
 
   return (
     <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
-
-        <div className="mt-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide sm:flex-wrap sm:justify-start sm:gap-5">
-            {brands.map((brand) => (
-              <BrandItem key={brand.id} brand={brand} />
-            ))}
-          </div>
+        <div className="mt-8">
+          <BrandMarquee brands={brandItems} />
         </div>
       </div>
     </section>

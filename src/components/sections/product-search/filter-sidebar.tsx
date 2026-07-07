@@ -171,7 +171,6 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
                 />
                 <span className="truncate text-slate-600">
                   {car.model}
-                  {car.manufactureYear ? ` (${car.manufactureYear})` : ""}
                 </span>
               </label>
             ))}

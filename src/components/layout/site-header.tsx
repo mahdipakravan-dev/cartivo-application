@@ -5,14 +5,8 @@ import { useState } from "react";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import {
-  Search,
-  ShoppingCart,
-  User,
-  Menu,
-  X,
-  ChevronDown,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
@@ -23,13 +17,12 @@ const navItems = [
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [megaOpen, setMegaOpen] = useState<string | null>(null);
 
   return (
     <div className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
       <header
         className={cn(
-          "mx-auto flex max-w-6xl items-center justify-between",
+          "mx-auto flex max-w-7xl items-center justify-between",
           "rounded-2xl border border-white/20 px-4 py-3",
           "bg-white/20 shadow-lg shadow-black/5 backdrop-2xl backdrop-blur-2xl",
           "supports-[backdrop-filter]:bg-white/15"
@@ -56,40 +49,15 @@ export function SiteHeader() {
         >
           <ul className="flex items-center gap-1">
             {navItems.map((item) => (
-              <li key={item.href} className="relative">
-                <button
-                  onMouseEnter={() => setMegaOpen(item.href)}
-                  onMouseLeave={() => setMegaOpen(null)}
+              <li key={item.href}>
+                <Link
+                  href={item.href}
                   className={cn(
-                    "flex items-center gap-1 rounded-xl px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900",
-                    megaOpen === item.href && "bg-slate-900/5 text-slate-900"
+                    "inline-flex items-center gap-1 rounded-md px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900"
                   )}
                 >
                   {item.label}
-                  <ChevronDown
-                    className={cn(
-                      "h-3.5 w-3.5 transition-transform",
-                      megaOpen === item.href && "rotate-180"
-                    )}
-                  />
-                </button>
-
-                {megaOpen === item.href && (
-                  <div
-                    onMouseEnter={() => setMegaOpen(item.href)}
-                    onMouseLeave={() => setMegaOpen(null)}
-                    className={cn(
-                      "absolute top-full right-0 mt-2 w-64",
-                      "rounded-2xl border border-slate-200/60",
-                      "bg-white/80 backdrop-blur-xl shadow-xl shadow-slate-900/5",
-                      "p-4"
-                    )}
-                  >
-                    <p className="text-xs text-slate-400">
-                      مگا منوی {item.label}
-                    </p>
-                  </div>
-                )}
+                </Link>
               </li>
             ))}
           </ul>
@@ -97,42 +65,31 @@ export function SiteHeader() {
 
         {/* Left — Actions */}
         <div className="flex items-center gap-1">
-          <button
-            aria-label="جست‌وجو"
-            className="rounded-xl p-2.5 text-slate-500 transition-all hover:bg-slate-900/5 hover:text-slate-800"
-          >
+          <Button variant="ghost" size="icon" aria-label="جست‌وجو">
             <Search className="h-5 w-5" />
-          </button>
+          </Button>
 
-          <button
-            aria-label="سبد خرید"
-            className="relative rounded-xl p-2.5 text-slate-500 transition-all hover:bg-slate-900/5 hover:text-slate-800"
-          >
+          <Button variant="ghost" size="icon" aria-label="سبد خرید" className="relative">
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
               0
             </span>
-          </button>
+          </Button>
 
-          <button
-            aria-label="پنل کاربری"
-            className="rounded-xl p-2.5 text-slate-500 transition-all hover:bg-slate-900/5 hover:text-slate-800"
-          >
+          <Button variant="ghost" size="icon" aria-label="پنل کاربری">
             <User className="h-5 w-5" />
-          </button>
+          </Button>
 
           {/* Mobile Toggle */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
-            className="rounded-xl p-2.5 text-slate-500 transition-all hover:bg-slate-900/5 hover:text-slate-800 lg:hidden"
+            className="lg:hidden"
           >
-            {mobileOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </button>
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
         </div>
       </header>
 
@@ -141,7 +98,7 @@ export function SiteHeader() {
         <nav
           aria-label="ناوبری موبایل"
           className={cn(
-            "mx-auto mt-2 max-w-6xl overflow-hidden",
+            "mx-auto mt-2 max-w-7xl overflow-hidden",
             "rounded-2xl border border-slate-200/60",
             "bg-white/80 backdrop-blur-xl shadow-xl shadow-slate-900/5",
             "lg:hidden"
@@ -153,7 +110,7 @@ export function SiteHeader() {
                 <Link
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900"
+                  className="block rounded-md px-4 py-3 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900"
                 >
                   {item.label}
                 </Link>
