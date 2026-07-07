@@ -7,6 +7,7 @@ import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
@@ -17,24 +18,18 @@ const navItems = [
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
-      <header
-        className={cn(
-          "mx-auto flex max-w-7xl items-center justify-between",
-          "rounded-2xl border border-white/20 px-4 py-3",
-          "bg-white/20 shadow-lg shadow-black/5 backdrop-2xl backdrop-blur-2xl",
-          "supports-[backdrop-filter]:bg-white/15"
-        )}
-      >
+    <div className="fixed inset-x-0 top-0 z-50 border-b border-slate-100 bg-white">
+      <header className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Right — Logo */}
         <Link
           href={ROUTES.home}
           className="flex items-center gap-2 text-slate-800"
           aria-label={`${siteConfig.name} — خانه`}
         >
-          <span className="text-xl font-extrabold tracking-tight lg:text-2xl">
+          <span className="text-xl font-extrabold tracking-tight text-[#14305A] lg:text-2xl">
             {siteConfig.name}
           </span>
           <span className="hidden text-[10px] font-medium tracking-wide text-slate-500 sm:inline">
@@ -48,18 +43,27 @@ export function SiteHeader() {
           className="absolute inset-x-0 top-0 hidden h-full items-center justify-center lg:flex"
         >
           <ul className="flex items-center gap-1">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "inline-flex items-center gap-1 rounded-md px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900"
-                  )}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "relative inline-flex items-center gap-1 px-4 py-2 text-sm font-medium transition-all",
+                      isActive
+                        ? "text-[#14305A]"
+                        : "text-slate-600 hover:text-slate-900"
+                    )}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <span className="absolute inset-x-2 -bottom-3 h-0.5 rounded-full bg-[#14305A]" />
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -97,25 +101,28 @@ export function SiteHeader() {
       {mobileOpen && (
         <nav
           aria-label="ناوبری موبایل"
-          className={cn(
-            "mx-auto mt-2 max-w-7xl overflow-hidden",
-            "rounded-2xl border border-slate-200/60",
-            "bg-white/80 backdrop-blur-xl shadow-xl shadow-slate-900/5",
-            "lg:hidden"
-          )}
+          className="border-t border-slate-100 bg-white lg:hidden"
         >
           <ul className="space-y-1 p-3">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-md px-4 py-3 text-sm font-medium text-slate-600 transition-all hover:bg-slate-900/5 hover:text-slate-900"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "block rounded-md px-4 py-3 text-sm font-medium transition-all",
+                      isActive
+                        ? "border-b-2 border-[#14305A] text-[#14305A]"
+                        : "text-slate-600 hover:bg-slate-900/5 hover:text-slate-900"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       )}

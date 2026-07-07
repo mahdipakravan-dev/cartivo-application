@@ -4,8 +4,8 @@
  */
 export const ROUTES = {
   home: "/",
-  brands: "/brands",
-  brandDetail: (slug: string) => `/brands/${slug}`,
+  brands: "/parts/brands",
+  brandDetail: (slug: string) => `/parts/${slug}`,
 
   // Parts hierarchy
   parts: "/parts",

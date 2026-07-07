@@ -64,11 +64,12 @@ export async function searchParts(
 
 /** Fetch a single part by ID (SSR). */
 export async function getPartById(
-  id: number,
+  id: string | number,
 ): Promise<PartFrontofficeResponse | null> {
   try {
+    const numericId = Number(id);
     const { data, error } = await apiClient.GET("/api/frontoffice/parts/{id}", {
-      params: { path: { id } },
+      params: { path: { id: numericId } },
       cache: "no-store",
     });
 

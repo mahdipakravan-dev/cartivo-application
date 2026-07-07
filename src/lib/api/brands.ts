@@ -89,16 +89,17 @@ export async function getCarsByBrand(
   }
 }
 
-/** Fetch a single car by ID (SSR). */
+/** Fetch a single car by ID or slug (SSR). */
 export async function getCarByIdOrSlug(
-  id: number,
+  idOrSlug: string | number,
 ): Promise<CarFrontofficeDetailResponse | null> {
   try {
-    const query = isNaN(+id) ? { slug: id } : { id }
+    const id = Number(idOrSlug);
+    const query = isNaN(id) ? { slug: String(idOrSlug) } : { id };
     const { data, error } = await apiClient.GET("/api/frontoffice/cars/detail", {
       params: { query },
       cache: "force-cache",
-      next: { tags: ["cars", `car:${id}`] },
+      next: { tags: ["cars", `car:${idOrSlug}`] },
     });
 
     if (error || !data) return null;

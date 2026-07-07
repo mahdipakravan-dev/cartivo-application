@@ -69,8 +69,8 @@ export function HomeHero({ brands }: HomeHeroProps) {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-l from-[#102a50]/95 via-[#102a50]/80 to-[#102a50]/50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FBFCFD] via-[#102a50]/40 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#FBFCFD] to-transparent" />
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-[#FBFCFD] via-[#102a50]/40 to-transparent" /> */}
+        {/* <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#FBFCFD] to-transparent" /> */}
       </div>
 
       {/* Content */}
