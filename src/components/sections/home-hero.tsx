@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { ROUTES } from "@/lib/routes";
 import { fetchCarsByBrand } from "@/lib/api/brands";
 import type { BrandFrontofficeResponse, CarFrontofficeDetailResponse } from "@/lib/api/types";
 
@@ -17,6 +19,7 @@ const HERO_IMAGES = [
 ];
 
 export function HomeHero({ brands }: HomeHeroProps) {
+  const router = useRouter();
   const [selectedBrandSlug, setSelectedBrandSlug] = useState<string>("");
   const [selectedCarId, setSelectedCarId] = useState<string>("");
   const [cars, setCars] = useState<CarFrontofficeDetailResponse[]>([]);
@@ -111,7 +114,9 @@ export function HomeHero({ brands }: HomeHeroProps) {
               </div>
               <Button
                 size="lg"
-                className="h-12 w-full rounded-xl bg-[#0066ff] text-sm font-semibold text-white shadow-lg shadow-[#0066ff]/30 transition-all hover:bg-[#0052cc] hover:shadow-xl hover:shadow-[#0066ff]/40"
+                disabled={!selectedBrandSlug || !selectedCarId}
+                onClick={() => router.push(ROUTES.partsCar(selectedBrandSlug, selectedCarId))}
+                className="h-12 w-full rounded-xl bg-[#14305A] text-sm font-semibold text-white shadow-lg shadow-[#14305A]/30 transition-all hover:bg-[#1a3d6f] hover:shadow-xl hover:shadow-[#14305A]/40 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Search className="h-4 w-4" />
                 جستجو

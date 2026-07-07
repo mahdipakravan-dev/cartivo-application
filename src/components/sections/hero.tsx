@@ -141,7 +141,7 @@ export function Hero({ bgSrc, videoSrc, className, children }: HeroProps) {
       </div>
 
       {/* Bottom gradient fade */}
-      {/* <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FBFCFD] to-transparent" /> */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FBFCFD] to-transparent" />
     </section>
   );
 }
