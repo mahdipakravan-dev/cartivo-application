@@ -7,13 +7,15 @@ import { Features } from "@/components/sections/features";
 import { Bestsellers } from "@/components/sections/bestsellers";
 import { Articles } from "@/components/sections/articles";
 import { getBrands } from "@/lib/api/brands";
+import { CatalogHydrator } from "@/lib/store";
 
 export default async function HomePage() {
   const { items: brands } = await getBrands({ size: 200 });
 
   return (
     <>
-      <HomeHero brands={brands} />
+      <CatalogHydrator brands={brands} />
+      <HomeHero variant="full-primary" brands={brands} />
       <BrandsSection />
       <PositionTypeSection />
       <Categories />

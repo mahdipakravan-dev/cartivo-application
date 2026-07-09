@@ -50,7 +50,7 @@ const categories = [
 export function Categories() {
   return (
     <section className="bg-white py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-black text-[#1A1A1B] lg:text-2xl">
             دسته‌بندی قطعات

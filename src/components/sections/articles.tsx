@@ -47,7 +47,7 @@ const articles: Article[] = [
 export function Articles() {
   return (
     <section className="bg-white py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <SectionHeader
           title="مقالات و راهنما"
           href="/articles"

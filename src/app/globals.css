@@ -42,6 +42,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.27 0.08 255);
+  --cartivo-container: 1400px;
+  --cartivo-hero-background-image: url("https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/8272c8ed3_generated_0cb84b85.png");
+  --cartivo-hero-background-overlay: linear-gradient(270deg, rgb(16 42 80 / 0.95), rgb(16 42 80 / 0.8), rgb(16 42 80 / 0.5));
+  --cartivo-hero-background: var(--cartivo-hero-background-overlay), var(--cartivo-hero-background-image);
 }
 
 .dark {
@@ -150,6 +154,12 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+.container-cartivo {
+  max-width: var(--cartivo-container);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @layer base {

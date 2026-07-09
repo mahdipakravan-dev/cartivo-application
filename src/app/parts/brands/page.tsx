@@ -64,7 +64,7 @@ export default async function BrandsPage() {
         {/* <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-[120px]" /> */}
         {/* <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[100px]" /> */}
 
-        <div className="relative mx-auto max-w-7xl  pt-20 pb-28 sm:px-6 mt-4">
+        <div className="relative container-cartivo pt-20 pb-28 sm:px-6 mt-4">
 
           {/* Breadcrumb */}
           <nav aria-label="مسیر ناوبری" className="mb-8 text-sm text-white/40">
@@ -134,7 +134,7 @@ export default async function BrandsPage() {
 
       {/* Brands Grid */}
       <section className="py-4 sm:py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <BrandGrid brands={brands} />
         </div>
       </section>

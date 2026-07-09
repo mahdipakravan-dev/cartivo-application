@@ -2,6 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { siteConfig } from "@/lib/config/site";
 import { iranYekan } from "@/lib/fonts";
+import { StoreProvider } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -44,9 +45,11 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
       <body className="flex min-h-dvh flex-col">
-        <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <StoreProvider>
+          <SiteHeader variant="abslute-on-header" />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </StoreProvider>
       </body>
     </html>
   );

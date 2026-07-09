@@ -59,7 +59,7 @@ export async function BrandsSection() {
   if (brandItems.length <= 8) {
     return (
       <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
           <StaticBrands brands={brandItems} />
         </div>
@@ -72,7 +72,7 @@ export async function BrandsSection() {
 
   return (
     <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
         <div className="mt-8">
           <BrandMarquee brands={brandItems} />

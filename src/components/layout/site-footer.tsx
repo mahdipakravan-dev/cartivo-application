@@ -28,7 +28,7 @@ const aboutLinks = [
 export function SiteFooter() {
   return (
     <footer className="bg-[#102a50] pb-24 pt-16 text-white md:pb-10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         {/* Top Grid */}
         <div className="mb-12 grid grid-cols-2 gap-8 lg:grid-cols-5">
           {/* Brand Info */}

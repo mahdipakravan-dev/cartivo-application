@@ -128,7 +128,7 @@ export async function Bestsellers() {
 
   return (
     <section className="py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <SectionHeader
           title="پرفروش‌ترین قطعات"
           href="/bestsellers"

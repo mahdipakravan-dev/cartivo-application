@@ -3,7 +3,7 @@ import { Search, ArrowLeft } from "lucide-react";
 export function VinGuide() {
   return (
     <section id="vin-guide" className="py-12 lg:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-[2rem] bg-gradient-to-l from-[#102a50] to-[#1a3a6a]">
           <div className="grid items-center gap-8 md:grid-cols-2">
             {/* Text */}

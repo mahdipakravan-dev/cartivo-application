@@ -90,7 +90,7 @@ export default async function PartsCarPage({
         <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-blue-500/10 blur-[100px]" />
         <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-indigo-500/10 blur-[100px]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <div className="relative container-cartivo px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <nav aria-label="مسیر ناوبری" className="mb-8 text-sm text-white/40">
             <ol className="flex items-center gap-2">
               <li>
@@ -167,7 +167,7 @@ export default async function PartsCarPage({
 
       {/* Search Section — no car filter */}
       <section className="py-8 sm:py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title={`قطعات ${car.brand} ${car.model}`} />
           <Suspense
             fallback={

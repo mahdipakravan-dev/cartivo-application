@@ -31,7 +31,7 @@ export default async function PartsPage({
 
   return (
     <section className="py-8 sm:py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <SectionHeader
           title="قطعات یدکی خودرو"
           href={ROUTES.brands}

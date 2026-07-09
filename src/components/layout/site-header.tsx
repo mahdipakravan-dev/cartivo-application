@@ -16,23 +16,52 @@ const navItems = [
   { label: "تماس با ما", href: "/contact" },
 ];
 
-export function SiteHeader() {
+type SiteHeaderVariant = "white" | "hero" | "abslute-on-header";
+
+interface SiteHeaderProps {
+  variant?: SiteHeaderVariant;
+}
+
+export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const isHero = variant === "hero" || variant === "abslute-on-header";
+  const isAbsoluteOnHero = variant === "abslute-on-header";
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 border-b border-slate-100 bg-white">
-      <header className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <div
+      className={cn(
+        "inset-x-0 top-0 z-50 border-b",
+        isAbsoluteOnHero ? "absolute" : "fixed",
+        isHero
+          ? "border-white/10 bg-primary text-white shadow-sm shadow-black/10"
+          : "border-slate-100 bg-white text-slate-900"
+      )}
+    >
+      <header className="container-cartivo flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Right — Logo */}
         <Link
           href={ROUTES.home}
-          className="flex items-center gap-2 text-slate-800"
+          className={cn(
+            "flex items-center gap-2",
+            isHero ? "text-white" : "text-slate-800"
+          )}
           aria-label={`${siteConfig.name} — خانه`}
         >
-          <span className="text-xl font-extrabold tracking-tight text-[#14305A] lg:text-2xl">
+          <span
+            className={cn(
+              "text-xl font-extrabold tracking-tight lg:text-2xl",
+              isHero ? "text-white" : "text-[#14305A]"
+            )}
+          >
             {siteConfig.name}
           </span>
-          <span className="hidden text-[10px] font-medium tracking-wide text-slate-500 sm:inline">
+          <span
+            className={cn(
+              "hidden text-[10px] font-medium tracking-wide sm:inline",
+              isHero ? "text-white/65" : "text-slate-500"
+            )}
+          >
             {siteConfig.nameEn}
           </span>
         </Link>
@@ -51,14 +80,23 @@ export function SiteHeader() {
                     href={item.href}
                     className={cn(
                       "relative inline-flex items-center gap-1 px-4 py-2 text-sm font-medium transition-all",
-                      isActive
-                        ? "text-[#14305A]"
-                        : "text-slate-600 hover:text-slate-900"
+                      isHero
+                        ? isActive
+                          ? "text-white"
+                          : "text-white/75 hover:text-white"
+                        : isActive
+                          ? "text-[#14305A]"
+                          : "text-slate-600 hover:text-slate-900"
                     )}
                   >
                     {item.label}
                     {isActive && (
-                      <span className="absolute inset-x-2 -bottom-3 h-0.5 rounded-full bg-[#14305A]" />
+                      <span
+                        className={cn(
+                          "absolute inset-x-2 -bottom-3 h-0.5 rounded-full",
+                          isHero ? "bg-white" : "bg-[#14305A]"
+                        )}
+                      />
                     )}
                   </Link>
                 </li>
@@ -69,18 +107,36 @@ export function SiteHeader() {
 
         {/* Left — Actions */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="جست‌وجو">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="جست‌وجو"
+            className={cn(isHero && "text-white hover:bg-white/10 hover:text-white")}
+          >
             <Search className="h-5 w-5" />
           </Button>
 
-          <Button variant="ghost" size="icon" aria-label="سبد خرید" className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="سبد خرید"
+            className={cn(
+              "relative",
+              isHero && "text-white hover:bg-white/10 hover:text-white"
+            )}
+          >
             <ShoppingCart className="h-5 w-5" />
             <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
               0
             </span>
           </Button>
 
-          <Button variant="ghost" size="icon" aria-label="پنل کاربری">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="پنل کاربری"
+            className={cn(isHero && "text-white hover:bg-white/10 hover:text-white")}
+          >
             <User className="h-5 w-5" />
           </Button>
 
@@ -90,7 +146,10 @@ export function SiteHeader() {
             size="icon"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
-            className="lg:hidden"
+            className={cn(
+              "lg:hidden",
+              isHero && "text-white hover:bg-white/10 hover:text-white"
+            )}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -101,7 +160,10 @@ export function SiteHeader() {
       {mobileOpen && (
         <nav
           aria-label="ناوبری موبایل"
-          className="border-t border-slate-100 bg-white lg:hidden"
+          className={cn(
+            "border-t lg:hidden",
+            isHero ? "border-white/10 bg-primary" : "border-slate-100 bg-white"
+          )}
         >
           <ul className="space-y-1 p-3">
             {navItems.map((item) => {
@@ -113,9 +175,13 @@ export function SiteHeader() {
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       "block rounded-md px-4 py-3 text-sm font-medium transition-all",
-                      isActive
-                        ? "border-b-2 border-[#14305A] text-[#14305A]"
-                        : "text-slate-600 hover:bg-slate-900/5 hover:text-slate-900"
+                      isHero
+                        ? isActive
+                          ? "border-b-2 border-white text-white"
+                          : "text-white/75 hover:bg-white/10 hover:text-white"
+                        : isActive
+                          ? "border-b-2 border-[#14305A] text-[#14305A]"
+                          : "text-slate-600 hover:bg-slate-900/5 hover:text-slate-900"
                     )}
                   >
                     {item.label}
