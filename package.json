@@ -25,7 +25,8 @@
     "react-hook-form": "^7.81.0",
     "react-redux": "^9.3.0",
     "shadcn": "^4.13.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",

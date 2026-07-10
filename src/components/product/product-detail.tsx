@@ -1,24 +1,22 @@
 import Link from "next/link";
-import { BadgeCheck, Check, ChevronLeft, Headphones, RotateCcw, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
+import { BadgeCheck, Car, Check, ChevronLeft, Headphones, MapPin, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { ProductGallery } from "./product-gallery";
-import { Button } from "@/components/ui/button";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 
-type RichPart = PartFrontofficeResponse & {
-  description?: string;
-  imageUrls?: string[];
-  brandName?: string;
-  manufacturer?: string;
-  sku?: string;
-  partNumber?: string;
+const POSITION_LABEL: Record<string, string> = {
+  INTERIOR: "داخلی",
+  EXTERIOR: "بیرونی",
 };
 
-export function ProductDetail({ part }: { part: RichPart }) {
+export function ProductDetail({ part }: { part: PartFrontofficeResponse }) {
   const name = part.name || "قطعه خودرو";
   const images = part.imageUrls?.filter(Boolean) || [];
-  const brand = part.brandName || part.manufacturer;
+  const brand = part.partBrand?.persianName || part.partBrand?.englishName;
+  const positionLabel = part.position ? POSITION_LABEL[part.position] : null;
+  const compatibleCars = part.cars?.filter(Boolean) || [];
   const productUrl = ROUTES.partDetail(String(part.id));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -26,7 +24,6 @@ export function ProductDetail({ part }: { part: RichPart }) {
     name,
     ...(part.description ? { description: part.description } : {}),
     ...(images.length ? { image: images } : {}),
-    ...(part.sku || part.partNumber ? { sku: part.sku || part.partNumber } : {}),
     ...(brand ? { brand: { "@type": "Brand", name: brand } } : {}),
     ...(part.price != null ? { offers: { "@type": "Offer", url: productUrl, priceCurrency: "IRR", price: part.price, availability: "https://schema.org/InStock", itemCondition: "https://schema.org/NewCondition" } } : {}),
   };
@@ -55,9 +52,27 @@ export function ProductDetail({ part }: { part: RichPart }) {
 
                 <h2 className="text-sm font-extrabold text-slate-800">ویژگی‌های محصول</h2>
                 <ul className="mt-3 space-y-3 text-sm text-slate-600">
-                  <li className="flex items-center gap-2"><Check className="size-4 text-emerald-500" /> مناسب استفاده در خودرو</li>
+                  {part.position && (
+                    <li className="flex items-center gap-2">
+                      <MapPin className="size-4 text-emerald-500" />
+                      {part.position === "INTERIOR" ? "داخل خودرو" : "خارج خودرو"}
+                    </li>
+                  )}
+                  {part.leaf != null && (
+                    <li className="flex items-center gap-2">
+                      <Check className="size-4 text-emerald-500" />
+                      {part.leaf ? "قطعه نهایی (قابل سفارش)" : "دسته‌بندی"}
+                    </li>
+                  )}
                   <li className="flex items-center gap-2"><Check className="size-4 text-emerald-500" /> کنترل کیفیت و سلامت فیزیکی</li>
-                  {part.partNumber && <li className="flex items-center gap-2"><Check className="size-4 text-emerald-500" /> شماره فنی: <span dir="ltr">{part.partNumber}</span></li>}
+                  {compatibleCars.length > 0 && (
+                    <li className="flex items-start gap-2">
+                      <Car className="mt-0.5 size-4 shrink-0 text-emerald-500" />
+                      <span>
+                        سازگار با: {compatibleCars.map(c => [c.brand?.persianName || c.brand?.englishName, c.model, c.trimLevel].filter(Boolean).join(" ")).join("، ")}
+                      </span>
+                    </li>
+                  )}
                 </ul>
 
                 <div className="mt-auto pt-8">
@@ -66,7 +81,11 @@ export function ProductDetail({ part }: { part: RichPart }) {
                       <span className="text-sm text-slate-500">قیمت محصول</span>
                       {part.price != null ? <p className="text-2xl font-black text-[#14305A]">{part.price.toLocaleString("fa-IR")} <span className="text-xs font-medium text-slate-400">ریال</span></p> : <p className="font-bold text-slate-600">تماس بگیرید</p>}
                     </div>
-                    <Button type="button" size="lg" disabled={part.price == null} className="mt-5 h-12 w-full rounded-xl text-base shadow-lg shadow-blue-950/15"><ShoppingCart className="size-5" /> افزودن به سبد خرید</Button>
+                    {part.id != null && part.price != null ? (
+                      <AddToCartButton partId={part.id} name={name} price={part.price} {...(images[0] ? { imageUrl: images[0] } : {})} />
+                    ) : (
+                      <p className="mt-5 text-center text-xs text-slate-400">این محصول در حال حاضر قابل سفارش نیست.</p>
+                    )}
                   </div>
                   <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] text-slate-500 sm:text-xs">
                     <div className="flex flex-col items-center gap-2"><Truck className="size-5 text-orange-500" /> ارسال سریع</div>
@@ -86,7 +105,13 @@ export function ProductDetail({ part }: { part: RichPart }) {
                 <Spec label="نام محصول" value={name} />
                 <Spec label="شناسه محصول" value={part.id?.toLocaleString("fa-IR") || "—"} />
                 {brand && <Spec label="برند سازنده" value={brand} />}
-                {(part.sku || part.partNumber) && <Spec label="کد فنی" value={part.sku || part.partNumber || ""} ltr />}
+                {part.partBrand?.englishName && part.partBrand?.persianName && part.partBrand.englishName !== part.partBrand.persianName && (
+                  <Spec label="Brand" value={part.partBrand.englishName} ltr />
+                )}
+                {positionLabel && <Spec label="موقعیت" value={positionLabel} />}
+                {compatibleCars.length > 0 && (
+                  <Spec label="خودروهای سازگار" value={compatibleCars.map(c => [c.brand?.persianName || c.brand?.englishName, c.model, c.trimLevel].filter(Boolean).join(" ")).join("، ")} />
+                )}
               </dl>
             </article>
             <aside className="h-fit rounded-[1.75rem] bg-[#14305A] p-6 text-white">

@@ -7,10 +7,11 @@ import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Search, User, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { getAccessToken } from "@/lib/api/auth-token";
+import { CartDropdown } from "@/components/cart/cart-dropdown";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
@@ -38,6 +39,17 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
     syncAuthentication();
     window.addEventListener("cartivo-auth-change", syncAuthentication);
     return () => window.removeEventListener("cartivo-auth-change", syncAuthentication);
+  }, []);
+
+  useEffect(() => {
+    const openAccount = () => setAccountOpen(true);
+    const closeAccount = () => setAccountOpen(false);
+    window.addEventListener("cartivo-open-auth", openAccount);
+    window.addEventListener("cartivo-close-auth", closeAccount);
+    return () => {
+      window.removeEventListener("cartivo-open-auth", openAccount);
+      window.removeEventListener("cartivo-close-auth", closeAccount);
+    };
   }, []);
 
   return (
@@ -128,20 +140,7 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
             <Search className="h-5 w-5" />
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="سبد خرید"
-            className={cn(
-              "relative",
-              isHero && "text-white hover:bg-white/10 hover:text-white"
-            )}
-          >
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              0
-            </span>
-          </Button>
+          <CartDropdown onHero={isHero} />
 
           <Button
             variant="ghost"

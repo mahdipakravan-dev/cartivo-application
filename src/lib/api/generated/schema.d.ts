@@ -25,6 +25,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/customer-addresses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update one of my delivery addresses */
+        put: operations["update"];
+        post?: never;
+        /** Delete one of my delivery addresses */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/reviews": {
         parameters: {
             query?: never;
@@ -86,6 +104,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/customer-addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List my delivery addresses */
+        get: operations["list"];
+        put?: never;
+        /** Create a delivery address */
+        post: operations["create_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/auth/verify-otp": {
         parameters: {
             query?: never;
@@ -140,6 +176,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active payment methods */
+        get: operations["list_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/payment-methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single active payment method by id */
+        get: operations["getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/parts/{parentPartId}/children": {
         parameters: {
             query?: never;
@@ -165,7 +235,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a single part with its computed price */
-        get: operations["getById"];
+        get: operations["getById_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -219,7 +289,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get an order detail (must belong to the authenticated customer) */
-        get: operations["getById_1"];
+        get: operations["getById_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -253,7 +323,7 @@ export interface paths {
             cookie?: never;
         };
         /** List active cars with pagination and filters */
-        get: operations["list"];
+        get: operations["list_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -270,7 +340,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a car detail by id */
-        get: operations["getById_2"];
+        get: operations["getById_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -324,7 +394,44 @@ export interface paths {
             cookie?: never;
         };
         /** List active part brands with pagination and filters */
-        get: operations["list_1"];
+        get: operations["list_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/brand-parts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single active part brand by id */
+        get: operations["getById_4"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/brand-parts/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search active part brands filtered by car compatibility
+         * @description Returns part brands that have at least one active part compatible with the given car. Optionally narrow by part-brand id.
+         */
+        get: operations["search_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -409,6 +516,36 @@ export interface components {
             field?: string;
             message?: string;
         };
+        /** @description Customer delivery address payload */
+        CustomerAddressRequest: {
+            /** @example تهران */
+            city: string;
+            /** @example تهران */
+            county: string;
+            /** @example خیابان ولیعصر، کوچه بهار */
+            fullAddress: string;
+            /** @example ۱۲ */
+            plaque: string;
+            /** @example +989121234567 */
+            recipientPhoneNumber: string;
+            /** @example قبل از تحویل تماس بگیرید */
+            description?: string;
+        };
+        /** @description A delivery address owned by the authenticated customer */
+        CustomerAddressResponse: {
+            /** Format: int64 */
+            id?: number;
+            city?: string;
+            county?: string;
+            fullAddress?: string;
+            plaque?: string;
+            recipientPhoneNumber?: string;
+            description?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
         /** @description Payload submitted by a customer to leave a review on a car */
         ReviewFrontofficeRequest: {
             /**
@@ -480,6 +617,18 @@ export interface components {
         };
         /** @description Payload submitted by a customer to place an order */
         OrderFrontofficeRequest: {
+            /**
+             * Format: int64
+             * @description ID of an address owned by the authenticated customer
+             * @example 1
+             */
+            addressId: number;
+            /**
+             * Format: int64
+             * @description ID of the chosen payment method
+             * @example 1
+             */
+            paymentMethodId: number;
             items: components["schemas"]["OrderItemFrontofficeRequest"][];
         };
         OrderItemFrontofficeRequest: {
@@ -508,6 +657,8 @@ export interface components {
             status?: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
             /** @example 2500000 */
             totalAmountRial?: number;
+            address?: components["schemas"]["CustomerAddressResponse"];
+            paymentMethod?: components["schemas"]["PaymentMethodInfo"];
             items?: components["schemas"]["OrderItemFrontofficeResponse"][];
             /** Format: date-time */
             createdAt?: string;
@@ -530,6 +681,15 @@ export interface components {
             unitPriceRial?: number;
             /** @example 2500000 */
             lineTotalRial?: number;
+        };
+        /** @description Minimal payment method info on the order */
+        PaymentMethodInfo: {
+            /** Format: int64 */
+            id?: number;
+            englishName?: string;
+            persianName?: string;
+            slug?: string;
+            iconUrl?: string;
         };
         /** @description Verify an OTP code and log in / register the customer */
         OtpVerifyRequest: {
@@ -591,13 +751,61 @@ export interface components {
             /** @description Whether a previous page exists */
             hasPrevious?: boolean;
         };
+        /** @description Payment method representation returned to the customer-facing site/app */
+        PaymentMethodFrontofficeResponse: {
+            /** Format: int64 */
+            id?: number;
+            englishName?: string;
+            persianName?: string;
+            slug?: string;
+            iconUrl?: string;
+            imageUrls?: string[];
+        };
+        /** @description Car brand info */
+        CarBrandResponse: {
+            /** Format: int64 */
+            id?: number;
+            englishName?: string;
+            persianName?: string;
+            slug?: string;
+            iconUrl?: string;
+            countryCode?: string;
+        };
+        /** @description Compatible car info */
+        CarResponse: {
+            /** Format: int64 */
+            id?: number;
+            model?: string;
+            trimLevel?: string;
+            /** @enum {string} */
+            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
+            slug?: string;
+            brand?: components["schemas"]["CarBrandResponse"];
+            imageUrls?: string[];
+        };
+        /** @description Part manufacturer/brand info */
+        PartBrandResponse: {
+            /** Format: int64 */
+            id?: number;
+            englishName?: string;
+            persianName?: string;
+            slug?: string;
+            iconUrl?: string;
+            countryCode?: string;
+        };
         /** @description Part representation returned to the customer-facing site/app */
         PartFrontofficeResponse: {
             /** Format: int64 */
             id?: number;
             name?: string;
+            description?: string;
             leaf?: boolean;
+            /** @enum {string} */
+            position?: "INTERIOR" | "EXTERIOR";
             price?: number;
+            partBrand?: components["schemas"]["PartBrandResponse"];
+            cars?: components["schemas"]["CarResponse"][];
+            imageUrls?: string[];
         };
         /** @description Single car detail returned to the customer-facing site/app */
         CarFrontofficeDetailResponse: {
@@ -630,6 +838,30 @@ export interface components {
             countryCode?: string;
             /** Format: int32 */
             carCount?: number;
+        };
+        /** @description Part brand (manufacturer) representation returned to the customer-facing site/app - public fields only */
+        PartBrandFrontofficeResponse: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            id?: number;
+            /** @example Bosch */
+            englishName?: string;
+            /** @example بوش */
+            persianName?: string;
+            /** @example bosch */
+            slug?: string;
+            /** @example http://localhost:8080/files/uploads/bosch.jpg */
+            iconUrl?: string;
+            /** @example DE */
+            countryCode?: string;
+            /**
+             * Format: int32
+             * @description Number of active parts manufactured by this brand
+             * @example 12
+             */
+            partCount?: number;
         };
     };
     responses: never;
@@ -712,6 +944,52 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerAddressRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddressResponse"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -907,6 +1185,54 @@ export interface operations {
             };
         };
     };
+    list: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddressResponse"][];
+                };
+            };
+        };
+    };
+    create_3: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerAddressRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddressResponse"];
+                };
+            };
+        };
+    };
     verifyOtp: {
         parameters: {
             query?: never;
@@ -1029,6 +1355,82 @@ export interface operations {
             };
         };
     };
+    list_1: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of active payment methods */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
+    getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Payment method ID
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment method found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethodFrontofficeResponse"];
+                };
+            };
+            /** @description Payment method not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     listChildren: {
         parameters: {
             query?: {
@@ -1099,7 +1501,7 @@ export interface operations {
             };
         };
     };
-    getById: {
+    getById_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1284,7 +1686,7 @@ export interface operations {
             };
         };
     };
-    getById_1: {
+    getById_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1397,7 +1799,7 @@ export interface operations {
             };
         };
     };
-    list: {
+    list_2: {
         parameters: {
             query?: {
                 /**
@@ -1463,7 +1865,7 @@ export interface operations {
             };
         };
     };
-    getById_2: {
+    getById_3: {
         parameters: {
             query?: {
                 /**
@@ -1608,7 +2010,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_3: {
         parameters: {
             query?: {
                 /**
@@ -1631,6 +2033,11 @@ export interface operations {
                  * @example DE
                  */
                 countryCode?: string;
+                /**
+                 * @description Filter by car ID - only return brands that have parts compatible with this car
+                 * @example 1
+                 */
+                carId?: number;
                 /**
                  * @description Page number, zero-based
                  * @example 0
@@ -1659,6 +2066,107 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Page of active part brands */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
+    getById_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Part brand ID
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Part brand found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartBrandFrontofficeResponse"];
+                };
+            };
+            /** @description Part brand not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    search_1: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Filter by english name (case-insensitive partial match)
+                 * @example Bosch
+                 */
+                englishName?: string;
+                /**
+                 * @description Filter by persian name (case-insensitive partial match)
+                 * @example بوش
+                 */
+                persianName?: string;
+                /**
+                 * @description Filter by slug (case-insensitive partial match)
+                 * @example bosch
+                 */
+                slug?: string;
+                /**
+                 * @description Filter by ISO country code (exact match)
+                 * @example DE
+                 */
+                countryCode?: string;
+                /**
+                 * @description Filter by car ID - only return brands that have parts compatible with this car
+                 * @example 1
+                 */
+                carId?: number;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of matching part brands */
             200: {
                 headers: {
                     [name: string]: unknown;
