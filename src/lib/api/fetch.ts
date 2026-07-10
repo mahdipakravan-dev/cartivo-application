@@ -1,4 +1,5 @@
 import { CLIENT_BASE_URL, DEFAULT_HEADERS } from "./config";
+import { getAccessToken } from "./auth-token";
 
 /**
  * Type-safe fetch wrapper for CSR (Client Components).
@@ -34,24 +35,22 @@ export async function apiFetch<T>(
   const { params, ...init } = options;
 
   const url = buildUrl(path, params);
+  const accessToken = getAccessToken();
 
   const response = await fetch(url, {
     ...init,
     headers: {
       ...DEFAULT_HEADERS,
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...init.headers,
     },
   });
 
-
-  console.log("OUTBOUND REQUEST ", {
-    url,
-    params,
-    response
-  })
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    const body = await response.json().catch(() => null) as { message?: string } | null;
+    throw new Error(body?.message || `خطا در ارتباط با سرور (${response.status})`);
   }
 
-  return response.json();
+  if (response.status === 204) return undefined as T;
+  return response.json() as Promise<T>;
 }

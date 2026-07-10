@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useEffect } from "react";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { AccountDialog } from "@/components/auth/account-dialog";
+import { getAccessToken } from "@/lib/api/auth-token";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
@@ -24,9 +27,18 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
   const pathname = usePathname();
   const isHero = variant === "hero" || variant === "abslute-on-header";
   const isAbsoluteOnHero = variant === "abslute-on-header";
+
+  useEffect(() => {
+    const syncAuthentication = () => setAuthenticated(Boolean(getAccessToken()));
+    syncAuthentication();
+    window.addEventListener("cartivo-auth-change", syncAuthentication);
+    return () => window.removeEventListener("cartivo-auth-change", syncAuthentication);
+  }, []);
 
   return (
     <div
@@ -135,9 +147,12 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
             variant="ghost"
             size="icon"
             aria-label="پنل کاربری"
-            className={cn(isHero && "text-white hover:bg-white/10 hover:text-white")}
+            aria-expanded={accountOpen}
+            onClick={() => setAccountOpen(true)}
+            className={cn("relative", isHero && "text-white hover:bg-white/10 hover:text-white")}
           >
             <User className="h-5 w-5" />
+            {authenticated && <span className="absolute bottom-0.5 right-0.5 size-2 rounded-full border border-white bg-emerald-500" />}
           </Button>
 
           {/* Mobile Toggle */}
@@ -192,6 +207,7 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
           </ul>
         </nav>
       )}
+      <AccountDialog open={accountOpen} onOpenChange={setAccountOpen} onAuthenticationChange={setAuthenticated} />
     </div>
   );
 }
