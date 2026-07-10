@@ -9,6 +9,7 @@ export const ROUTES = {
 
   // Parts hierarchy
   parts: "/parts",
+  partDetail: (partId: string) => `/parts/${partId}`,
   partsBrand: (brandSlug: string) => `/parts/${brandSlug}`,
   partsCar: (brandSlug: string, carSlug: string) => `/parts/${brandSlug}/${carSlug}`,
   partsPart: (brandSlug: string, carSlug: string, partId: string) =>

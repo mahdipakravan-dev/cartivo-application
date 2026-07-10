@@ -2,7 +2,7 @@
 
 import { FilterSidebar } from "./filter-sidebar";
 import { MobileFilterToggle } from "./mobile-filter";
-import { ProductCard } from "./product-card";
+import { ProductCard } from "@/components/product-card";
 import { Pagination } from "./pagination";
 import type { PartSearchParams } from "@/lib/api/parts";
 import type { PartFrontofficeResponse, CarFrontofficeDetailResponse } from "@/lib/api/types";
@@ -16,14 +16,14 @@ interface SearchResultsProps {
     totalElements: number;
     totalPages: number;
   };
-  brandSlug: string;
+  /** Kept for compatibility with brand-filtered result pages. */
+  brandSlug?: string;
 }
 
 export function SearchResults({
   initialParams,
   cars,
   results,
-  brandSlug,
 }: SearchResultsProps) {
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
@@ -57,7 +57,7 @@ export function SearchResults({
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {results.items.map((part) => (
-              <ProductCard key={part.id} part={part} brandSlug={brandSlug} />
+              <ProductCard key={part.id} part={part} />
             ))}
           </div>
         )}

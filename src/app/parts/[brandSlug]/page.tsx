@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getBrandBySlug, getCarsByBrand } from "@/lib/api/brands";
-import { searchParts } from "@/lib/api/parts";
+import { getPartById, searchParts } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { parseSearchParams } from "@/lib/search-params";
@@ -12,6 +12,9 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { SectionHeader } from "@/components/ui/section-header";
 import { SearchResults } from "@/components/sections/product-search/search-results";
 import type { CarFrontofficeDetailResponse } from "@/lib/api/types";
+import { ProductDetail } from "@/components/product/product-detail";
+
+const isPartId = (value: string) => /^\d+$/.test(value);
 
 export async function generateMetadata({
   params,
@@ -19,6 +22,25 @@ export async function generateMetadata({
   params: Promise<{ brandSlug: string }>;
 }): Promise<Metadata> {
   const { brandSlug } = await params;
+  if (isPartId(brandSlug)) {
+    const part = await getPartById(brandSlug);
+    if (!part) return { title: "قطعه یافت نشد" };
+    const title = `${part.name || "قطعه خودرو"} — خرید و قیمت`;
+    const description = `مشاهده مشخصات و قیمت ${part.name || "قطعه خودرو"}، تضمین اصالت و ارسال سریع از کارتیوو.`;
+    return {
+      title,
+      description,
+      alternates: { canonical: ROUTES.partDetail(brandSlug) },
+      openGraph: {
+        title: `${title} | ${siteConfig.name}`,
+        description,
+        url: ROUTES.partDetail(brandSlug),
+        type: "website",
+      },
+      twitter: { card: "summary_large_image", title, description },
+      robots: { index: true, follow: true },
+    };
+  }
   const brand = await getBrandBySlug(brandSlug);
   if (!brand) return { title: "برند یافت نشد" };
 
@@ -85,6 +107,11 @@ export default async function PartsBrandPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { brandSlug } = await params;
+  if (isPartId(brandSlug)) {
+    const part = await getPartById(brandSlug);
+    if (!part) notFound();
+    return <ProductDetail part={part} />;
+  }
   const sp = await searchParams;
   const filters = parseSearchParams(sp);
 
@@ -212,7 +239,6 @@ export default async function PartsBrandPage({
               initialParams={filters}
               cars={cars}
               results={results}
-              brandSlug={brandSlug}
             />
           </Suspense>
         </div>
