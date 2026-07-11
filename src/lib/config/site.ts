@@ -12,6 +12,13 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://cartivo.ir",
   locale: "fa_IR",
   twitterHandle: "@cartivo",
+  contact: {
+    phone: "021-12345678",
+    phoneDisplay: "۰۲۱-۱۲۳۴۵۶۷۸",
+    email: "info@cartivo.ir",
+    address: "تهران، خیابان ولیعصر",
+    workingHours: "شنبه تا چهارشنبه، ۹ تا ۱۸",
+  },
 } as const;
 
 export type SiteConfig = typeof siteConfig;

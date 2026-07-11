@@ -104,7 +104,13 @@ export function AccountDialog({ open, onOpenChange, onAuthenticationChange }: Ac
       onAuthenticationChange(true);
       setProfile(null);
       onOpenChange(false);
-      router.push("/profile");
+      const postLoginAction = window.sessionStorage.getItem("cartivo_post_login_action");
+      if (postLoginAction === "part-request") {
+        window.sessionStorage.removeItem("cartivo_post_login_action");
+        window.dispatchEvent(new Event("cartivo-open-part-request"));
+      } else {
+        router.push("/profile");
+      }
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "کد واردشده معتبر نیست.");
     }

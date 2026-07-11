@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, ChevronLeft, CircleUserRound,
-  LoaderCircle, LogOut, Mail, MapPin, Package, Phone, ReceiptText, Save, ShoppingBag,
+  ClipboardList, LoaderCircle, LogOut, Mail, MapPin, Package, Phone, ReceiptText, Save, ShoppingBag,
   UserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +13,12 @@ import { Input } from "@/components/ui/input";
 import { getProfile, updateProfile, type CustomerProfile, type ProfileUpdate } from "@/lib/api/auth";
 import { clearAccessToken, getAccessToken } from "@/lib/api/auth-token";
 import { getMyOrders, getOrder, type Order } from "@/lib/api/orders";
+import { getPartRequests, type PartRequest } from "@/lib/api/part-requests";
 import type { PageResponse } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
-type Tab = "profile" | "orders";
+type Tab = "profile" | "orders" | "requests";
 type ProfileForm = { firstName: string; lastName: string; email: string; nationalCode: string };
 
 const STATUS: Record<string, { label: string; className: string }> = {
@@ -28,10 +29,18 @@ const STATUS: Record<string, { label: string; className: string }> = {
   CANCELLED: { label: "لغو شده", className: "bg-red-50 text-red-700" },
 };
 
+const REQUEST_STATUS: Record<string, { label: string; className: string }> = {
+  NEW: { label: "ثبت‌شده", className: "bg-blue-50 text-blue-700" },
+  IN_PROGRESS: { label: "در حال بررسی", className: "bg-amber-50 text-amber-700" },
+  RESOLVED: { label: "پاسخ داده‌شده", className: "bg-emerald-50 text-emerald-700" },
+  REJECTED: { label: "امکان تأمین ندارد", className: "bg-red-50 text-red-700" },
+};
+
 export function ProfileDashboard() {
   const [tab, setTab] = useState<Tab>("profile");
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [partRequests, setPartRequests] = useState<PartRequest[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingOrder, setLoadingOrder] = useState(false);
@@ -44,10 +53,15 @@ export function ProfileDashboard() {
       setLoading(false);
       return;
     }
-    Promise.all([getProfile(), getMyOrders({ page: 0, size: 50 })])
-      .then(([customer, orderPage]) => {
+    getProfile()
+      .then(async (customer) => {
+        const [orderPage, requests] = await Promise.all([
+          getMyOrders({ page: 0, size: 50 }),
+          customer.id != null ? getPartRequests(customer.id) : Promise.resolve([]),
+        ]);
         setProfile(customer);
         setOrders((((orderPage as PageResponse).content ?? []) as Order[]));
+        setPartRequests(requests);
         form.reset({ firstName: customer.firstName || "", lastName: customer.lastName || "", email: customer.email || "", nationalCode: customer.nationalCode || "" });
       })
       .catch((reason) => {
@@ -107,7 +121,7 @@ export function ProfileDashboard() {
           <div className="absolute -right-20 -top-28 size-72 rounded-full bg-cyan-300/10 blur-3xl" />
           <div className="relative flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4"><div className="flex size-16 items-center justify-center rounded-2xl border border-white/15 bg-white/10"><CircleUserRound className="size-8 text-cyan-200" /></div><div><p className="text-xs font-bold text-cyan-200">حساب کاربری من</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">{displayName}</h1><p dir="ltr" className="mt-1 text-right text-xs text-white/45">{localPhone(profile?.phoneNumber)}</p></div></div>
-            <div className="flex gap-3"><Stat value={orders.length.toLocaleString("fa-IR")} label="سفارش" /><Stat value={profile?.email ? "کامل" : "ناقص"} label="وضعیت پروفایل" /></div>
+            <div className="flex flex-wrap gap-3"><Stat value={orders.length.toLocaleString("fa-IR")} label="سفارش" /><Stat value={partRequests.length.toLocaleString("fa-IR")} label="درخواست قطعه" /><Stat value={profile?.email ? "کامل" : "ناقص"} label="وضعیت پروفایل" /></div>
           </div>
         </section>
 
@@ -115,6 +129,7 @@ export function ProfileDashboard() {
           <aside className="h-fit rounded-[1.5rem] border border-slate-100 bg-white p-3 shadow-sm">
             <NavButton active={tab === "profile"} icon={UserRound} label="اطلاعات حساب" onClick={() => { setTab("profile"); setSelectedOrder(null); }} />
             <NavButton active={tab === "orders"} icon={ShoppingBag} label="سفارش‌های من" badge={orders.length} onClick={() => setTab("orders")} />
+            <NavButton active={tab === "requests"} icon={ClipboardList} label="درخواست‌های قطعه" badge={partRequests.length} onClick={() => { setTab("requests"); setSelectedOrder(null); }} />
             <div className="my-2 h-px bg-slate-100" />
             <button onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-500 transition hover:bg-red-50 hover:text-red-600"><LogOut className="size-4" /> خروج از حساب</button>
           </aside>
@@ -123,6 +138,8 @@ export function ProfileDashboard() {
             {error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
             {tab === "profile" ? (
               <ProfileFormView form={form} profile={profile} saved={saved} onSubmit={saveProfile} />
+            ) : tab === "requests" ? (
+              <PartRequestsList requests={partRequests} />
             ) : selectedOrder || loadingOrder ? (
               <OrderDetail order={selectedOrder} loading={loadingOrder} onBack={() => setSelectedOrder(null)} />
             ) : (
@@ -141,6 +158,10 @@ function ProfileFormView({ form, profile, saved, onSubmit }: { form: ReturnType<
 
 function OrdersList({ orders, onOpen }: { orders: Order[]; onOpen: (id?: number) => void }) {
   return <div><Header eyebrow="تاریخچه خرید" title="سفارش‌های من" subtitle="وضعیت سفارش‌ها و جزئیات هر خرید را اینجا دنبال کنید." />{orders.length === 0 ? <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-slate-200 py-16 text-center"><Package className="size-12 text-slate-200" /><p className="mt-4 text-sm font-bold text-slate-500">هنوز سفارشی ثبت نکرده‌اید</p><Link href={ROUTES.parts} className="mt-4 text-sm font-bold text-cyan-700">مشاهده قطعات</Link></div> : <div className="mt-7 space-y-3">{orders.map((order) => <OrderRow key={order.id} order={order} onOpen={() => onOpen(order.id)} />)}</div>}</div>;
+}
+
+function PartRequestsList({ requests }: { requests: PartRequest[] }) {
+  return <div><Header eyebrow="پیگیری درخواست‌ها" title="درخواست‌های قطعه" subtitle="نتیجه بررسی کارشناسان و وضعیت درخواست‌های خود را اینجا ببینید." />{requests.length === 0 ? <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-slate-200 py-16 text-center"><ClipboardList className="size-12 text-slate-200" /><p className="mt-4 text-sm font-bold text-slate-500">هنوز درخواست قطعه‌ای ثبت نکرده‌اید</p><Link href={ROUTES.home} className="mt-4 text-sm font-bold text-cyan-700">ثبت درخواست از صفحه اصلی</Link></div> : <div className="mt-7 space-y-3">{requests.map((request, index) => { const status = REQUEST_STATUS[request.status || ""] || { label: request.status || "نامشخص", className: "bg-slate-50 text-slate-600" }; return <article key={request.id ?? index} className="rounded-2xl border border-slate-100 p-4 sm:p-5"><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start"><div className="flex items-start gap-3"><span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-[#14305A]"><ClipboardList className="size-5" /></span><div><h3 className="text-sm font-black text-slate-800">{request.requestedPartName || "قطعه درخواستی"}</h3><p className="mt-1 flex items-center gap-1 text-[10px] text-slate-400"><CalendarDays className="size-3" />{formatDate(request.createdAt)}{request.id != null && ` • کد ${request.id.toLocaleString("fa-IR")}`}</p></div></div><span className={cn("w-fit rounded-full px-3 py-1.5 text-[10px] font-bold", status.className)}>{status.label}</span></div>{request.description && <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-500">{request.description}</p>}{request.adminResponse && <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3"><p className="text-[10px] font-bold text-emerald-700">پاسخ کارشناس</p><p className="mt-1 text-sm leading-7 text-emerald-900/70">{request.adminResponse}</p></div>}</article>; })}</div>}</div>;
 }
 
 function OrderRow({ order, onOpen }: { order: Order; onOpen: () => void }) {

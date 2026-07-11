@@ -16,9 +16,9 @@ import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
-  { label: "دسته‌بندی‌ها", href: "/categories" },
+  { label: "دسته‌بندی‌ها", href: ROUTES.categories },
   { label: "خدمات", href: "/services" },
-  { label: "تماس با ما", href: "/contact" },
+  { label: "تماس با ما", href: ROUTES.contact },
 ];
 
 type SiteHeaderVariant = "white" | "hero" | "abslute-on-header";

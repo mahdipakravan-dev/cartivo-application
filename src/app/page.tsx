@@ -5,6 +5,7 @@ import { Features } from "@/components/sections/features";
 import { Bestsellers } from "@/components/sections/bestsellers";
 import { PartBrandsSection } from "@/components/sections/part-brands";
 import { Articles } from "@/components/sections/articles";
+import { PartRequestCover } from "@/components/sections/part-request-cover";
 import { getBrands } from "@/lib/api/brands";
 import { CatalogHydrator } from "@/lib/store";
 
@@ -20,6 +21,7 @@ export default async function HomePage() {
       <Bestsellers />
       <Features />
       <PartBrandsSection />
+      <PartRequestCover />
       <Articles />
     </>
   );

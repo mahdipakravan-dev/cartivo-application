@@ -11,6 +11,8 @@ export const ROUTES = {
 
   // Parts hierarchy
   parts: "/parts",
+  categories: "/categories",
+  contact: "/contact",
   basket: "/basket",
   profile: "/profile",
   blogDetail: (slug: string) => `/blogs/${slug}`,
