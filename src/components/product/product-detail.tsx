@@ -5,18 +5,22 @@ import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { ProductGallery } from "./product-gallery";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { getRelatedBlogs } from "@/lib/api/content";
+import { ProductReviews } from "./product-reviews";
+import { ProductRelatedBlogs } from "./product-related-blogs";
 
 const POSITION_LABEL: Record<string, string> = {
   INTERIOR: "داخلی",
   EXTERIOR: "بیرونی",
 };
 
-export function ProductDetail({ part }: { part: PartFrontofficeResponse }) {
+export async function ProductDetail({ part }: { part: PartFrontofficeResponse }) {
   const name = part.name || "قطعه خودرو";
   const images = part.imageUrls?.filter(Boolean) || [];
   const brand = part.partBrand?.persianName || part.partBrand?.englishName;
   const positionLabel = part.position ? POSITION_LABEL[part.position] : null;
   const compatibleCars = part.cars?.filter(Boolean) || [];
+  const relatedBlogs = part.id != null ? await getRelatedBlogs(part.id, 3) : [];
   const productUrl = ROUTES.partDetail(String(part.id));
   const jsonLd = {
     "@context": "https://schema.org",
@@ -120,6 +124,8 @@ export function ProductDetail({ part }: { part: PartFrontofficeResponse }) {
               <p className="mt-3 text-sm leading-7 text-white/65">کارشناسان کارتیوو برای بررسی سازگاری قطعه با خودروی شما در کنارتان هستند.</p>
             </aside>
           </section>
+          <ProductReviews cars={compatibleCars} />
+          <ProductRelatedBlogs blogs={relatedBlogs} />
         </div>
       </main>
     </>

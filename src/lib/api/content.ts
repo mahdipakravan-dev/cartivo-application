@@ -1,6 +1,6 @@
 import { apiClient } from "./client";
 import { searchParts } from "./parts";
-import type { PageResponse, PartBrandFrontofficeResponse } from "./types";
+import type { BlogDetailResponse, PageResponse, PartBrandFrontofficeResponse } from "./types";
 
 export interface BlogPreview {
   id?: number;
@@ -58,6 +58,35 @@ export async function getLatestRelatedBlogs(size = 4): Promise<BlogPreview[]> {
       .filter((blog): blog is BlogPreview => blog !== null);
   } catch {
     return [];
+  }
+}
+
+export async function getRelatedBlogs(partId: number, size = 3): Promise<BlogPreview[]> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/blogs/related", {
+      params: { query: { partId, page: 0, size, sortBy: "createdAt", sortDir: "DESC" } },
+      cache: "no-store",
+    });
+    if (error || !data) return [];
+    return (((data as PageResponse).content ?? []) as Record<string, unknown>[])
+      .map(normalizeBlog)
+      .filter((blog): blog is BlogPreview => blog !== null);
+  } catch {
+    return [];
+  }
+}
+
+export async function getBlogDetail(slug: string): Promise<BlogDetailResponse | null> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/blogs/detail", {
+      params: { query: { slug } },
+      cache: "force-cache",
+      next: { tags: ["blogs", `blog:${slug}`] },
+    });
+    if (error || !data) return null;
+    return data;
+  } catch {
+    return null;
   }
 }
 

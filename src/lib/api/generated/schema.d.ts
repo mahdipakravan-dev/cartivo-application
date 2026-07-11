@@ -500,6 +500,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/blogs/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get full blog post detail by id or slug
+         * @description At least one of id or slug is required. Returns full content, images, and linked cars/parts.
+         */
+        get: operations["getBlogDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -902,6 +922,34 @@ export interface components {
              * @example 12
              */
             partCount?: number;
+        };
+        /** @description Full blog post detail returned to the customer-facing site/app */
+        BlogDetailResponse: {
+            /** Format: int64 */
+            id?: number;
+            title?: string;
+            slug?: string;
+            excerpt?: string;
+            content?: string;
+            coverImageUrl?: string;
+            imageUrls?: string[];
+            /** Format: date-time */
+            publishedAt?: string;
+            cars?: components["schemas"]["CarInfo"][];
+            parts?: components["schemas"]["PartInfo"][];
+        };
+        /** @description Minimal car info linked to the blog */
+        CarInfo: {
+            /** Format: int64 */
+            id?: number;
+            model?: string;
+            slug?: string;
+        };
+        /** @description Minimal part info linked to the blog */
+        PartInfo: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
         };
     };
     responses: never;
@@ -2350,6 +2398,49 @@ export interface operations {
             };
             /** @description Neither carId nor partId was provided */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getBlogDetail: {
+        parameters: {
+            query?: {
+                /** @description Blog ID */
+                id?: number;
+                /** @description Blog slug */
+                slug?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Blog post detail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlogDetailResponse"];
+                };
+            };
+            /** @description Neither id nor slug was provided */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Blog not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

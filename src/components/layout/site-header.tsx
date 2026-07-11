@@ -142,17 +142,27 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
 
           <CartDropdown onHero={isHero} />
 
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="پنل کاربری"
-            aria-expanded={accountOpen}
-            onClick={() => setAccountOpen(true)}
-            className={cn("relative", isHero && "text-white hover:bg-white/10 hover:text-white")}
-          >
-            <User className="h-5 w-5" />
-            {authenticated && <span className="absolute bottom-0.5 right-0.5 size-2 rounded-full border border-white bg-emerald-500" />}
-          </Button>
+          {authenticated ? (
+            <Link
+              href={ROUTES.profile}
+              aria-label="پنل کاربری"
+              className={cn("relative flex size-8 items-center justify-center rounded-lg transition-colors hover:bg-muted", isHero && "text-white hover:bg-white/10")}
+            >
+              <User className="h-5 w-5" />
+              <span className="absolute bottom-0.5 right-0.5 size-2 rounded-full border border-white bg-emerald-500" />
+            </Link>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="ورود به حساب کاربری"
+              aria-expanded={accountOpen}
+              onClick={() => setAccountOpen(true)}
+              className={cn("relative", isHero && "text-white hover:bg-white/10 hover:text-white")}
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          )}
 
           {/* Mobile Toggle */}
           <Button

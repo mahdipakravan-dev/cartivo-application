@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, type RegisterOptions, type UseFormReturn } from "react-hook-form";
 import { ArrowRight, CheckCircle2, LoaderCircle, LogOut, ShieldCheck, UserRound, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface AccountDialogProps {
 }
 
 export function AccountDialog({ open, onOpenChange, onAuthenticationChange }: AccountDialogProps) {
+  const router = useRouter();
   const [step, setStep] = useState<Step>(getAccessToken() ? "profile" : "phone");
   const [phone, setPhone] = useState("");
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
@@ -101,7 +103,8 @@ export function AccountDialog({ open, onOpenChange, onAuthenticationChange }: Ac
       setAccessToken(result.accessToken);
       onAuthenticationChange(true);
       setProfile(null);
-      setStep("profile");
+      onOpenChange(false);
+      router.push("/profile");
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : "کد واردشده معتبر نیست.");
     }

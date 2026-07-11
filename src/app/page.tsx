@@ -14,7 +14,7 @@ export default async function HomePage() {
   return (
     <>
       <CatalogHydrator brands={brands} />
-      <HomeHero variant="full-primary" brands={brands} />
+      <HomeHero variant="default" brands={brands} />
       <BrandsSection />
       <PositionTypeSection />
       <Bestsellers />

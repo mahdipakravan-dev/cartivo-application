@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowLeft, BookOpen, CalendarDays } from "lucide-react";
 import { getLatestRelatedBlogs, type BlogPreview } from "@/lib/api/content";
 import { SectionHeader } from "@/components/ui/section-header";
+import { ROUTES } from "@/lib/routes";
 
 function formatDate(value?: string) {
   if (!value) return "تازه منتشر شده";
@@ -43,7 +44,7 @@ function ArticleCard({ article, featured = false }: { article: BlogPreview; feat
   );
 
   const className = `group flex overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-[0_10px_35px_rgb(15_23_42/0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgb(15_48_90/0.1)] ${featured ? "flex-col md:grid md:grid-cols-[1.1fr_.9fr] lg:col-span-2" : "flex-col"}`;
-  return article.slug ? <a href={`/blogs/${article.slug}`} className={className}>{content}</a> : <article className={className}>{content}</article>;
+  return article.slug ? <a href={ROUTES.blogDetail(article.slug)} className={className}>{content}</a> : <article className={className}>{content}</article>;
 }
 
 export async function Articles() {
