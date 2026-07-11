@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         hostname: "cdn.cartivo.ir",
       },
       {
+        protocol: "https",
+        hostname: "media.base44.com",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
       },

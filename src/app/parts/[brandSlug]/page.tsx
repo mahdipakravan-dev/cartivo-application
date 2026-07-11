@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ArrowDownLeft, BadgeCheck, CarFront, ChevronLeft, Search, Wrench } from "lucide-react";
 import { getBrandBySlug, getCarsByBrand } from "@/lib/api/brands";
 import { getPartById, searchParts } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
@@ -61,38 +62,46 @@ export async function generateMetadata({
 function CarItem({
   car,
   brandSlug,
+  brandName,
 }: {
   car: CarFrontofficeDetailResponse;
   brandSlug: string;
+  brandName: string;
 }) {
   const primaryImage = car.imageUrls?.[0];
+  const carName = [brandName, car.model, car.trimLevel].filter(Boolean).join(" ");
 
   return (
     <Link
       href={ROUTES.partsCar(brandSlug, String(car.id))}
-      className="group/car flex shrink-0 flex-col items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      aria-label={`${car.brand} ${car.model} — مشاهده جزئیات`}
+      className="group/car overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/70 outline-none transition duration-300 hover:-translate-y-1 hover:border-slate-200 hover:bg-white hover:shadow-[0_18px_40px_rgb(15_23_42/0.08)] focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label={`${carName} — مشاهده قطعات سازگار`}
     >
-      <div className="relative flex h-26 w-26 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm shadow-slate-100/50 transition-all duration-300 group-hover/car:-translate-y-1 group-hover/car:border-slate-200 group-hover/car:shadow-lg group-hover/car:shadow-slate-200/60">
+      <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,#fff_0%,#f1f5f9_75%)] p-4 sm:p-5">
         {primaryImage ? (
           <Image
             src={primaryImage}
-            alt={`${car.brand} ${car.model}`}
-            width={80}
-            height={80}
-            className="object-cover transition-transform duration-300 group-hover/car:scale-110"
+            alt={carName}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            className="object-contain p-4 transition-transform duration-500 group-hover/car:scale-105 sm:p-5"
             loading="lazy"
           />
         ) : (
-          <span className="text-lg font-bold text-slate-300 transition-colors group-hover/car:text-slate-500">
-            {car.model?.slice(0, 3)}
-          </span>
+          <CarFront className="size-14 text-slate-200 transition-colors group-hover/car:text-cyan-600/30" />
         )}
+        <span className="absolute right-3 top-3 rounded-lg border border-white/80 bg-white/80 px-2 py-1 text-[9px] font-bold text-slate-500 shadow-sm backdrop-blur-sm">
+          {brandName}
+        </span>
       </div>
 
-      <div className="max-w-[8rem] text-center">
-        <span className="block truncate text-xs font-medium text-slate-500 transition-colors group-hover/car:text-slate-800">
-          {car.model}
+      <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-white px-4 py-3.5">
+        <div className="min-w-0">
+          <h3 className="truncate text-sm font-extrabold text-slate-800">{car.model || "مدل خودرو"}</h3>
+          <p className="mt-0.5 truncate text-[10px] text-slate-400">{car.trimLevel || "مشاهده قطعات سازگار"}</p>
+        </div>
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition group-hover/car:bg-[#14305A] group-hover/car:text-white">
+          <ChevronLeft className="size-4" />
         </span>
       </div>
     </Link>
@@ -139,93 +148,147 @@ export default async function PartsBrandPage({
     <>
       <JsonLd data={brandJsonLd} />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        {/* <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-blue-500/10 blur-[100px]" />
-        <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-indigo-500/10 blur-[100px]" /> */}
-
-        <div className="relative container-cartivo px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-          <nav aria-label="مسیر ناوبری" className="mb-8 text-sm text-white/40">
+      <main className="bg-[#f8fafc] pb-20 pt-24 sm:pt-28">
+        <div className="container-cartivo px-4 sm:px-6 lg:px-8">
+          <nav aria-label="مسیر ناوبری" className="mb-6 text-xs text-slate-400">
             <ol className="flex items-center gap-2">
               <li>
-                <Link href={ROUTES.home} className="transition-colors hover:text-white/70">
+                <Link href={ROUTES.home} className="transition-colors hover:text-[#14305A]">
                   خانه
                 </Link>
               </li>
-              <li aria-hidden="true">/</li>
+              <li aria-hidden="true"><ChevronLeft className="size-3" /></li>
               <li>
-                <Link href={ROUTES.parts} className="transition-colors hover:text-white/70">
-                  قطعات
+                <Link href={ROUTES.brands} className="transition-colors hover:text-[#14305A]">
+                  برندهای خودرو
                 </Link>
               </li>
-              <li aria-hidden="true">/</li>
-              <li aria-current="page" className="font-medium text-white">
+              <li aria-hidden="true"><ChevronLeft className="size-3" /></li>
+              <li aria-current="page" className="font-bold text-slate-600">
                 {brand.persianName}
               </li>
             </ol>
           </nav>
 
-          <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
-            <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-[2rem] border border-white/10 bg-white/10 shadow-xl shadow-black/10 backdrop-blur-sm sm:h-36 sm:w-36">
-              {brand.iconUrl ? (
-                <Image
-                  src={brand.iconUrl}
-                  alt={`لوگوی ${brand.persianName}`}
-                  width={120}
-                  height={120}
-                  className="h-20 w-20 object-contain sm:h-24 sm:w-24"
-                />
-              ) : (
-                <span className="text-3xl font-bold text-white/30">
-                  {brand.englishName?.slice(0, 3)}
-                </span>
-              )}
-            </div>
+          <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
+            <div className="pointer-events-none absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-36 left-1/3 size-80 rounded-full bg-blue-400/10 blur-3xl" />
 
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                {brand.persianName}
-              </h1>
-              <p className="mt-2 text-lg text-white/50">{brand.englishName}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+            <div className="grid min-h-[400px] lg:grid-cols-[1.08fr_.92fr]">
+              <div className="relative z-10 flex items-center px-6 py-12 sm:px-10 lg:px-14 lg:py-16">
+                <div className="max-w-xl">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-cyan-100 backdrop-blur-sm">
+                    <BadgeCheck className="size-4" />
+                    انتخاب دقیق بر اساس خودرو
+                  </div>
+                  <h1 className="mt-6 text-3xl font-black leading-[1.35] text-white sm:text-4xl lg:text-5xl">
+                    قطعات یدکی
+                    <span className="block text-cyan-300">{brand.persianName}</span>
+                  </h1>
+                  <p dir="ltr" className="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white/35">
+                    {brand.englishName}
+                  </p>
+                  <p className="mt-5 max-w-lg text-sm leading-7 text-white/65 sm:text-base sm:leading-8">
+                    مدل خودروی {brand.persianName} خود را انتخاب کنید تا قطعات سازگار را بدون جست‌وجوی اضافه و با اطمینان بیشتری پیدا کنید.
+                  </p>
+
+                  <div className="mt-8 flex flex-wrap gap-3">
+                    {cars.length > 0 && (
+                      <a href="#brand-cars" className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-5 text-sm font-extrabold text-[#14305A] shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-cyan-50">
+                        <CarFront className="size-4" />
+                        انتخاب مدل خودرو
+                        <ArrowDownLeft className="size-4" />
+                      </a>
+                    )}
+                    <a href="#brand-parts" className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/15">
+                      <Search className="size-4" />
+                      مشاهده قطعات
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative hidden min-h-[400px] items-center justify-center overflow-hidden border-r border-white/10 lg:flex">
+                <div className="absolute size-[340px] rounded-full border border-white/10" />
+                <div className="absolute size-[270px] rounded-full border border-dashed border-cyan-200/15" />
+                <div className="absolute size-[210px] rounded-full bg-cyan-300/10 blur-2xl" />
+                <div className="relative flex size-52 items-center justify-center rounded-[2.5rem] border border-white/20 bg-white p-8 shadow-2xl shadow-black/25 rotate-[-3deg]">
+                  {brand.iconUrl ? (
+                    <Image
+                      src={brand.iconUrl}
+                      alt={`لوگوی ${brand.persianName}`}
+                      width={150}
+                      height={150}
+                      className="h-full w-full object-contain"
+                      priority
+                    />
+                  ) : (
+                    <span dir="ltr" className="text-4xl font-black text-[#14305A]">
+                      {brand.englishName?.slice(0, 3)}
+                    </span>
+                  )}
+                </div>
+                <div className="absolute bottom-9 right-10 flex items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-xs font-bold text-white/75 shadow-xl backdrop-blur-md">
+                  <CarFront className="size-4 text-cyan-300" />
                   {cars.length.toLocaleString("fa-IR")} مدل خودرو
-                </span>
+                </div>
                 {brand.countryCode && (
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
+                  <div dir="ltr" className="absolute left-10 top-10 rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-black tracking-widest text-white/70 backdrop-blur-md">
                     {brand.countryCode}
-                  </span>
+                  </div>
                 )}
+                <Wrench className="absolute bottom-14 left-14 size-8 rotate-[-18deg] text-cyan-300/25" />
               </div>
             </div>
-          </div>
+          </section>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FBFCFD] to-transparent" />
-      </section>
-
       {/* Cars Section */}
-      <section className="py-8 sm:py-8">
+      <section id="brand-cars" className="scroll-mt-24 py-10 sm:py-12">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-          <SectionHeader title="خودروها" />
-          {cars.length === 0 ? (
-            <p className="mt-8 text-center text-sm text-slate-400">
-              خودرویی برای این برند یافت نشد.
-            </p>
-          ) : (
-            <div className="mt-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide sm:flex-wrap sm:justify-start sm:gap-5">
-                {cars.map((car) => (
-                  <CarItem key={car.id} car={car} brandSlug={brandSlug} />
-                ))}
+          <div className="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-[0_16px_50px_rgb(15_23_42/0.045)] sm:p-7 lg:p-9">
+            <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-bold text-cyan-700">انتخاب خودرو</p>
+                <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+                  مدل‌های {brand.persianName}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  مدل دقیق خودروی خود را انتخاب کنید تا فقط قطعات سازگار نمایش داده شوند.
+                </p>
+              </div>
+              <div className="flex w-fit items-center gap-2 rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs font-bold text-slate-500">
+                <CarFront className="size-4 text-cyan-700" />
+                {cars.length.toLocaleString("fa-IR")} مدل موجود
               </div>
             </div>
-          )}
+
+            {cars.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="flex size-14 items-center justify-center rounded-2xl bg-slate-50">
+                  <CarFront className="size-7 text-slate-300" />
+                </div>
+                <p className="mt-4 text-sm font-bold text-slate-500">خودرویی برای این برند یافت نشد</p>
+                <p className="mt-1 text-xs text-slate-400">می‌توانید قطعات برند را از بخش بعدی جست‌وجو کنید.</p>
+              </div>
+            ) : (
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+                {cars.map((car) => (
+                  <CarItem
+                    key={car.id}
+                    car={car}
+                    brandSlug={brandSlug}
+                    brandName={brand.persianName ?? ""}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       {/* Search Section */}
-      <section className="border-t border-slate-100 py-8 sm:py-12">
+      <section id="brand-parts" className="scroll-mt-24 border-t border-slate-200/70 py-10 sm:py-12">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title="جست‌وجوی قطعات" />
           <Suspense
@@ -243,6 +306,7 @@ export default async function PartsBrandPage({
           </Suspense>
         </div>
       </section>
+      </main>
     </>
   );
 }

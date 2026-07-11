@@ -15,6 +15,8 @@ export type CarFrontofficeDetailResponse =
   components["schemas"]["CarFrontofficeDetailResponse"];
 export type PartFrontofficeResponse =
   components["schemas"]["PartFrontofficeResponse"];
+export type PartBrandFrontofficeResponse =
+  components["schemas"]["PartBrandFrontofficeResponse"];
 
 /**
  * Generic paginated result — maps PageResponse.content to a concrete type.

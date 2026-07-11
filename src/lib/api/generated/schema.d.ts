@@ -264,6 +264,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/parts/most-ordered": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the most ordered parts across all orders
+         * @description Returns leaf parts sorted by total quantity ordered, descending. No login required.
+         */
+        get: operations["mostOrdered"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/parts/cars/{carId}/top-level": {
         parameters: {
             query?: never;
@@ -432,6 +452,26 @@ export interface paths {
          * @description Returns part brands that have at least one active part compatible with the given car. Optionally narrow by part-brand id.
          */
         get: operations["search_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/blogs/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the most recently published blog posts
+         * @description Returns active, published blogs sorted by publishedAt descending.
+         */
+        get: operations["getTopBlogs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1630,6 +1670,47 @@ export interface operations {
             };
         };
     };
+    mostOrdered: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of most ordered parts with prices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
     listTopLevel: {
         parameters: {
             query?: {
@@ -2167,6 +2248,47 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Page of matching part brands */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
+    getTopBlogs: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of recent blog posts */
             200: {
                 headers: {
                     [name: string]: unknown;
