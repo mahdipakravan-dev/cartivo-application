@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { getAccessToken } from "@/lib/api/auth-token";
 import { CartDropdown } from "@/components/cart/cart-dropdown";
+import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 
 const navItems = [
   { label: "برندها", href: ROUTES.brands },
@@ -30,6 +31,7 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const isHero = variant === "hero" || variant === "abslute-on-header";
   const isAbsoluteOnHero = variant === "abslute-on-header";
@@ -135,7 +137,8 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
             variant="ghost"
             size="icon"
             aria-label="جست‌وجو"
-            className={cn(isHero && "text-white hover:bg-white/10 hover:text-white")}
+            onClick={() => setSearchOpen(true)}
+            className={cn(isHero && "relative cursor-pointer text-white hover:bg-white/10 hover:text-white")}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -217,6 +220,7 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         </nav>
       )}
       <AccountDialog open={accountOpen} onOpenChange={setAccountOpen} onAuthenticationChange={setAuthenticated} />
+      <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }

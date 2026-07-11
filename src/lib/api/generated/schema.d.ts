@@ -335,6 +335,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/global-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Global search across brands, cars, part categories, and child parts
+         * @description Case-insensitive partial match on name/model/slug fields. Returns grouped results: brands, cars, part categories, and leaf parts.
+         */
+        get: operations["globalSearch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/cars": {
         parameters: {
             query?: never;
@@ -867,18 +887,6 @@ export interface components {
             cars?: components["schemas"]["CarResponse"][];
             imageUrls?: string[];
         };
-        /** @description Single car detail returned to the customer-facing site/app */
-        CarFrontofficeDetailResponse: {
-            /** Format: int64 */
-            id?: number;
-            brand?: string;
-            model?: string;
-            trimLevel?: string;
-            /** @enum {string} */
-            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
-            description?: string;
-            imageUrls?: string[];
-        };
         /** @description Car brand representation returned to the customer-facing site/app - public fields only */
         BrandFrontofficeResponse: {
             /**
@@ -898,6 +906,58 @@ export interface components {
             countryCode?: string;
             /** Format: int32 */
             carCount?: number;
+        };
+        /** @description Car representation returned to the customer-facing site/app - public fields only */
+        CarFrontofficeResponse: {
+            /** Format: int64 */
+            id?: number;
+            brand?: string;
+            model?: string;
+            trimLevel?: string;
+            /** @enum {string} */
+            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
+            imageUrls?: string[];
+        };
+        /** @description Global search result grouped by entity type */
+        GlobalSearchResponse: {
+            /** @description Matching car brands */
+            brands?: components["schemas"]["BrandFrontofficeResponse"][];
+            /** @description Matching cars */
+            cars?: components["schemas"]["CarFrontofficeResponse"][];
+            /** @description Matching part categories (top-level) */
+            partCategories?: components["schemas"]["PartCategoryResult"][];
+            /** @description Matching child/leaf parts */
+            parts?: components["schemas"]["PartChildResult"][];
+        };
+        /** @description Minimal part category info */
+        PartCategoryResult: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            position?: string;
+        };
+        /** @description Minimal child part info */
+        PartChildResult: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            description?: string;
+            /** Format: int64 */
+            parentPartId?: number;
+            parentPartName?: string;
+            partBrandName?: string;
+        };
+        /** @description Single car detail returned to the customer-facing site/app */
+        CarFrontofficeDetailResponse: {
+            /** Format: int64 */
+            id?: number;
+            brand?: string;
+            model?: string;
+            trimLevel?: string;
+            /** @enum {string} */
+            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
+            description?: string;
+            imageUrls?: string[];
         };
         /** @description Part brand (manufacturer) representation returned to the customer-facing site/app - public fields only */
         PartBrandFrontofficeResponse: {
@@ -1919,6 +1979,41 @@ export interface operations {
             };
             /** @description JWT is not a customer token */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    globalSearch: {
+        parameters: {
+            query: {
+                /**
+                 * @description Search text
+                 * @example brake
+                 */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Grouped search results */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GlobalSearchResponse"];
+                };
+            };
+            /** @description Missing search query */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
