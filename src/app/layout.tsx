@@ -46,7 +46,7 @@ export default function RootLayout({
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
       <body className="flex min-h-dvh flex-col">
         <StoreProvider>
-          <SiteHeader variant="abslute-on-header" />
+          <SiteHeader variant="transparent-background" />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </StoreProvider>

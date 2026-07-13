@@ -1,5 +1,5 @@
 import { CLIENT_BASE_URL, DEFAULT_HEADERS } from "./config";
-import { getAccessToken } from "./auth-token";
+import { getAccessToken, logoutUser } from "./auth-token";
 
 /**
  * Type-safe fetch wrapper for CSR (Client Components).
@@ -47,6 +47,11 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 403) {
+      logoutUser();
+      throw new Error("دسترسی شما منقضی شده است. لطفا دوباره وارد شوید.");
+    }
+
     const body = await response.json().catch(() => null) as { message?: string } | null;
     throw new Error(body?.message || `خطا در ارتباط با سرور (${response.status})`);
   }

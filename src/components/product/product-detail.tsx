@@ -118,7 +118,7 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
                 )}
               </dl>
             </article>
-            <aside className="h-fit rounded-[1.75rem] bg-[#14305A] p-6 text-white">
+            <aside className="h-full rounded-[1.75rem] bg-[#14305A] p-6 text-white">
               <Headphones className="size-8 text-cyan-300" />
               <h2 className="mt-5 text-lg font-extrabold">برای انتخاب قطعه کمک می‌خواهید؟</h2>
               <p className="mt-3 text-sm leading-7 text-white/65">کارشناسان کارتیوو برای بررسی سازگاری قطعه با خودروی شما در کنارتان هستند.</p>

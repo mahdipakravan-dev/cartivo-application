@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { PartFinder } from "./part-finder";
 
 interface HeroProps {
   bgSrc?: string;
@@ -80,46 +80,7 @@ export function Hero({ bgSrc, videoSrc, className, children }: HeroProps) {
               بر اساس برند، مدل و شماره فنی.
             </p>
 
-            {/* Glassy Search Card */}
-            <div className="mx-auto mt-10 max-w-2xl">
-              <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/10 p-1.5 shadow-2xl shadow-black/20 backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/15">
-                {/* Glow effect */}
-                <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-r from-blue-500/20 via-transparent to-emerald-500/20 opacity-0 transition-opacity group-hover:opacity-100" />
-
-                <div className="relative flex items-center rounded-xl bg-white/5 backdrop-blur-sm">
-                  <div className="flex-1 px-5 py-4">
-                    <input
-                      type="text"
-                      placeholder="خودرو، قطعه یا شماره فنی را جست‌وجو کنید..."
-                      className="w-full bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
-                      dir="rtl"
-                    />
-                  </div>
-                  <button
-                    aria-label="جست‌وجو"
-                    className="m-1.5 flex items-center gap-2 rounded-xl bg-white/10 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-white/20"
-                  >
-                    <Search className="h-4 w-4" />
-                    <span className="hidden sm:inline">جست‌وجو</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Quick suggestions */}
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-                <span className="text-xs text-white/30">پرجست‌وجو:</span>
-                {["لنت ترمز", "فیلتر روغن", "فیلتر هوا", "شمع موتور"].map(
-                  (tag) => (
-                    <button
-                      key={tag}
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/50 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10 hover:text-white/80"
-                    >
-                      {tag}
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
+            <PartFinder />
 
             {/* Stats */}
             <div className="mx-auto mt-16 grid max-w-md grid-cols-3 gap-8 border-t border-white/10 pt-8">

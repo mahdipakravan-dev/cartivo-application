@@ -70,7 +70,7 @@ const tiles: ImageTextTileProps[] = [
 
 export function Features() {
   return (
-    <section className="bg-white py-14 sm:py-16" aria-label="خدمات کارتیوو">
+    <section id="services" className="bg-white py-14 sm:py-16" aria-label="خدمات کارتیوو">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {tiles.map((tile) => (

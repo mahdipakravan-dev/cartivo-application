@@ -15,13 +15,13 @@ import { CartDropdown } from "@/components/cart/cart-dropdown";
 import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 
 const navItems = [
-  { label: "برندها", href: ROUTES.brands },
-  { label: "دسته‌بندی‌ها", href: ROUTES.categories },
-  { label: "خدمات", href: "/services" },
+  { label: "خانه", href: ROUTES.home },
+  { label: "دسته بندی", href: ROUTES.categories },
+  { label: "خدمات", href: `${ROUTES.home}#services` },
   { label: "تماس با ما", href: ROUTES.contact },
 ];
 
-type SiteHeaderVariant = "white" | "hero" | "abslute-on-header";
+type SiteHeaderVariant = "white" | "hero" | "abslute-on-header" | "transparent-background";
 
 interface SiteHeaderProps {
   variant?: SiteHeaderVariant;
@@ -33,8 +33,15 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
   const [authenticated, setAuthenticated] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
-  const isHero = variant === "hero" || variant === "abslute-on-header";
-  const isAbsoluteOnHero = variant === "abslute-on-header";
+  const useTransparentHomeHeader =
+    variant === "transparent-background" && pathname === ROUTES.home;
+  const isHero =
+    variant === "hero" ||
+    variant === "abslute-on-header" ||
+    useTransparentHomeHeader;
+  const isAbsoluteOnHero =
+    variant === "abslute-on-header" || useTransparentHomeHeader;
+  const isTransparentBackground = useTransparentHomeHeader;
 
   useEffect(() => {
     const syncAuthentication = () => setAuthenticated(Boolean(getAccessToken()));
@@ -60,7 +67,9 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         "inset-x-0 top-0 z-50 border-b",
         isAbsoluteOnHero ? "absolute" : "fixed",
         isHero
-          ? "border-white/10 bg-primary text-white shadow-sm shadow-black/10"
+          ? isTransparentBackground
+            ? "border-white/10 bg-transparent text-white"
+            : "border-white/10 bg-primary text-white shadow-sm shadow-black/10"
           : "border-slate-100 bg-white text-slate-900"
       )}
     >
@@ -99,7 +108,11 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         >
           <ul className="flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const hrefWithoutHash = item.href.split("#")[0];
+              const isHomeItem = hrefWithoutHash === ROUTES.home;
+              const isActive = isHomeItem
+                ? pathname === ROUTES.home
+                : pathname === hrefWithoutHash || pathname.startsWith(hrefWithoutHash + "/");
               return (
                 <li key={item.href}>
                   <Link
@@ -194,7 +207,11 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         >
           <ul className="space-y-1 p-3">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const hrefWithoutHash = item.href.split("#")[0];
+              const isHomeItem = hrefWithoutHash === ROUTES.home;
+              const isActive = isHomeItem
+                ? pathname === ROUTES.home
+                : pathname === hrefWithoutHash || pathname.startsWith(hrefWithoutHash + "/");
               return (
                 <li key={item.href}>
                   <Link
