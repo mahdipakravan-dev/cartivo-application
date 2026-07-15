@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getBrands } from "@/lib/api/brands";
+import { getBrands, getTopBrands } from "@/lib/api/brands";
 import { ROUTES } from "@/lib/routes";
 import type { BrandFrontofficeResponse } from "@/lib/api/types";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -50,28 +50,17 @@ function StaticBrands({ brands }: { brands: BrandFrontofficeResponse[] }) {
 }
 
 export async function BrandsSection() {
-  const { items: brands } = await getBrands({ size: 50, sort: "persianName" });
-  const brandItems = brands.filter(item => item.carCount && item.carCount > 0)
+  const brands = await getTopBrands();
+  const brandItems = brands
 
   if (brandItems.length === 0) return null;
 
-  // If 8 or fewer brands, show static grid (fits one row)
-  if (brandItems.length <= 8) {
-    return (
-      <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
-        <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-          <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
-          <StaticBrands brands={brandItems} />
-        </div>
-      </section>
-    );
-  }
-
+  console.log(brandItems)
   // More than 8 brands — use infinite marquee
   const { BrandMarquee } = await import("@/components/sections/brand-marquee");
 
   return (
-    <section className="relative overflow-hidden py-16 sm:py-20" aria-label="برندهای خودرو">
+    <section className="relative overflow-hidden py-12 sm:py-16" aria-label="برندهای خودرو">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <SectionHeader title="انتخاب برند" href={ROUTES.brands} linkText="مشاهده همه برند ها" />
         <div className="mt-8">

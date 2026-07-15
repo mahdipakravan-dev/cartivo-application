@@ -53,6 +53,24 @@ export async function getAllBrands(): Promise<BrandFrontofficeResponse[]> {
   }
 }
 
+export async function getTopBrands(): Promise<BrandFrontofficeResponse[]> {
+  try {
+    const { data, error } = await apiClient.GET("/api/frontoffice/brands/top", {
+    params: {
+      query: {
+      },
+    },
+    cache: "force-cache",
+    next: { tags: ["brands"] },
+  });
+
+  if (error || !data) throw new Error("Failed to fetch brands");
+  if(data) return data
+  } catch {
+    return [];
+  }
+}
+
 /** Fetch a single brand by slug. */
 export async function getBrandBySlug(
   slug: string,

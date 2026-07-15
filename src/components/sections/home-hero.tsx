@@ -70,8 +70,8 @@ const HERO_SCENES = [
       {
         id: "wheel",
         label: "چرخ",
-        top: "69%",
-        left: "33%",
+        top: "49%",
+        left: "83%",
         size: "1rem",
         delay: "440ms",
         tooltipClassName: "-translate-x-[76%] translate-y-4",
@@ -79,7 +79,7 @@ const HERO_SCENES = [
       {
         id: "mirror",
         label: "آیینه",
-        top: "43%",
+        top: "38%",
         left: "66%",
         size: "0.7rem",
         delay: "660ms",
@@ -88,8 +88,8 @@ const HERO_SCENES = [
       {
         id: "light",
         label: "چراغ",
-        top: "50%",
-        left: "24%",
+        top: "44%",
+        left: "14%",
         size: "0.85rem",
         delay: "880ms",
         tooltipClassName: "-translate-x-[82%] -translate-y-[calc(100%+0.4rem)]",
@@ -105,7 +105,7 @@ const HERO_SCENES = [
       {
         id: "engine",
         label: "موتور",
-        top: "34%",
+        top: "44%",
         left: "31%",
         size: "1rem",
         delay: "0ms",
@@ -114,8 +114,8 @@ const HERO_SCENES = [
       {
         id: "steering",
         label: "فرمان",
-        top: "32%",
-        left: "61%",
+        top: "39%",
+        left: "58%",
         size: "0.82rem",
         delay: "200ms",
         tooltipClassName: "translate-x-3 -translate-y-[calc(100%+0.8rem)]",
@@ -123,8 +123,8 @@ const HERO_SCENES = [
       {
         id: "gearbox",
         label: "جعبه دنده",
-        top: "57%",
-        left: "49%",
+        top: "47%",
+        left: "19%",
         size: "0.92rem",
         delay: "400ms",
         tooltipClassName: "-translate-x-1/2 translate-y-4",
@@ -132,7 +132,7 @@ const HERO_SCENES = [
       {
         id: "pedal",
         label: "پدال",
-        top: "63%",
+        top: "53%",
         left: "59%",
         size: "0.72rem",
         delay: "600ms",

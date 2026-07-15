@@ -406,6 +406,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/brands/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List top 10 active brands with icon and cars, filterable by country */
+        get: operations["listTopBrands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/brand": {
         parameters: {
             query?: never;
@@ -2181,6 +2198,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
+    listTopBrands: {
+        parameters: {
+            query?: {
+                countryCode?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of top brands */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandFrontofficeResponse"];
                 };
             };
         };

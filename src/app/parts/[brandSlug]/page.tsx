@@ -185,9 +185,6 @@ export default async function PartsBrandPage({
                     قطعات یدکی
                     <span className="block text-cyan-300">{brand.persianName}</span>
                   </h1>
-                  <p dir="ltr" className="mt-2 text-sm font-bold uppercase tracking-[0.18em] text-white/35">
-                    {brand.englishName}
-                  </p>
                   <p className="mt-5 max-w-lg text-sm leading-7 text-white/65 sm:text-base sm:leading-8">
                     مدل خودروی {brand.persianName} خود را انتخاب کنید تا قطعات سازگار را بدون جست‌وجوی اضافه و با اطمینان بیشتری پیدا کنید.
                   </p>
@@ -212,7 +209,7 @@ export default async function PartsBrandPage({
                 <div className="absolute size-[340px] rounded-full border border-white/10" />
                 <div className="absolute size-[270px] rounded-full border border-dashed border-cyan-200/15" />
                 <div className="absolute size-[210px] rounded-full bg-cyan-300/10 blur-2xl" />
-                <div className="relative flex size-52 items-center justify-center rounded-[2.5rem] border border-white/20 bg-white p-8 shadow-2xl shadow-black/25 rotate-[-3deg]">
+                <div className="relative flex size-52 items-center justify-center rounded-[2.5rem] border border-white/20 bg-white p-8 shadow-2xl shadow-black/25">
                   {brand.iconUrl ? (
                     <Image
                       src={brand.iconUrl}
@@ -232,12 +229,6 @@ export default async function PartsBrandPage({
                   <CarFront className="size-4 text-cyan-300" />
                   {cars.length.toLocaleString("fa-IR")} مدل خودرو
                 </div>
-                {brand.countryCode && (
-                  <div dir="ltr" className="absolute left-10 top-10 rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-black tracking-widest text-white/70 backdrop-blur-md">
-                    {brand.countryCode}
-                  </div>
-                )}
-                <Wrench className="absolute bottom-14 left-14 size-8 rotate-[-18deg] text-cyan-300/25" />
               </div>
             </div>
           </section>
