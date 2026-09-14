@@ -17,7 +17,7 @@ export function CartDropdown({ onHero }: { onHero: boolean }) {
   useEffect(() => setMounted(true), []);
 
   const quantity = mounted ? items.reduce((sum, item) => sum + item.quantity, 0) : 0;
-  const total = mounted ? items.reduce((sum, item) => sum + item.price * item.quantity, 0) : 0;
+  const total = mounted ? items.reduce((sum, item) => sum + item.displayedUnitPriceRial * item.quantity, 0) : 0;
   const show = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     setOpen(true);
@@ -45,9 +45,9 @@ export function CartDropdown({ onHero }: { onHero: boolean }) {
           ) : (
             <div className="max-h-64 divide-y divide-slate-100 overflow-y-auto">
               {items.slice(0, 4).map((item) => (
-                <div key={item.partId} className="flex items-center gap-3 py-3">
+                <div key={`${item.partId}:${item.sellerId}`} className="flex items-center gap-3 py-3">
                   <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-50"><Package className="size-5 text-[#14305A]" /></div>
-                  <div className="min-w-0 flex-1"><p className="truncate text-xs font-bold text-slate-700">{item.name}</p><p className="mt-1 text-[11px] text-slate-400">{item.quantity.toLocaleString("fa-IR")} × {item.price.toLocaleString("fa-IR")} ریال</p></div>
+                  <div className="min-w-0 flex-1"><p className="truncate text-xs font-bold text-slate-700">{item.name}</p><p className="mt-1 truncate text-[10px] text-cyan-700">{item.sellerName}</p><p className="mt-1 text-[11px] text-slate-400">{item.quantity.toLocaleString("fa-IR")} × {item.displayedUnitPriceRial.toLocaleString("fa-IR")} ریال</p></div>
                 </div>
               ))}
               {items.length > 4 && <p className="py-2 text-center text-xs text-slate-400">و {(items.length - 4).toLocaleString("fa-IR")} محصول دیگر</p>}

@@ -7,17 +7,19 @@ import { useCartStore } from "@/lib/store/cart-store";
 
 interface AddToCartButtonProps {
   partId: number;
+  sellerId: number;
+  sellerName: string;
   name: string;
-  price: number;
+  displayedUnitPriceRial: number;
   imageUrl?: string;
 }
 
-export function AddToCartButton({ partId, name, price, imageUrl }: AddToCartButtonProps) {
+export function AddToCartButton({ partId, sellerId, sellerName, name, displayedUnitPriceRial, imageUrl }: AddToCartButtonProps) {
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
 
   const add = () => {
-    addItem({ partId, name, price, ...(imageUrl ? { imageUrl } : {}) });
+    addItem({ partId, sellerId, sellerName, name, displayedUnitPriceRial, ...(imageUrl ? { imageUrl } : {}) });
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1800);
   };

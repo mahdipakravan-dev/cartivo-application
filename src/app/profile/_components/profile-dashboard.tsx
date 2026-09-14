@@ -1,13 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, ChevronLeft, CircleUserRound,
-  ClipboardList, LoaderCircle, LogOut, Mail, MapPin, Package, Phone, ReceiptText, Save, ShoppingBag,
-  UserRound,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getProfile, updateProfile, type CustomerProfile, type ProfileUpdate } from "@/lib/api/auth";
@@ -17,9 +9,18 @@ import { getPartRequests, type PartRequest } from "@/lib/api/part-requests";
 import type { PageResponse } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import {
+  ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, ChevronLeft, CircleUserRound,
+  ClipboardList, LoaderCircle, LogOut, Mail, MapPin, Package, Phone, ReceiptText, Save, ShoppingBag,
+  UserRound,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 type Tab = "profile" | "orders" | "requests";
 type ProfileForm = { firstName: string; lastName: string; email: string; nationalCode: string };
+type ProfileFeedback = { type: "success" | "error"; message: string } | null;
 
 const STATUS: Record<string, { label: string; className: string }> = {
   PENDING: { label: "در انتظار بررسی", className: "bg-amber-50 text-amber-700" },
@@ -46,6 +47,7 @@ export function ProfileDashboard() {
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [profileFeedback, setProfileFeedback] = useState<ProfileFeedback>(null);
   const form = useForm<ProfileForm>({ defaultValues: { firstName: "", lastName: "", email: "", nationalCode: "" } });
 
   useEffect(() => {
@@ -73,6 +75,7 @@ export function ProfileDashboard() {
   const saveProfile = async (values: ProfileForm) => {
     setError("");
     setSaved(false);
+    setProfileFeedback(null);
     try {
       const payload: ProfileUpdate = {
         ...(values.firstName && { firstName: values.firstName }),
@@ -83,10 +86,17 @@ export function ProfileDashboard() {
       const updated = await updateProfile(payload);
       setProfile(updated);
       setSaved(true);
+      setProfileFeedback({ type: "success", message: "اطلاعات حساب با موفقیت ذخیره شد." });
       window.setTimeout(() => setSaved(false), 2500);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "ذخیره تغییرات انجام نشد.");
+      const message = reason instanceof Error ? reason.message : "ذخیره تغییرات انجام نشد.";
+      setProfileFeedback({ type: "error", message });
     }
+  };
+
+  const handleInvalidProfileSubmit = () => {
+    setSaved(false);
+    setProfileFeedback({ type: "error", message: "فرم کامل نیست. لطفا خطاهای فرم را بررسی کنید." });
   };
 
   const openOrder = async (id?: number) => {
@@ -137,7 +147,7 @@ export function ProfileDashboard() {
           <section className="min-w-0 rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-[0_16px_50px_rgb(15_23_42/0.045)] sm:p-7 lg:p-9">
             {error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
             {tab === "profile" ? (
-              <ProfileFormView form={form} profile={profile} saved={saved} onSubmit={saveProfile} />
+              <ProfileFormView form={form} profile={profile} saved={saved} feedback={profileFeedback} onSubmit={saveProfile} onInvalid={handleInvalidProfileSubmit} />
             ) : tab === "requests" ? (
               <PartRequestsList requests={partRequests} />
             ) : selectedOrder || loadingOrder ? (
@@ -152,8 +162,8 @@ export function ProfileDashboard() {
   );
 }
 
-function ProfileFormView({ form, profile, saved, onSubmit }: { form: ReturnType<typeof useForm<ProfileForm>>; profile: CustomerProfile | null; saved: boolean; onSubmit: (values: ProfileForm) => Promise<void> }) {
-  return <div><Header eyebrow="مشخصات فردی" title="اطلاعات حساب" subtitle="اطلاعات تماس و هویتی خود را مشاهده یا ویرایش کنید." /><form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 grid gap-5 sm:grid-cols-2"><Field label="نام" icon={UserRound}><Input className="h-12 rounded-xl" {...form.register("firstName")} /></Field><Field label="نام خانوادگی" icon={UserRound}><Input className="h-12 rounded-xl" {...form.register("lastName")} /></Field><Field label="شماره موبایل" icon={Phone}><Input dir="ltr" disabled value={localPhone(profile?.phoneNumber)} className="h-12 rounded-xl bg-slate-50 text-left" /></Field><Field label="ایمیل" icon={Mail}><Input dir="ltr" type="email" className="h-12 rounded-xl text-left" {...form.register("email", { pattern: /^\S+@\S+\.\S+$/ })} /></Field><Field label="کد ملی" icon={BadgeCheck}><Input inputMode="numeric" maxLength={10} className="h-12 rounded-xl" {...form.register("nationalCode", { pattern: /^$|^\d{10}$/ })} /></Field><div className="flex items-end"><Button type="submit" disabled={form.formState.isSubmitting} className="h-12 w-full rounded-xl text-sm font-bold">{form.formState.isSubmitting ? <LoaderCircle className="animate-spin" /> : saved ? <><CheckCircle2 /> ذخیره شد</> : <><Save /> ذخیره تغییرات</>}</Button></div></form></div>;
+function ProfileFormView({ form, profile, saved, feedback, onSubmit, onInvalid }: { form: ReturnType<typeof useForm<ProfileForm>>; profile: CustomerProfile | null; saved: boolean; feedback: ProfileFeedback; onSubmit: (values: ProfileForm) => Promise<void>; onInvalid: () => void }) {
+  return <div><Header eyebrow="مشخصات فردی" title="اطلاعات حساب" subtitle="اطلاعات تماس و هویتی خود را مشاهده یا ویرایش کنید." />{feedback && <div role="alert" className={cn("mt-6 rounded-xl px-4 py-3 text-sm", feedback.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700")}>{feedback.message}</div>}<form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="mt-8 grid gap-5 sm:grid-cols-2" noValidate><Field label="نام" icon={UserRound}><Input className="h-12 rounded-xl" {...form.register("firstName")} /></Field><Field label="نام خانوادگی" icon={UserRound}><Input className="h-12 rounded-xl" {...form.register("lastName")} /></Field><Field label="شماره موبایل" icon={Phone}><Input dir="ltr" disabled value={localPhone(profile?.phoneNumber)} className="h-12 rounded-xl bg-slate-50 text-left" /></Field><Field label="ایمیل" icon={Mail} error={form.formState.errors.email?.message}><Input dir="ltr" type="email" className="h-12 rounded-xl text-left" {...form.register("email", { validate: (value) => !value || /^\S+@\S+\.\S+$/.test(value) || "ایمیل معتبر نیست." })} /></Field><Field label="کد ملی (اختیاری)" icon={BadgeCheck} error={form.formState.errors.nationalCode?.message} hint="پر کردن این فیلد الزامی نیست."><Input inputMode="numeric" maxLength={10} className="h-12 rounded-xl" {...form.register("nationalCode", { validate: (value) => !value || /^\d{10}$/.test(value) || "کد ملی باید ۱۰ رقم باشد." })} /></Field><div className="flex items-end"><Button type="submit" disabled={form.formState.isSubmitting} className="h-12 w-full rounded-xl text-sm font-bold">{form.formState.isSubmitting ? <LoaderCircle className="animate-spin" /> : saved ? <><CheckCircle2 /> ذخیره شد</> : <><Save /> ذخیره تغییرات</>}</Button></div></form></div>;
 }
 
 function OrdersList({ orders, onOpen }: { orders: Order[]; onOpen: (id?: number) => void }) {
@@ -172,12 +182,12 @@ function OrderRow({ order, onOpen }: { order: Order; onOpen: () => void }) {
 function OrderDetail({ order, loading, onBack }: { order: Order | null; loading: boolean; onBack: () => void }) {
   if (loading || !order) return <div className="flex min-h-72 items-center justify-center"><LoaderCircle className="size-7 animate-spin text-[#14305A]" /></div>;
   const status = STATUS[order.status || ""] || { label: order.status || "نامشخص", className: "bg-slate-50 text-slate-600" };
-  return <div><button onClick={onBack} className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#14305A]"><ChevronLeft className="size-4 rotate-180" /> بازگشت به سفارش‌ها</button><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><Header eyebrow={`سفارش #${order.id?.toLocaleString("fa-IR")}`} title="جزئیات سفارش" subtitle={formatDate(order.createdAt)} /><span className={cn("w-fit rounded-full px-3 py-2 text-xs font-bold", status.className)}>{status.label}</span></div><div className="mt-7 divide-y divide-slate-100 rounded-2xl border border-slate-100">{order.items?.map((item, index) => <div key={`${item.partId}-${index}`} className="flex items-center justify-between gap-4 p-4"><div><p className="text-sm font-bold text-slate-700">{item.partName || "قطعه خودرو"}</p><p className="mt-1 text-xs text-slate-400">{item.quantity?.toLocaleString("fa-IR")} عدد × {formatPrice(item.unitPriceRial)}</p></div><p className="shrink-0 text-sm font-black text-[#14305A]">{formatPrice(item.lineTotalRial)}</p></div>)}</div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Info icon={MapPin} label="آدرس تحویل" value={[order.address?.city, order.address?.fullAddress, order.address?.plaque && `پلاک ${order.address.plaque}`].filter(Boolean).join("، ") || "—"} /><Info icon={ReceiptText} label="روش پرداخت" value={order.paymentMethod?.persianName || order.paymentMethod?.englishName || "—"} /></div><div className="mt-5 flex items-center justify-between rounded-2xl bg-slate-50 p-5"><span className="text-sm text-slate-500">مبلغ کل سفارش</span><strong className="text-xl text-[#14305A]">{formatPrice(order.totalAmountRial)}</strong></div></div>;
+  return <div><button onClick={onBack} className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#14305A]"><ChevronLeft className="size-4 rotate-180" /> بازگشت به سفارش‌ها</button><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><Header eyebrow={`سفارش #${order.id?.toLocaleString("fa-IR")}`} title="جزئیات سفارش" subtitle={formatDate(order.createdAt)} /><span className={cn("w-fit rounded-full px-3 py-2 text-xs font-bold", status.className)}>{status.label}</span></div><div className="mt-7 divide-y divide-slate-100 rounded-2xl border border-slate-100">{order.items?.map((item, index) => <div key={`${item.partId}-${item.sellerId}-${index}`} className="flex items-center justify-between gap-4 p-4"><div><p className="text-sm font-bold text-slate-700">{item.partName || "قطعه خودرو"}</p><p className="mt-1 text-xs font-bold text-cyan-700">{item.sellerName || `فروشنده #${item.sellerId ?? "—"}`}</p><p className="mt-1 text-xs text-slate-400">{item.quantity?.toLocaleString("fa-IR")} عدد × {formatPrice(item.unitPriceRial)}</p></div><p className="shrink-0 text-sm font-black text-[#14305A]">{formatPrice(item.lineTotalRial)}</p></div>)}</div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Info icon={MapPin} label="آدرس تحویل" value={[order.address?.city, order.address?.fullAddress, order.address?.plaque && `پلاک ${order.address.plaque}`].filter(Boolean).join("، ") || "—"} /><Info icon={ReceiptText} label="روش پرداخت" value={order.paymentMethod?.persianName || order.paymentMethod?.englishName || "—"} /></div><div className="mt-5 flex items-center justify-between rounded-2xl bg-slate-50 p-5"><span className="text-sm text-slate-500">مبلغ کل سفارش</span><strong className="text-xl text-[#14305A]">{formatPrice(order.totalAmountRial)}</strong></div></div>;
 }
 
 function LoginRequired() { return <main className="flex min-h-[75vh] items-center justify-center bg-[#f8fafc] px-4 pt-20"><div className="max-w-md rounded-[2rem] border border-slate-100 bg-white p-8 text-center shadow-xl"><div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#14305A] text-white"><CircleUserRound className="size-8" /></div><h1 className="mt-5 text-2xl font-black text-slate-900">وارد حساب خود شوید</h1><p className="mt-3 text-sm leading-7 text-slate-500">برای مشاهده پروفایل و سفارش‌ها ابتدا وارد شوید.</p><Button onClick={() => window.dispatchEvent(new Event("cartivo-open-auth"))} className="mt-6 h-12 w-full rounded-xl">ورود به حساب</Button></div></main>; }
 function Header({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle: string }) { return <div><p className="text-xs font-bold text-cyan-700">{eyebrow}</p><h2 className="mt-1 text-2xl font-black text-slate-900">{title}</h2><p className="mt-2 text-sm text-slate-400">{subtitle}</p></div>; }
-function Field({ label, icon: Icon, children }: { label: string; icon: typeof UserRound; children: React.ReactNode }) { return <label className="text-xs font-bold text-slate-600"><span className="mb-2 flex items-center gap-1.5"><Icon className="size-3.5 text-slate-400" />{label}</span>{children}</label>; }
+function Field({ label, icon: Icon, children, hint, error }: { label: string; icon: typeof UserRound; children: React.ReactNode; hint?: string | undefined; error?: string | undefined }) { return <label className="text-xs font-bold text-slate-600"><span className="mb-2 flex items-center gap-1.5"><Icon className="size-3.5 text-slate-400" />{label}</span>{children}{error ? <span className="mt-2 block text-xs font-medium text-red-600">{error}</span> : hint ? <span className="mt-2 block text-[11px] font-medium text-slate-400">{hint}</span> : null}</label>; }
 function NavButton({ active, icon: Icon, label, badge, onClick }: { active: boolean; icon: typeof UserRound; label: string; badge?: number; onClick: () => void }) { return <button onClick={onClick} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition", active ? "bg-[#14305A] text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800")}><Icon className="size-4" />{label}{badge != null && <span className={cn("mr-auto rounded-full px-2 py-0.5 text-[10px]", active ? "bg-white/15" : "bg-slate-100")}>{badge.toLocaleString("fa-IR")}</span>}</button>; }
 function Stat({ value, label }: { value: string; label: string }) { return <div className="min-w-24 rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 text-center"><p className="font-black text-white">{value}</p><p className="mt-1 text-[10px] text-white/45">{label}</p></div>; }
 function Info({ icon: Icon, label, value }: { icon: typeof MapPin; label: string; value: string }) { return <div className="rounded-2xl border border-slate-100 p-4"><p className="flex items-center gap-2 text-xs font-bold text-slate-400"><Icon className="size-4" />{label}</p><p className="mt-2 text-sm leading-6 text-slate-700">{value}</p></div>; }

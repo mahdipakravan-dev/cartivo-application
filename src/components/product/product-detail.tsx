@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { BadgeCheck, Car, Check, ChevronLeft, Headphones, MapPin, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { BadgeCheck, Car, Check, ChevronLeft, Headphones, MapPin, RotateCcw, Scale, ShieldCheck, Truck } from "lucide-react";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { ProductGallery } from "./product-gallery";
-import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel";
 import { getRelatedBlogs } from "@/lib/api/content";
 import { ProductReviews } from "./product-reviews";
 import { ProductRelatedBlogs } from "./product-related-blogs";
@@ -12,6 +12,7 @@ import { ProductRelatedBlogs } from "./product-related-blogs";
 const POSITION_LABEL: Record<string, string> = {
   INTERIOR: "داخلی",
   EXTERIOR: "بیرونی",
+  BOTH: "داخلی و بیرونی",
 };
 
 export async function ProductDetail({ part }: { part: PartFrontofficeResponse }) {
@@ -81,14 +82,19 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
 
                 <div className="mt-auto pt-8">
                   <div className="rounded-2xl bg-slate-50 p-5">
-                    <div className="flex items-end justify-between gap-4">
-                      <span className="text-sm text-slate-500">قیمت محصول</span>
-                      {part.price != null ? <p className="text-2xl font-black text-[#14305A]">{part.price.toLocaleString("fa-IR")} <span className="text-xs font-medium text-slate-400">ریال</span></p> : <p className="font-bold text-slate-600">تماس بگیرید</p>}
-                    </div>
-                    {part.id != null && part.price != null ? (
-                      <AddToCartButton partId={part.id} name={name} price={part.price} {...(images[0] ? { imageUrl: images[0] } : {})} />
+                    {part.id != null ? (
+                      <SellerPurchasePanel partId={part.id} name={name} {...(images[0] ? { imageUrl: images[0] } : {})} />
                     ) : (
                       <p className="mt-5 text-center text-xs text-slate-400">این محصول در حال حاضر قابل سفارش نیست.</p>
+                    )}
+                    {part.id != null && (
+                      <Link
+                        href={ROUTES.compareParts(part.id)}
+                        className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 transition hover:border-cyan-200 hover:text-[#14305A]"
+                      >
+                        <Scale className="size-4 text-cyan-700" />
+                        مقایسه با محصول دیگر
+                      </Link>
                     )}
                   </div>
                   <div className="mt-5 grid grid-cols-3 gap-2 text-center text-[10px] text-slate-500 sm:text-xs">

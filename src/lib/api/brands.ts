@@ -53,7 +53,7 @@ export async function getAllBrands(): Promise<BrandFrontofficeResponse[]> {
   }
 }
 
-export async function getTopBrands(): Promise<BrandFrontofficeResponse[]> {
+export async function getTopBrands() {
   try {
     const { data, error } = await apiClient.GET("/api/frontoffice/brands/top", {
     params: {

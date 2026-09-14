@@ -6,9 +6,9 @@ import { getPartById } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Package, ShoppingCart, Shield, Truck, CheckCircle } from "lucide-react";
+import { Package, Shield, Truck, CheckCircle } from "lucide-react";
+import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel";
 
 export async function generateMetadata({
   params,
@@ -202,28 +202,7 @@ export default async function PartsPartPage({
               <div className="sticky top-24 space-y-4">
                 <Card>
                   <CardContent className="p-6">
-                    {/* Price */}
-                    <div className="text-center">
-                      <p className="text-sm text-slate-400">قیمت</p>
-                      {part.price != null ? (
-                        <p className="mt-2 text-3xl font-extrabold text-primary">
-                          {part.price.toLocaleString("fa-IR")}
-                          <span className="mr-1 text-sm font-normal text-slate-400">ریال</span>
-                        </p>
-                      ) : (
-                        <p className="mt-2 text-lg font-bold text-slate-400">قیمت تماس بگیرید</p>
-                      )}
-                    </div>
-
-                    {/* Add to Cart Button */}
-                    <Button
-                      size="lg"
-                      className="mt-6 w-full"
-                      disabled={part.price == null}
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                      افزودن به سبد خرید
-                    </Button>
+                    <SellerPurchasePanel partId={part.id!} name={part.name || "قطعه خودرو"} />
 
                     {/* Features */}
                     <div className="mt-6 space-y-3 border-t border-slate-100 pt-6">

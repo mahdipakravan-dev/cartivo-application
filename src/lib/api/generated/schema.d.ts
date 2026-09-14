@@ -63,6 +63,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/price-locks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a temporary price lock */
+        post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/price-locks/{token}/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate an unexpired, unused price lock */
+        post: operations["validate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/part-requests": {
         parameters: {
             query?: never;
@@ -77,7 +111,7 @@ export interface paths {
          * Submit a request for a part not found in the catalog
          * @description Starts in NEW status. An admin can later update it to IN_PROGRESS, RESOLVED, or REJECTED.
          */
-        post: operations["create_1"];
+        post: operations["create_2"];
         delete?: never;
         options?: never;
         head?: never;
@@ -95,9 +129,9 @@ export interface paths {
         put?: never;
         /**
          * Place a new order for the authenticated customer
-         * @description Unit prices are computed server-side via the part pricing system at order time. Prices stored on order items are immutable after creation.
+         * @description Unit prices use the current persisted part price at order time. Prices stored on order items are immutable after creation.
          */
-        post: operations["create_2"];
+        post: operations["create_3"];
         delete?: never;
         options?: never;
         head?: never;
@@ -115,7 +149,7 @@ export interface paths {
         get: operations["list"];
         put?: never;
         /** Create a delivery address */
-        post: operations["create_3"];
+        post: operations["create_4"];
         delete?: never;
         options?: never;
         head?: never;
@@ -217,7 +251,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List leaf parts under a category for a given car, with computed price (e.g. parts under Wheel: brake pad, tire) */
+        /** List leaf parts under a category for a given car, with stored price (e.g. parts under Wheel: brake pad, tire) */
         get: operations["listChildren"];
         put?: never;
         post?: never;
@@ -234,8 +268,59 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a single part with its computed price */
+        /** Get a single part with its stored price */
         get: operations["getById_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/parts/{id}/sellers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the currently available seller offers for a part */
+        get: operations["getAvailableSellers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/parts/{id}/price": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current stored effective price and last calculation details for a part */
+        get: operations["getEffectivePrice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/parts/{id}/price-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get daily average seller-price history for a part */
+        get: operations["getPriceHistory"];
         put?: never;
         post?: never;
         delete?: never;
@@ -673,6 +758,32 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        PriceLockCreateRequest: {
+            /** Format: int64 */
+            partId: number;
+            /** Format: int64 */
+            sellerId: number;
+        };
+        PriceLockResponse: {
+            lockToken?: string;
+            /** Format: int64 */
+            partId?: number;
+            /** Format: int64 */
+            sellerId?: number;
+            /** Format: int64 */
+            customerId?: number;
+            lockedPrice?: number;
+            formula?: string;
+            appliedRates?: {
+                [key: string]: number;
+            };
+            calculationBreakdown?: string;
+            /** Format: date-time */
+            calculatedAt?: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            valid?: boolean;
+        };
         /** @description Payload submitted by a customer asking for a part not found in the catalog */
         PartRequestFrontofficeRequest: {
             /**
@@ -735,10 +846,18 @@ export interface components {
              */
             partId: number;
             /**
+             * Format: int64
+             * @description Selected seller for this part
+             * @example 25
+             */
+            sellerId: number;
+            /**
              * Format: int32
              * @example 2
              */
             quantity: number;
+            /** @description Optional unexpired price-lock token for this part */
+            priceLockToken?: string;
         };
         /** @description Order representation returned to the customer-facing site/app */
         OrderFrontofficeResponse: {
@@ -769,6 +888,12 @@ export interface components {
             partId?: number;
             /** @example Door Lock */
             partName?: string;
+            /**
+             * Format: int64
+             * @example 25
+             */
+            sellerId?: number;
+            sellerName?: string;
             /**
              * Format: int32
              * @example 2
@@ -895,14 +1020,98 @@ export interface components {
             /** Format: int64 */
             id?: number;
             name?: string;
+            /** @enum {string} */
+            makingType?: "ELECTRICAL" | "MECHANICAL";
+            businessName?: string;
+            /** Factory Serial Number */
+            partNumber?: string;
+            manufacturerCode?: string;
+            commercialName?: string;
+            manufacturerName?: string;
+            /** @enum {string} */
+            unit?: "PIECE" | "PAIR" | "SET" | "PACKAGE" | "CARTON" | "LITER";
             description?: string;
             leaf?: boolean;
             /** @enum {string} */
-            position?: "INTERIOR" | "EXTERIOR";
+            position?: "INTERIOR" | "EXTERIOR" | "BOTH";
             price?: number;
             partBrand?: components["schemas"]["PartBrandResponse"];
             cars?: components["schemas"]["CarResponse"][];
             imageUrls?: string[];
+        };
+        SellerOfferResponse: {
+            /** Format: int64 */
+            sellerId?: number;
+            sellerName?: string;
+            priceRial?: number;
+            /** Format: date-time */
+            validFrom?: string;
+            /** Format: date-time */
+            validUntil?: string;
+            /** Format: date-time */
+            lastUpdatedAt?: string;
+        };
+        EffectivePriceResponse: {
+            /** Format: int64 */
+            partId?: number;
+            /** Format: int64 */
+            sellerId?: number;
+            finalCalculatedPrice?: number;
+            appliedRates?: {
+                [key: string]: number;
+            };
+            formula?: string;
+            /** Format: date-time */
+            calculationTime?: string;
+            calculationBreakdown?: string;
+            /** Format: date-time */
+            validFrom?: string;
+            /** Format: date-time */
+            validUntil?: string;
+            /** @enum {string} */
+            priceSource?: "MANUAL" | "FORMULA" | "MARKETPLACE" | "EXTERNAL_API";
+            /** Format: date-time */
+            lastPriceUpdatedAt?: string;
+        };
+        /** @description Standard paginated response wrapper */
+        PageResponsePartAveragePriceHistoryResponse: {
+            /** @description Items of the current page */
+            content?: components["schemas"]["PartAveragePriceHistoryResponse"][];
+            /**
+             * Format: int32
+             * @description Current page number, zero-based
+             */
+            page?: number;
+            /**
+             * Format: int32
+             * @description Number of items per page
+             */
+            size?: number;
+            /**
+             * Format: int64
+             * @description Total number of items in the dataset
+             */
+            totalElements?: number;
+            /**
+             * Format: int32
+             * @description Total number of pages
+             */
+            totalPages?: number;
+            /** @description Whether a next page exists */
+            hasNext?: boolean;
+            /** @description Whether a previous page exists */
+            hasPrevious?: boolean;
+        };
+        PartAveragePriceHistoryResponse: {
+            /** Format: int64 */
+            partId?: number;
+            /** Format: date */
+            priceDate?: string;
+            averagePriceRial?: number;
+            /** Format: int64 */
+            sellerCount?: number;
+            /** Format: date-time */
+            recordedAt?: string;
         };
         /** @description Car brand representation returned to the customer-facing site/app - public fields only */
         BrandFrontofficeResponse: {
@@ -1200,6 +1409,56 @@ export interface operations {
             };
         };
     };
+    create_1: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceLockCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceLockResponse"];
+                };
+            };
+        };
+    };
+    validate: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceLockResponse"];
+                };
+            };
+        };
+    };
     listForCustomer: {
         parameters: {
             query: {
@@ -1255,7 +1514,7 @@ export interface operations {
             };
         };
     };
-    create_1: {
+    create_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -1297,7 +1556,7 @@ export interface operations {
             };
         };
     };
-    create_2: {
+    create_3: {
         parameters: {
             query?: {
                 id?: number;
@@ -1372,7 +1631,7 @@ export interface operations {
             };
         };
     };
-    create_3: {
+    create_4: {
         parameters: {
             query?: {
                 id?: number;
@@ -1637,7 +1896,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Page of leaf parts with computed prices */
+            /** @description Page of leaf parts with stored prices */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1681,7 +1940,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Part found with computed price */
+            /** @description Part found with stored price */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1706,6 +1965,95 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getAvailableSellers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOfferResponse"][];
+                };
+            };
+        };
+    };
+    getEffectivePrice: {
+        parameters: {
+            query?: {
+                sellerId?: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EffectivePriceResponse"];
+                };
+            };
+        };
+    };
+    getPriceHistory: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponsePartAveragePriceHistoryResponse"];
                 };
             };
         };
@@ -1746,7 +2094,42 @@ export interface operations {
                  * @description Only parts whose parent category has this position
                  * @example EXTERIOR
                  */
-                positionType?: "INTERIOR" | "EXTERIOR";
+                positionType?: "INTERIOR" | "EXTERIOR" | "BOTH";
+                /**
+                 * @description Part business name (case-insensitive partial match)
+                 * @example Door Lock
+                 */
+                businessName?: string;
+                /**
+                 * @description Factory serial number (case-insensitive partial match)
+                 * @example DL-206
+                 */
+                partNumber?: string;
+                /**
+                 * @description Manufacturer code (case-insensitive partial match)
+                 * @example OEM-9675
+                 */
+                manufacturerCode?: string;
+                /**
+                 * @description Commercial name (case-insensitive partial match)
+                 * @example SecureLock
+                 */
+                commercialName?: string;
+                /**
+                 * @description Manufacturer name (case-insensitive partial match)
+                 * @example Bosch
+                 */
+                manufacturerName?: string;
+                /**
+                 * @description Making type (exact match)
+                 * @example MECHANICAL
+                 */
+                makingType?: "ELECTRICAL" | "MECHANICAL";
+                /**
+                 * @description Unit (exact match)
+                 * @example PIECE
+                 */
+                unit?: "PIECE" | "PAIR" | "SET" | "PACKAGE" | "CARTON" | "LITER";
                 /**
                  * @description Minimum price in Rial, inclusive
                  * @example 100000
@@ -1784,7 +2167,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Page of matching parts with computed price */
+            /** @description Page of matching parts with stored price */
             200: {
                 headers: {
                     [name: string]: unknown;

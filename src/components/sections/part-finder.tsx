@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 type FinderTab = "vehicle" | "vin" | "image";
 type CameraPhase = "preview" | "searching" | "results";
 
-const STATIC_IMAGE_QUERY = "درب ۲۰۶";
+const STATIC_IMAGE_QUERY = "۲۰۶";
 const EMPTY_IMAGE_RESULTS: GlobalSearchResponse = {
   brands: [],
   cars: [],

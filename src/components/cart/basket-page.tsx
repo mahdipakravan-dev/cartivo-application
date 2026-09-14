@@ -2,24 +2,68 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, CheckCircle2, Minus, Package, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, LoaderCircle, Minus, Package, Plus, ShieldCheck, ShoppingBag, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Order } from "@/lib/api/orders";
 import { getAccessToken } from "@/lib/api/auth-token";
+import { getPartSellerOffers } from "@/lib/api/pricing";
 import { ROUTES } from "@/lib/routes";
-import { useCartStore } from "@/lib/store/cart-store";
+import { cartLineKey, useCartStore } from "@/lib/store/cart-store";
 import { CheckoutStep } from "@/components/cart/checkout-step";
 
 export function BasketPage() {
   const items = useCartStore((state) => state.items);
   const setQuantity = useCartStore((state) => state.setQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const updateItemPrice = useCartStore((state) => state.updateItemPrice);
   const clear = useCartStore((state) => state.clear);
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<"cart" | "checkout">("cart");
   const [awaitingAuthentication, setAwaitingAuthentication] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
+  const [refreshingPrices, setRefreshingPrices] = useState(false);
+  const [priceError, setPriceError] = useState("");
+  const [invalidLines, setInvalidLines] = useState<Record<string, string>>({});
+  const lineSignature = items.map((item) => cartLineKey(item.partId, item.sellerId)).join(",");
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || !lineSignature) return;
+    let active = true;
+    const currentItems = useCartStore.getState().items;
+    setRefreshingPrices(true);
+    setPriceError("");
+    Promise.allSettled(currentItems.map((item) => getPartSellerOffers(item.partId)))
+      .then((results) => {
+        if (!active) return;
+        const nextInvalidLines: Record<string, string> = {};
+        results.forEach((result, index) => {
+          const item = currentItems[index];
+          if (!item) return;
+          const key = cartLineKey(item.partId, item.sellerId);
+          if (result.status === "rejected") {
+            nextInvalidLines[key] = result.reason instanceof Error ? result.reason.message : "بررسی پیشنهاد فروشنده انجام نشد.";
+            return;
+          }
+          const offer = result.value.find((candidate) => candidate.sellerId === item.sellerId);
+          if (offer?.priceRial == null) {
+            nextInvalidLines[key] = "این فروشنده دیگر برای این قطعه پیشنهاد فعالی ندارد.";
+            return;
+          }
+          updateItemPrice(item.partId, item.sellerId, offer.priceRial);
+        });
+        setInvalidLines(nextInvalidLines);
+        if (Object.keys(nextInvalidLines).length > 0) {
+          setPriceError("برخی پیشنهادهای سبد خرید تغییر کرده یا دیگر در دسترس نیستند.");
+        }
+      })
+      .catch((requestError) => {
+        if (!active) return;
+        setPriceError(requestError instanceof Error ? requestError.message : "به‌روزرسانی قیمت فروشندگان انجام نشد.");
+      })
+      .finally(() => active && setRefreshingPrices(false));
+    return () => { active = false; };
+  }, [mounted, lineSignature, updateItemPrice]);
 
   useEffect(() => {
     if (!awaitingAuthentication) return;
@@ -33,9 +77,14 @@ export function BasketPage() {
     return () => window.removeEventListener("cartivo-auth-change", continueAfterLogin);
   }, [awaitingAuthentication]);
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + item.displayedUnitPriceRial * item.quantity, 0);
+  const hasInvalidLines = Object.keys(invalidLines).length > 0;
 
   const goToCheckout = () => {
+    if (hasInvalidLines) {
+      setPriceError("برای ادامه، فروشنده نامعتبر را حذف کنید یا در صفحه قطعه فروشنده دیگری انتخاب کنید.");
+      return;
+    }
     if (!getAccessToken()) {
       setAwaitingAuthentication(true);
       window.dispatchEvent(new Event("cartivo-open-auth"));
@@ -61,6 +110,8 @@ export function BasketPage() {
           <h1 className="mt-6 text-2xl font-black text-slate-900">سفارش شما ثبت شد</h1>
           <p className="mt-3 text-sm leading-7 text-slate-500">سفارش با موفقیت دریافت شد و در انتظار بررسی است.</p>
           {order.id != null && <p className="mt-4 rounded-xl bg-slate-50 py-3 text-sm text-slate-500">شماره سفارش: <b className="text-slate-800">{order.id.toLocaleString("fa-IR")}</b></p>}
+          {order.items?.length ? <div className="mt-4 space-y-2 text-right">{order.items.map((item, index) => <div key={`${item.partId}-${item.sellerId}-${index}`} className="rounded-xl border border-slate-100 p-3"><p className="text-sm font-bold text-slate-700">{item.partName || "قطعه خودرو"}</p><p className="mt-1 text-xs text-cyan-700">{item.sellerName || `فروشنده #${item.sellerId ?? "—"}`}</p><p className="mt-1 text-xs text-slate-400">{item.quantity?.toLocaleString("fa-IR") ?? "—"} × {formatServerPrice(item.unitPriceRial)} = {formatServerPrice(item.lineTotalRial)}</p></div>)}</div> : null}
+          {order.totalAmountRial != null && <p className="mt-4 text-lg font-black text-[#14305A]">مبلغ نهایی: {order.totalAmountRial.toLocaleString("fa-IR")} ریال</p>}
           <Button render={<Link href={ROUTES.parts} />} className="mt-6 h-11 w-full rounded-xl">ادامه خرید</Button>
         </div>
       </main>
@@ -83,23 +134,24 @@ export function BasketPage() {
             <Button render={<Link href={ROUTES.parts} />} className="mt-6 h-11 rounded-xl px-6"><ArrowRight /> مشاهده قطعات</Button>
           </section>
         ) : step === "checkout" ? (
-          <CheckoutStep items={items} total={total} onBack={() => setStep("cart")} onSuccess={completeOrder} />
+          <CheckoutStep items={items} onBack={() => setStep("cart")} onSuccess={completeOrder} />
         ) : (
           <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <section className="space-y-3">
+              {priceError && <p role="alert" className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800">{priceError}</p>}
               {items.map((item) => (
-                <article key={item.partId} className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5">
+                <article key={cartLineKey(item.partId, item.sellerId)} className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5">
                   <Link href={ROUTES.partDetail(String(item.partId))} className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50">
                     {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="size-full object-contain p-2" /> : <Package className="size-8 text-[#14305A]" />}
                   </Link>
-                  <div className="min-w-0 flex-1"><Link href={ROUTES.partDetail(String(item.partId))} className="font-extrabold leading-7 text-slate-800 hover:text-blue-700">{item.name}</Link><p className="mt-1 text-sm font-bold text-[#14305A]">{item.price.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></p></div>
+                  <div className="min-w-0 flex-1"><Link href={ROUTES.partDetail(String(item.partId))} className="font-extrabold leading-7 text-slate-800 hover:text-blue-700">{item.name}</Link><p className="mt-1 text-xs font-bold text-cyan-700">فروشنده: {item.sellerName}</p><p className="mt-1 text-sm font-bold text-[#14305A]">{item.displayedUnitPriceRial.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></p>{invalidLines[cartLineKey(item.partId, item.sellerId)] && <p className="mt-2 text-xs leading-5 text-red-600">{invalidLines[cartLineKey(item.partId, item.sellerId)]} <Link href={ROUTES.partDetail(String(item.partId))} className="font-bold underline">انتخاب فروشنده جدید</Link></p>}</div>
                   <div className="flex items-center justify-between gap-3 sm:justify-end">
                     <div className="flex items-center rounded-xl border border-slate-200 p-1">
-                      <button type="button" onClick={() => setQuantity(item.partId, item.quantity + 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="افزایش تعداد"><Plus className="size-4" /></button>
+                      <button type="button" onClick={() => setQuantity(item.partId, item.sellerId, item.quantity + 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="افزایش تعداد"><Plus className="size-4" /></button>
                       <span className="w-9 text-center text-sm font-bold">{item.quantity.toLocaleString("fa-IR")}</span>
-                      <button type="button" onClick={() => setQuantity(item.partId, item.quantity - 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="کاهش تعداد"><Minus className="size-4" /></button>
+                      <button type="button" onClick={() => setQuantity(item.partId, item.sellerId, item.quantity - 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="کاهش تعداد"><Minus className="size-4" /></button>
                     </div>
-                    <button type="button" onClick={() => removeItem(item.partId)} className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`حذف ${item.name}`}><Trash2 className="size-4" /></button>
+                    <button type="button" onClick={() => removeItem(item.partId, item.sellerId)} className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`حذف ${item.name}`}><Trash2 className="size-4" /></button>
                   </div>
                 </article>
               ))}
@@ -110,7 +162,7 @@ export function BasketPage() {
               <dl className="mt-5 space-y-4 text-sm"><div className="flex justify-between"><dt className="text-slate-500">قیمت کالاها</dt><dd>{total.toLocaleString("fa-IR")} ریال</dd></div><div className="flex justify-between"><dt className="text-slate-500">هزینه ارسال</dt><dd className="text-xs text-slate-400">در مرحله بعد محاسبه می‌شود</dd></div></dl>
               <div className="my-5 h-px bg-slate-100" />
               <div className="flex items-end justify-between"><span className="text-sm font-bold text-slate-600">مبلغ قابل پرداخت</span><b className="text-xl text-[#14305A]">{total.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></b></div>
-              <Button type="button" onClick={goToCheckout} className="mt-6 h-12 w-full rounded-xl text-base shadow-lg shadow-blue-950/15">مرحله بعد</Button>
+              <Button type="button" onClick={goToCheckout} disabled={refreshingPrices || hasInvalidLines} className="mt-6 h-12 w-full rounded-xl text-base shadow-lg shadow-blue-950/15">{refreshingPrices ? <><LoaderCircle className="animate-spin" /> به‌روزرسانی قیمت‌ها</> : "مرحله بعد"}</Button>
               <p className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-slate-400"><ShieldCheck className="size-4 text-emerald-600" /> پرداخت و اطلاعات شما امن است</p>
             </aside>
           </div>
@@ -118,4 +170,8 @@ export function BasketPage() {
       </div>
     </main>
   );
+}
+
+function formatServerPrice(value?: number) {
+  return value == null ? "—" : `${value.toLocaleString("fa-IR")} ریال`;
 }

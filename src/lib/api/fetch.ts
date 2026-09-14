@@ -1,5 +1,5 @@
 import { CLIENT_BASE_URL, DEFAULT_HEADERS } from "./config";
-import { getAccessToken, logoutUser } from "./auth-token";
+import { getAccessToken } from "./auth-token";
 
 /**
  * Type-safe fetch wrapper for CSR (Client Components).
@@ -12,6 +12,30 @@ import { getAccessToken, logoutUser } from "./auth-token";
 type FetchOptions = RequestInit & {
   params?: Record<string, string | number | boolean | undefined | null>;
 };
+
+export interface ApiErrorBody {
+  timestamp?: string;
+  status?: number;
+  error?: string;
+  message?: string;
+  fieldErrors?: unknown;
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+  readonly body: ApiErrorBody | null;
+
+  constructor(status: number, message: string, body: ApiErrorBody | null = null) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
+export function isApiError(error: unknown, ...statuses: number[]): error is ApiError {
+  return error instanceof ApiError && (statuses.length === 0 || statuses.includes(error.status));
+}
 
 function buildUrl(path: string, params?: Record<string, string | number | boolean | undefined | null>): string {
   const base = CLIENT_BASE_URL || "";
@@ -47,13 +71,13 @@ export async function apiFetch<T>(
   });
 
   if (!response.ok) {
-    if (response.status === 403) {
-      logoutUser();
-      throw new Error("دسترسی شما منقضی شده است. لطفا دوباره وارد شوید.");
-    }
-
-    const body = await response.json().catch(() => null) as { message?: string } | null;
-    throw new Error(body?.message || `خطا در ارتباط با سرور (${response.status})`);
+    const body = await response.json().catch(() => null) as ApiErrorBody | null;
+    const fallback = response.status === 401
+      ? "برای ادامه خرید وارد حساب کاربری شوید."
+      : response.status === 403
+        ? "این عملیات فقط با حساب مشتری مجاز است."
+        : `خطا در ارتباط با سرور (${response.status})`;
+    throw new ApiError(response.status, body?.message || fallback, body);
   }
 
   if (response.status === 204) return undefined as T;

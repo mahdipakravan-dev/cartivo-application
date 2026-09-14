@@ -1,4 +1,5 @@
-import Image from "next/image";
+import { CarFront, Headphones, ShieldCheck, Truck } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ImageTextTileVariant = "primary-background" | "secondary-background";
@@ -6,14 +7,14 @@ export type ImageTextTileVariant = "primary-background" | "secondary-background"
 interface ImageTextTileProps {
   title: string;
   subtitle: string;
-  image: string;
+  icon: LucideIcon;
   variant?: ImageTextTileVariant;
 }
 
 export function ImageTextTile({
   title,
   subtitle,
-  image,
+  icon: Icon,
   variant = "secondary-background",
 }: ImageTextTileProps) {
   const primary = variant === "primary-background";
@@ -28,8 +29,13 @@ export function ImageTextTile({
       )}
     >
       <div className={cn("absolute -right-12 size-36 rounded-full blur-2xl", primary ? "bg-cyan-300/10" : "bg-white/80")} />
-      <div className="relative h-24 w-[44%] shrink-0">
-        <Image src={image} alt="" fill sizes="180px" className="object-contain drop-shadow-lg" />
+      <div
+        className={cn(
+          "relative z-10 flex size-20 shrink-0 items-center justify-center rounded-2xl",
+          primary ? "bg-white/10 text-cyan-100" : "bg-white text-[#14305A] shadow-sm",
+        )}
+      >
+        <Icon className="size-10" strokeWidth={1.8} />
       </div>
       <div className="relative z-10 min-w-0 flex-1 pr-2">
         <h3 className="text-sm font-black leading-6 sm:text-base">{title}</h3>
@@ -45,25 +51,25 @@ const tiles: ImageTextTileProps[] = [
   {
     title: "ارسال سریع",
     subtitle: "تحویل مطمئن سفارش",
-    image: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/54ec375fd_generated_d9e27dd1.png",
+    icon: Truck,
     variant: "primary-background",
   },
   {
     title: "ضمانت اصالت",
     subtitle: "قطعات بررسی‌شده",
-    image: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/10877c212_generated_4caa0b9b.png",
+    icon: ShieldCheck,
     variant: "secondary-background",
   },
   {
     title: "انتخاب دقیق",
     subtitle: "سازگار با خودروی شما",
-    image: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/a79b85e09_generated_25901b0a.png",
+    icon: CarFront,
     variant: "primary-background",
   },
   {
     title: "پشتیبانی تخصصی",
     subtitle: "همراه شما در خرید",
-    image: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/969d3daa3_generated_76dda287.png",
+    icon: Headphones,
     variant: "secondary-background",
   },
 ];

@@ -15,8 +15,11 @@ export const ROUTES = {
   contact: "/contact",
   basket: "/basket",
   profile: "/profile",
+  compare: "/compare",
   blogDetail: (slug: string) => `/blogs/${slug}`,
   partDetail: (partId: string) => `/parts/${partId}`,
+  compareParts: (basePartId: string | number, targetPartId?: string | number) =>
+    `/compare?base=${basePartId}${targetPartId != null ? `&target=${targetPartId}` : ""}`,
   partsBrand: (brandSlug: string) => `/parts/${brandSlug}`,
   partsCar: (brandSlug: string, carSlug: string) => `/parts/${brandSlug}/${carSlug}`,
   partsPart: (brandSlug: string, carSlug: string, partId: string) =>

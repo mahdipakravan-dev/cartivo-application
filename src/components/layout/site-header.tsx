@@ -17,7 +17,7 @@ import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 const navItems = [
   { label: "خانه", href: ROUTES.home },
   { label: "دسته بندی", href: ROUTES.categories },
-  { label: "خدمات", href: `${ROUTES.home}#services` },
+  { label: "قطعات", href: `${ROUTES.parts}` },
   { label: "تماس با ما", href: ROUTES.contact },
 ];
 
@@ -73,12 +73,12 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
           : "border-slate-100 bg-white text-slate-900"
       )}
     >
-      <header className="container-cartivo flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <header className="container-cartivo relative flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Right — Logo */}
         <Link
           href={ROUTES.home}
           className={cn(
-            "flex items-center gap-2",
+            "relative z-10 flex items-center gap-2",
             isHero ? "text-white" : "text-slate-800"
           )}
           aria-label={`${siteConfig.name} — خانه`}
@@ -104,9 +104,9 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         {/* Center — Desktop Navigation */}
         <nav
           aria-label="ناوبری اصلی"
-          className="absolute inset-x-0 top-0 hidden h-full items-center justify-center lg:flex"
+          className="pointer-events-none absolute inset-x-0 top-0 hidden h-full items-center justify-center lg:flex"
         >
-          <ul className="flex items-center gap-1">
+          <ul className="pointer-events-auto flex items-center gap-1">
             {navItems.map((item) => {
               const hrefWithoutHash = item.href.split("#")[0];
               const isHomeItem = hrefWithoutHash === ROUTES.home;
@@ -145,7 +145,7 @@ export function SiteHeader({ variant = "white" }: SiteHeaderProps) {
         </nav>
 
         {/* Left — Actions */}
-        <div className="flex items-center gap-1">
+        <div className="relative z-10 flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"

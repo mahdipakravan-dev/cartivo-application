@@ -49,8 +49,6 @@ function ArticleCard({ article, featured = false }: { article: BlogPreview; feat
 
 export async function Articles() {
   const articles = await getLatestRelatedBlogs(4);
-  if (articles.length === 0) return null;
-
   return (
     <section className="bg-white py-14 sm:py-16" aria-label="آخرین مقالات">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">

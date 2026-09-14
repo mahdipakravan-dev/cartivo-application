@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // خروجی استاندارد Node — در صورت نیاز به Docker می‌توانید "standalone" کنید
   // output: "standalone",
-
   images: {
     // دامنه‌ی سرویس فایل/تصویر بک‌اند را اینجا اضافه کنید
     remotePatterns: [
@@ -29,7 +28,6 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: true,
   },
 
-  // هدرهای امنیتی پایه (مکمل تنظیمات وب‌سرور)
   async headers() {
     return [
       {

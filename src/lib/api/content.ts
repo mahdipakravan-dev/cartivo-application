@@ -1,5 +1,4 @@
 import { apiClient } from "./client";
-import { searchParts } from "./parts";
 import type { BlogDetailResponse, PageResponse, PartBrandFrontofficeResponse } from "./types";
 
 export interface BlogPreview {
@@ -43,19 +42,12 @@ export async function getPartBrandBySlug(slug: string): Promise<PartBrandFrontof
 
 export async function getLatestRelatedBlogs(size = 4): Promise<BlogPreview[]> {
   try {
-    const seed = await searchParts({ size: 1, sortBy: "createdAt", sortDir: "DESC" });
-    const partId = seed.items[0]?.id;
-    if (partId == null) return [];
-
     const { data, error } = await apiClient.GET("/api/frontoffice/blogs/top", {
-      params: { query: {  page: 0, size : 3, sortBy: "createdAt", sortDir: "DESC" } },
+      params: { query: { page: 0, size, sortBy: "createdAt", sortDir: "DESC" } },
       cache: "no-store",
     });
     if (error || !data) return [];
-
-    return (((data as PageResponse).content ?? []) as Record<string, unknown>[])
-      .map(normalizeBlog)
-      .filter((blog): blog is BlogPreview => blog !== null);
+    return normalizeBlogCollection(data);
   } catch {
     return [];
   }
@@ -68,9 +60,7 @@ export async function getRelatedBlogs(partId: number, size = 3): Promise<BlogPre
       cache: "no-store",
     });
     if (error || !data) return [];
-    return (((data as PageResponse).content ?? []) as Record<string, unknown>[])
-      .map(normalizeBlog)
-      .filter((blog): blog is BlogPreview => blog !== null);
+    return normalizeBlogCollection(data);
   } catch {
     return [];
   }
@@ -107,6 +97,18 @@ function normalizeBlog(value: Record<string, unknown>): BlogPreview | null {
   if (publishedAt) blog.publishedAt = publishedAt;
   if (category) blog.category = category;
   return blog;
+}
+
+function normalizeBlogCollection(value: unknown): BlogPreview[] {
+  const items = Array.isArray(value)
+    ? value
+    : Array.isArray((value as PageResponse).content)
+      ? (value as PageResponse).content
+      : [];
+
+  return (items as Record<string, unknown>[])
+    .map(normalizeBlog)
+    .filter((blog): blog is BlogPreview => blog !== null);
 }
 
 function stringValue(value: unknown): string | undefined {

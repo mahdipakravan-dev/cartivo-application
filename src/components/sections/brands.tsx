@@ -51,11 +51,10 @@ function StaticBrands({ brands }: { brands: BrandFrontofficeResponse[] }) {
 
 export async function BrandsSection() {
   const brands = await getTopBrands();
-  const brandItems = brands
+  const brandItems = brands as BrandFrontofficeResponse[]
 
-  if (brandItems.length === 0) return null;
+  if (brandItems?.length === 0) return null;
 
-  console.log(brandItems)
   // More than 8 brands — use infinite marquee
   const { BrandMarquee } = await import("@/components/sections/brand-marquee");
 
