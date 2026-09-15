@@ -75,7 +75,7 @@ export async function apiFetch<T>(
     const fallback = response.status === 401
       ? "برای ادامه خرید وارد حساب کاربری شوید."
       : response.status === 403
-        ? "این عملیات فقط با حساب مشتری مجاز است."
+        ? "لطفا مجددا وارد سامانه شوید."
         : `خطا در ارتباط با سرور (${response.status})`;
     throw new ApiError(response.status, body?.message || fallback, body);
   }

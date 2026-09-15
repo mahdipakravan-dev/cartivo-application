@@ -838,6 +838,11 @@ export interface components {
              */
             paymentMethodId: number;
             items: components["schemas"]["OrderItemFrontofficeRequest"][];
+            /**
+             * @description Optional global voucher code
+             * @example SAVE10
+             */
+            voucherCode?: string;
         };
         OrderItemFrontofficeRequest: {
             /**
@@ -872,7 +877,12 @@ export interface components {
              */
             status?: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
             /** @example 2500000 */
+            subtotalAmountRial?: number;
+            /** @example 250000 */
+            discountAmountRial?: number;
+            /** @example 2500000 */
             totalAmountRial?: number;
+            voucher?: components["schemas"]["VoucherInfo"];
             address?: components["schemas"]["CustomerAddressResponse"];
             paymentMethod?: components["schemas"]["PaymentMethodInfo"];
             items?: components["schemas"]["OrderItemFrontofficeResponse"][];
@@ -912,6 +922,11 @@ export interface components {
             persianName?: string;
             slug?: string;
             iconUrl?: string;
+        };
+        /** @description Voucher snapshot captured when the order was created */
+        VoucherInfo: {
+            code?: string;
+            percent?: number;
         };
         /** @description Verify an OTP code and log in / register the customer */
         OtpVerifyRequest: {

@@ -111,7 +111,7 @@ export function BasketPage() {
           <p className="mt-3 text-sm leading-7 text-slate-500">سفارش با موفقیت دریافت شد و در انتظار بررسی است.</p>
           {order.id != null && <p className="mt-4 rounded-xl bg-slate-50 py-3 text-sm text-slate-500">شماره سفارش: <b className="text-slate-800">{order.id.toLocaleString("fa-IR")}</b></p>}
           {order.items?.length ? <div className="mt-4 space-y-2 text-right">{order.items.map((item, index) => <div key={`${item.partId}-${item.sellerId}-${index}`} className="rounded-xl border border-slate-100 p-3"><p className="text-sm font-bold text-slate-700">{item.partName || "قطعه خودرو"}</p><p className="mt-1 text-xs text-cyan-700">{item.sellerName || `فروشنده #${item.sellerId ?? "—"}`}</p><p className="mt-1 text-xs text-slate-400">{item.quantity?.toLocaleString("fa-IR") ?? "—"} × {formatServerPrice(item.unitPriceRial)} = {formatServerPrice(item.lineTotalRial)}</p></div>)}</div> : null}
-          {order.totalAmountRial != null && <p className="mt-4 text-lg font-black text-[#14305A]">مبلغ نهایی: {order.totalAmountRial.toLocaleString("fa-IR")} ریال</p>}
+          {(order.subtotalAmountRial != null || order.totalAmountRial != null) && <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm"><dl className="space-y-3"><div className="flex justify-between"><dt className="text-slate-500">جمع کالاها</dt><dd>{formatServerPrice(order.subtotalAmountRial)}</dd></div>{order.voucher && <div className="flex justify-between text-emerald-700"><dt>کد تخفیف</dt><dd>{order.voucher.code || "—"} ({formatPercent(order.voucher.percent)})</dd></div>}{order.discountAmountRial != null && order.discountAmountRial > 0 && <div className="flex justify-between text-emerald-700"><dt>مبلغ تخفیف</dt><dd>− {formatServerPrice(order.discountAmountRial)}</dd></div>}<div className="flex justify-between border-t border-slate-200 pt-3 text-base font-black text-[#14305A]"><dt>مبلغ نهایی</dt><dd>{formatServerPrice(order.totalAmountRial)}</dd></div></dl></div>}
           <Button render={<Link href={ROUTES.parts} />} className="mt-6 h-11 w-full rounded-xl">ادامه خرید</Button>
         </div>
       </main>
@@ -174,4 +174,8 @@ export function BasketPage() {
 
 function formatServerPrice(value?: number) {
   return value == null ? "—" : `${value.toLocaleString("fa-IR")} ریال`;
+}
+
+function formatPercent(value?: number) {
+  return value == null ? "—" : `${value.toLocaleString("fa-IR", { maximumFractionDigits: 2 })}٪`;
 }

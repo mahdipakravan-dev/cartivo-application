@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { ArrowRight, Check, CreditCard, LoaderCircle, MapPin, Plus, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createAddress, getAddresses, getPaymentMethods, type CustomerAddress, type CustomerAddressRequest, type PaymentMethod } from "@/lib/api/checkout";
-import { createOrder, type Order } from "@/lib/api/orders";
+import { createOrder, findMatchingRecentOrder, getMyOrders, type Order, type OrderRequest } from "@/lib/api/orders";
 import { createPriceLock, getPartSellerOffers, validatePriceLock, type PriceLock } from "@/lib/api/pricing";
 import { clearAccessToken, getAccessToken } from "@/lib/api/auth-token";
 import { isApiError } from "@/lib/api/fetch";
@@ -45,6 +45,8 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
   const [creatingAddress, setCreatingAddress] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
+  const [voucherCode, setVoucherCode] = useState("");
   const [priceLocks, setPriceLocks] = useState<Record<string, PriceLock>>({});
   const [sellerPrices, setSellerPrices] = useState<Record<string, number>>(() =>
     Object.fromEntries(
@@ -168,6 +170,7 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
   };
 
   const finalize = async () => {
+    if (submissionInFlight.current) return;
     if (hasInvalidLines) {
       setError("برای ادامه باید فروشنده اقلام نامعتبر را دوباره انتخاب کنید.");
       return;
@@ -176,13 +179,17 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
       setError("آدرس تحویل و روش پرداخت را انتخاب کنید.");
       return;
     }
+    submissionInFlight.current = true;
     setSubmitting(true);
     setError("");
+    const submittedAt = Date.now();
+    let orderRequest: OrderRequest | null = null;
     try {
       const { locks, failures } = await validateOrRenewLocks(checkoutItems, priceLocks);
       setPriceLocks(locks);
       if (failures.length > 0) setLockNotice("برخی قفل‌های قیمت تمدید نشدند؛ سفارش با قیمت جاری فروشنده ثبت می‌شود.");
-      const order = await createOrder({
+      const normalizedVoucherCode = voucherCode.trim();
+      orderRequest = {
         addressId,
         paymentMethodId,
         items: checkoutItems.map((item) => {
@@ -194,7 +201,9 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
             ...(isUsablePriceLock(lock, item) ? { priceLockToken: lock.lockToken } : {}),
           };
         }),
-      });
+        ...(normalizedVoucherCode ? { voucherCode: normalizedVoucherCode } : {}),
+      };
+      const order = await createOrder(orderRequest);
       onSuccess(order);
     } catch (requestError) {
       if (isApiError(requestError, 401)) requestAuthentication();
@@ -212,8 +221,23 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
           }
         }
       }
-      setError(requestError instanceof Error ? requestError.message : "ثبت سفارش با خطا مواجه شد.");
+      if (!isApiError(requestError) && orderRequest) {
+        try {
+          const recentOrders = await getMyOrders({ page: 0, size: 20, sortBy: "createdAt", sortDir: "DESC" });
+          const matchingOrder = findMatchingRecentOrder(recentOrders.content ?? [], orderRequest, submittedAt);
+          if (matchingOrder) {
+            onSuccess(matchingOrder);
+            return;
+          }
+          setError("پاسخ ثبت سفارش دریافت نشد، اما سفارش مشابهی در تاریخچه پیدا نشد. می‌توانید دوباره تلاش کنید.");
+        } catch {
+          setError("ارتباط هنگام ثبت سفارش قطع شد و بررسی تاریخچه سفارش‌ها نیز ممکن نبود. پیش از تلاش دوباره، سفارش‌های حساب خود را بررسی کنید.");
+        }
+      } else {
+        setError(requestError instanceof Error ? requestError.message : "ثبت سفارش با خطا مواجه شد.");
+      }
     } finally {
+      submissionInFlight.current = false;
       setSubmitting(false);
     }
   };
@@ -282,6 +306,22 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
         <button type="button" onClick={onBack} className="mb-5 flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-[#14305A]"><ArrowRight className="size-4" /> بازگشت به سبد خرید</button>
         <h2 className="font-black text-slate-900">خلاصه نهایی سفارش</h2>
         <dl className="mt-5 space-y-4 text-sm"><div className="flex justify-between"><dt className="text-slate-500">تعداد کالا</dt><dd>{checkoutItems.reduce((sum, item) => sum + item.quantity, 0).toLocaleString("fa-IR")}</dd></div><div className="flex justify-between"><dt className="text-slate-500">قیمت فروشندگان</dt><dd>{lockedTotal.toLocaleString("fa-IR")} ریال</dd></div></dl>
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <label htmlFor="voucher-code" className="text-xs font-bold text-slate-600">کد تخفیف (اختیاری)</label>
+          <Input
+            id="voucher-code"
+            value={voucherCode}
+            onChange={(event) => setVoucherCode(event.target.value)}
+            onBlur={() => setVoucherCode((value) => value.trim())}
+            disabled={submitting}
+            dir="ltr"
+            autoComplete="off"
+            spellCheck={false}
+            className="mt-2 h-11 rounded-xl text-left uppercase"
+            placeholder="SAVE10"
+          />
+          <p className="mt-2 text-[11px] leading-5 text-slate-400">اعتبار کد هنگام ثبت نهایی سفارش توسط سرور بررسی می‌شود.</p>
+        </div>
         <div className="my-5 h-px bg-slate-100" />
         <div className="flex items-end justify-between"><span className="text-sm font-bold text-slate-600">{allPricesLocked ? "مبلغ قفل‌شده سفارش" : "مبلغ برآوردی سفارش"}</span><b className="text-xl text-[#14305A]">{lockedTotal.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></b></div>
         {lockNotice && <p role="status" className="mt-4 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-800">{lockNotice}</p>}
