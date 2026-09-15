@@ -1,6 +1,7 @@
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { siteConfig } from "@/lib/config/site";
+import { getAllTopLevelParts } from "@/lib/api/parts";
 import { iranYekan } from "@/lib/fonts";
 import { StoreProvider } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -39,14 +40,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const topLevelParts = await getAllTopLevelParts();
+
   return (
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
       <body className="flex min-h-dvh flex-col">
         <StoreProvider>
-          <SiteHeader variant="transparent-background" />
+          <SiteHeader
+            variant="transparent-background"
+            topLevelParts={topLevelParts}
+          />
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </StoreProvider>

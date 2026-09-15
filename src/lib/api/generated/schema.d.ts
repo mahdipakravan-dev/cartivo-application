@@ -329,6 +329,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/parts/top-level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all active top-level Parts
+         * @description Returns active, non-deleted Parts whose parentPartId is null, without requiring a car selection.
+         */
+        get: operations["listAllTopLevelParts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/parts/search": {
         parameters: {
             query?: never;
@@ -432,6 +452,23 @@ export interface paths {
          * @description Case-insensitive partial match on name/model/slug fields. Returns grouped results: brands, cars, part categories, and leaf parts.
          */
         get: operations["globalSearch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active categories for a top-level Part */
+        get: operations["listFrontofficeCategoriesByParent"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1020,6 +1057,14 @@ export interface components {
             brand?: components["schemas"]["CarBrandResponse"];
             imageUrls?: string[];
         };
+        /** @description Compact category information embedded in part responses */
+        CategorySummaryResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            persianName?: string;
+            imageUrl?: string;
+        };
         /** @description Part manufacturer/brand info */
         PartBrandResponse: {
             /** Format: int64 */
@@ -1053,12 +1098,18 @@ export interface components {
             partBrand?: components["schemas"]["PartBrandResponse"];
             cars?: components["schemas"]["CarResponse"][];
             imageUrls?: string[];
+            categories?: components["schemas"]["CategorySummaryResponse"][];
+            manufacturerYears?: number[];
         };
         SellerOfferResponse: {
             /** Format: int64 */
             sellerId?: number;
             sellerName?: string;
             priceRial?: number;
+            /** Format: int32 */
+            inventoryQuantity?: number;
+            /** Format: int32 */
+            availableQuantity?: number;
             /** Format: date-time */
             validFrom?: string;
             /** Format: date-time */
@@ -1176,6 +1227,7 @@ export interface components {
             id?: number;
             name?: string;
             position?: string;
+            manufacturerYears?: number[];
         };
         /** @description Minimal child part info */
         PartChildResult: {
@@ -1187,6 +1239,7 @@ export interface components {
             parentPartId?: number;
             parentPartName?: string;
             partBrandName?: string;
+            manufacturerYears?: number[];
         };
         /** @description Single car detail returned to the customer-facing site/app */
         CarFrontofficeDetailResponse: {
@@ -2073,6 +2126,47 @@ export interface operations {
             };
         };
     };
+    listAllTopLevelParts: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of active top-level Parts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+        };
+    };
     search: {
         parameters: {
             query?: {
@@ -2429,6 +2523,70 @@ export interface operations {
             };
             /** @description Missing search query */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listFrontofficeCategoriesByParent: {
+        parameters: {
+            query: {
+                /**
+                 * @description Top-level Part ID
+                 * @example 1
+                 */
+                parentId: number;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Page of active categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponse"];
+                };
+            };
+            /** @description The supplied Part is not top-level */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parent Part not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

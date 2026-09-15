@@ -16,6 +16,8 @@ export type CarFrontofficeDetailResponse =
 export type CarResponse = components["schemas"]["CarResponse"];
 export type PartFrontofficeResponse =
   components["schemas"]["PartFrontofficeResponse"];
+export type CategorySummaryResponse =
+  components["schemas"]["CategorySummaryResponse"];
 export type PartBrandFrontofficeResponse =
   components["schemas"]["PartBrandFrontofficeResponse"];
 export type BlogDetailResponse = components["schemas"]["BlogDetailResponse"];

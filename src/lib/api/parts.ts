@@ -1,5 +1,6 @@
 import { apiClient } from "./client";
 import type { PartFrontofficeResponse, PaginatedResult, PageResponse } from "./types";
+import { collectPaginatedItems } from "../catalog-navigation";
 
 function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T> {
   return {
@@ -30,6 +31,26 @@ export interface PartSearchParams {
 export type PartSearchParamsUpdate = {
   [K in keyof PartSearchParams]: PartSearchParams[K] | undefined;
 };
+
+/** Fetch every active top-level part for global catalog navigation. */
+export async function getAllTopLevelParts(): Promise<PartFrontofficeResponse[]> {
+  try {
+    return await collectPaginatedItems(async (page) => {
+      const { data, error } = await apiClient.GET("/api/frontoffice/parts/top-level", {
+        params: {
+          query: { page, size: 100, sortBy: "name", sortDir: "ASC" },
+        },
+        cache: "force-cache",
+        next: { tags: ["top-level-parts"] },
+      });
+
+      if (error || !data) throw new Error("Failed to fetch top-level parts");
+      return parsePage<PartFrontofficeResponse>(data);
+    });
+  } catch {
+    return [];
+  }
+}
 
 export async function searchParts(
   params: PartSearchParams,
