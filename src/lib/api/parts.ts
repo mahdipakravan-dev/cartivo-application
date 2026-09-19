@@ -19,6 +19,8 @@ export interface PartSearchParams {
   carIds?: number[];
   partBrandIds?: number[];
   parentPartIds?: number[];
+  parentId?: number;
+  categoryId?: number;
   positionType?: "INTERIOR" | "EXTERIOR";
   minPrice?: number;
   maxPrice?: number;
@@ -31,6 +33,17 @@ export interface PartSearchParams {
 export type PartSearchParamsUpdate = {
   [K in keyof PartSearchParams]: PartSearchParams[K] | undefined;
 };
+
+/** Fetch every purchasable part matching the supplied catalog filters. */
+export async function searchAllParts(
+  params: Omit<PartSearchParams, "page" | "size">,
+): Promise<PartFrontofficeResponse[]> {
+  return collectPaginatedItems((page) => searchParts({
+    ...params,
+    page,
+    size: 100,
+  }));
+}
 
 /** Fetch every active top-level part for global catalog navigation. */
 export async function getAllTopLevelParts(): Promise<PartFrontofficeResponse[]> {
@@ -65,6 +78,8 @@ export async function searchParts(
     if (params.carIds?.length) query.carIds = params.carIds;
     if (params.partBrandIds?.length) query.partBrandIds = params.partBrandIds;
     if (params.parentPartIds?.length) query.parentPartIds = params.parentPartIds;
+    if (params.parentId != null) query.parentId = params.parentId;
+    if (params.categoryId != null) query.categoryId = params.categoryId;
     if (params.positionType) query.positionType = params.positionType;
     if (params.minPrice != null) query.minPrice = params.minPrice;
     if (params.maxPrice != null) query.maxPrice = params.maxPrice;

@@ -18,9 +18,9 @@ const HERO_SECTION_HEIGHT = {
   lg: "lg:min-h-[700px]",
   innerBase: "min-h-[520px]",
   innerLg: "lg:min-h-[580px]",
-  imageBase: "min-h-[380px]",
-  imageSm: "sm:min-h-[470px]",
-  imageLg: "lg:min-h-[540px]",
+  imageBase: "min-h-[280px]",
+  imageSm: "sm:min-h-[380px]",
+  imageLg: "lg:min-h-[500px]",
 } as const;
 
 export function HomeHero({ brands, variant = "default" }: HomeHeroProps) {
@@ -74,7 +74,7 @@ export function HomeHero({ brands, variant = "default" }: HomeHeroProps) {
     return (
       <section
         className={cn(
-          "relative isolate overflow-hidden bg-primary pt-24 text-white lg:pt-28",
+          "relative z-10 isolate overflow-x-clip bg-primary pt-24 text-white lg:pt-28",
           HERO_SECTION_HEIGHT.base,
           HERO_SECTION_HEIGHT.lg
         )}
@@ -89,7 +89,7 @@ export function HomeHero({ brands, variant = "default" }: HomeHeroProps) {
             HERO_SECTION_HEIGHT.innerLg
           )}
         >
-          <div className="grid w-full items-center justify-between gap-14 lg:grid-cols-[minmax(460px,1.2fr)_minmax(0,0.9fr)] lg:gap-4">
+          <div className="grid w-full items-center justify-between gap-2 sm:gap-8 lg:grid-cols-[minmax(460px,1.2fr)_minmax(0,0.9fr)] lg:gap-6">
 
             <div className="max-w-2xl justify-self-start text-right">
               <p className="mb-4 inline-flex rounded-full  px-4 py-1.5 text-xs font-semibold text-white/80 backdrop-blur">
@@ -110,7 +110,7 @@ export function HomeHero({ brands, variant = "default" }: HomeHeroProps) {
               </div>
             </div>
             
-            <div className="relative mx-auto w-full max-w-[860px] lg:mx-0">
+            <div className="relative mx-auto w-full max-w-[760px] lg:mx-0">
               <figure
                 aria-label="ویترین خودروها"
                 className={cn(
@@ -120,41 +120,41 @@ export function HomeHero({ brands, variant = "default" }: HomeHeroProps) {
                   HERO_SECTION_HEIGHT.imageLg
                 )}
               >
-                <div className="pointer-events-none absolute inset-[8%_5%_4%] rounded-full bg-gradient-to-br from-cyan-300/30 via-sky-300/10 to-transparent blur-3xl" />
-                <div className="pointer-events-none absolute inset-x-[3%] bottom-[9%] h-[15%] rounded-[50%] bg-slate-950/40 blur-2xl" />
+                <div className="pointer-events-none absolute inset-[10%_8%_5%] rounded-full bg-gradient-to-br from-cyan-300/30 via-sky-300/10 to-transparent blur-3xl" />
+                <div className="pointer-events-none absolute inset-x-[8%] bottom-[7%] h-[12%] rounded-[50%] bg-slate-950/45 blur-2xl" />
 
                 <div
                   role="group"
                   aria-label="خودروها در یک ردیف"
                   dir="ltr"
-                  className="absolute inset-x-[-8%] bottom-[7%] z-10 flex h-[72%] items-end justify-center sm:inset-x-[-5%] lg:inset-x-[-10%]"
+                  className="absolute inset-x-0 bottom-[5%] z-10 h-[86%]"
                 >
-                  <span className="relative z-10 h-[82%] w-[39%] shrink-0 transition-transform duration-500 hover:z-40 hover:-translate-y-1 hover:scale-[1.03]">
+                  <span className="absolute bottom-[9%] left-0 z-10 aspect-[4/3] w-[56%] sm:w-[50%] lg:left-[2%]">
                     <Image
                       src="/images/home-hero/car-kapra.png"
                       alt="کاپرا نقره‌ای"
                       fill
-                      sizes="(min-width: 1024px) 18vw, 38vw"
+                      sizes="(min-width: 1024px) 20vw, 48vw"
                       className="object-contain object-bottom drop-shadow-[0_24px_38px_rgba(2,6,23,0.42)]"
                     />
                   </span>
 
-                  <span className="relative z-20 -ml-[5%] h-[88%] w-[39%] shrink-0 transition-transform duration-500 hover:z-40 hover:-translate-y-1 hover:scale-[1.03]">
+                  <span className="absolute bottom-[2%] left-1/2 z-30 aspect-[4/3] w-[68%] -translate-x-1/2 sm:w-[61%]">
                     <Image
                       src="/images/home-hero/car-jack.png"
                       alt="جک S5 سفید"
                       fill
-                      sizes="(min-width: 1024px) 18vw, 38vw"
-                      className="object-contain object-bottom drop-shadow-[0_24px_38px_rgba(2,6,23,0.42)]"
+                      sizes="(min-width: 1024px) 24vw, 58vw"
+                      className="object-contain object-bottom drop-shadow-[0_26px_42px_rgba(2,6,23,0.48)]"
                     />
                   </span>
 
-                  <span className="relative z-30 -ml-[5%] h-[80%] w-[39%] shrink-0 transition-transform duration-500 hover:z-40 hover:-translate-y-1 hover:scale-[1.03]">
+                  <span className="absolute bottom-[8%] right-0 z-20 aspect-[4/3] w-[56%] sm:w-[50%] lg:right-[2%]">
                     <Image
                       src="/images/home-hero/car-benz.png"
                       alt="مرسدس بنز C200 سفید"
                       fill
-                      sizes="(min-width: 1024px) 18vw, 38vw"
+                      sizes="(min-width: 1024px) 20vw, 48vw"
                       className="object-contain object-bottom drop-shadow-[0_24px_38px_rgba(2,6,23,0.46)]"
                       priority
                     />

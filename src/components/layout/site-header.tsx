@@ -97,29 +97,6 @@ function SupportDrawer({
           <div dir="rtl"><CartivoLogo /></div>
         </div>
 
-        <div className="space-y-5 border-b border-slate-200 pb-6">
-          <a href="tel:02191001234" className="flex items-center gap-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600"><Headphones className="size-5" /></span>
-            <span><b className="block text-[15px]">۰۲۱-۹۱۰۰۱۲۳۴</b><small className="text-xs text-slate-500">پشتیبانی تلفنی (۸ صبح تا ۱۰ شب)</small></span>
-          </a>
-          <button type="button" className="flex w-full items-center gap-4 text-right">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600"><MessageSquare className="size-5" /></span>
-            <span><b className="block text-[16px]">گفتگوی آنلاین</b><small className="text-xs text-slate-500">پاسخ‌دهی سریع و آنلاین</small></span>
-          </button>
-          <Link href={ROUTES.contact} onClick={onClose} className="flex items-center gap-4">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600"><CircleHelp className="size-5" /></span>
-            <span><b className="block text-[16px]">مرکز راهنما</b><small className="text-xs text-slate-500">سوالات متداول و راهنمای خرید</small></span>
-          </Link>
-        </div>
-
-        <div className="space-y-1 border-b border-slate-200 py-4">
-          <Link href={ROUTES.profile} onClick={onClose} className="flex items-center gap-4 rounded-xl py-2.5 hover:bg-slate-50">
-            <UserRound className="size-6" /><span className="flex-1"><b className="block">حساب کاربری</b><small className="text-xs text-slate-500">ورود / ثبت‌نام</small></span><ChevronLeft className="size-5" />
-          </Link>
-          <button type="button" className="flex w-full items-center gap-4 rounded-xl py-2.5 text-right hover:bg-slate-50">
-            <Heart className="size-6" /><span className="flex-1"><b className="block">علاقه‌مندی‌ها</b><small className="text-xs text-slate-500">محصولات ذخیره‌شده</small></span><ChevronLeft className="size-5" />
-          </button>
-        </div>
 
         <h2 className="mb-3 mt-5 text-[22px] font-black text-slate-950">دسته‌بندی‌ها</h2>
         <nav aria-label="دسته‌بندی‌های محصولات">

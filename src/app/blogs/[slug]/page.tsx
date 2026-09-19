@@ -57,7 +57,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   return (
     <>
       <JsonLd data={jsonLd} />
-      <main className="bg-[#f8fafc] pb-20 pt-24 sm:pt-28">
+      <main className="bg-[#f8fafc] pb-20 pt-12 sm:pt-28">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <nav aria-label="مسیر ناوبری" className="mb-6 overflow-hidden text-xs text-slate-400">
             <ol className="flex items-center gap-1.5 whitespace-nowrap"><li><Link href={ROUTES.home} className="hover:text-[#14305A]">خانه</Link></li><li><ChevronLeft className="size-3" /></li><li className="text-slate-500">مجله کارتیوو</li><li><ChevronLeft className="size-3" /></li><li className="truncate font-bold text-slate-600">{title}</li></ol>

@@ -48,7 +48,7 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
 
           <section className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-4 shadow-[0_20px_60px_rgb(15_23_42/0.06)] sm:p-7 lg:p-9">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-12">
-              <ProductGallery images={images} name={name} />
+              <ProductGallery images={images} name={name} {...(part.id != null ? { partId: part.id } : {})} />
               <div className="flex flex-col py-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-700"><BadgeCheck className="size-4" /> تضمین اصالت کالا</div>
                 <h1 className="mt-4 text-2xl font-black leading-relaxed text-slate-900 sm:text-3xl">{name}</h1>

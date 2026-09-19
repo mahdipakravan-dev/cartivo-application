@@ -9,6 +9,7 @@ import { getAccessToken } from "@/lib/api/auth-token";
 import { getPartSellerOffers } from "@/lib/api/pricing";
 import { ROUTES } from "@/lib/routes";
 import { cartLineKey, useCartStore } from "@/lib/store/cart-store";
+import { getAvailableQuantityError } from "@/lib/seller-shipping";
 import { CheckoutStep } from "@/components/cart/checkout-step";
 
 export function BasketPage() {
@@ -24,6 +25,7 @@ export function BasketPage() {
   const [refreshingPrices, setRefreshingPrices] = useState(false);
   const [priceError, setPriceError] = useState("");
   const [invalidLines, setInvalidLines] = useState<Record<string, string>>({});
+  const [availableQuantities, setAvailableQuantities] = useState<Record<string, number>>({});
   const lineSignature = items.map((item) => cartLineKey(item.partId, item.sellerId)).join(",");
   useEffect(() => setMounted(true), []);
 
@@ -37,6 +39,7 @@ export function BasketPage() {
       .then((results) => {
         if (!active) return;
         const nextInvalidLines: Record<string, string> = {};
+        const nextAvailableQuantities: Record<string, number> = {};
         results.forEach((result, index) => {
           const item = currentItems[index];
           if (!item) return;
@@ -50,10 +53,20 @@ export function BasketPage() {
             nextInvalidLines[key] = "این فروشنده دیگر برای این قطعه پیشنهاد فعالی ندارد.";
             return;
           }
+          if (offer.availableQuantity != null) {
+            nextAvailableQuantities[key] = offer.availableQuantity;
+          }
           updateItemPrice(item.partId, item.sellerId, offer.priceRial);
         });
         setInvalidLines(nextInvalidLines);
-        if (Object.keys(nextInvalidLines).length > 0) {
+        setAvailableQuantities(nextAvailableQuantities);
+        const hasQuantityError = currentItems.some((item) =>
+          getAvailableQuantityError(
+            item.quantity,
+            nextAvailableQuantities[cartLineKey(item.partId, item.sellerId)],
+          ),
+        );
+        if (Object.keys(nextInvalidLines).length > 0 || hasQuantityError) {
           setPriceError("برخی پیشنهادهای سبد خرید تغییر کرده یا دیگر در دسترس نیستند.");
         }
       })
@@ -78,7 +91,12 @@ export function BasketPage() {
   }, [awaitingAuthentication]);
 
   const total = items.reduce((sum, item) => sum + item.displayedUnitPriceRial * item.quantity, 0);
-  const hasInvalidLines = Object.keys(invalidLines).length > 0;
+  const hasInvalidLines = Object.keys(invalidLines).length > 0 || items.some((item) =>
+    getAvailableQuantityError(
+      item.quantity,
+      availableQuantities[cartLineKey(item.partId, item.sellerId)],
+    ),
+  );
 
   const goToCheckout = () => {
     if (hasInvalidLines) {
@@ -139,22 +157,27 @@ export function BasketPage() {
           <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
             <section className="space-y-3">
               {priceError && <p role="alert" className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-800">{priceError}</p>}
-              {items.map((item) => (
-                <article key={cartLineKey(item.partId, item.sellerId)} className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5">
+              {items.map((item) => {
+                const key = cartLineKey(item.partId, item.sellerId);
+                const availableQuantity = availableQuantities[key];
+                const lineError = invalidLines[key] ?? getAvailableQuantityError(item.quantity, availableQuantity);
+                return (
+                <article key={key} className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:p-5">
                   <Link href={ROUTES.partDetail(String(item.partId))} className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50">
                     {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="size-full object-contain p-2" /> : <Package className="size-8 text-[#14305A]" />}
                   </Link>
-                  <div className="min-w-0 flex-1"><Link href={ROUTES.partDetail(String(item.partId))} className="font-extrabold leading-7 text-slate-800 hover:text-blue-700">{item.name}</Link><p className="mt-1 text-xs font-bold text-cyan-700">فروشنده: {item.sellerName}</p><p className="mt-1 text-sm font-bold text-[#14305A]">{item.displayedUnitPriceRial.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></p>{invalidLines[cartLineKey(item.partId, item.sellerId)] && <p className="mt-2 text-xs leading-5 text-red-600">{invalidLines[cartLineKey(item.partId, item.sellerId)]} <Link href={ROUTES.partDetail(String(item.partId))} className="font-bold underline">انتخاب فروشنده جدید</Link></p>}</div>
+                  <div className="min-w-0 flex-1"><Link href={ROUTES.partDetail(String(item.partId))} className="font-extrabold leading-7 text-slate-800 hover:text-blue-700">{item.name}</Link><p className="mt-1 text-xs font-bold text-cyan-700">فروشنده: {item.sellerName}</p><p className="mt-1 text-sm font-bold text-[#14305A]">{item.displayedUnitPriceRial.toLocaleString("fa-IR")} <span className="text-[10px] font-normal text-slate-400">ریال</span></p>{lineError && <p className="mt-2 text-xs leading-5 text-red-600">{lineError} <Link href={ROUTES.partDetail(String(item.partId))} className="font-bold underline">انتخاب فروشنده جدید</Link></p>}</div>
                   <div className="flex items-center justify-between gap-3 sm:justify-end">
                     <div className="flex items-center rounded-xl border border-slate-200 p-1">
-                      <button type="button" onClick={() => setQuantity(item.partId, item.sellerId, item.quantity + 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="افزایش تعداد"><Plus className="size-4" /></button>
+                      <button type="button" onClick={() => setQuantity(item.partId, item.sellerId, item.quantity + 1)} disabled={availableQuantity != null && item.quantity >= availableQuantity} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-35" aria-label="افزایش تعداد"><Plus className="size-4" /></button>
                       <span className="w-9 text-center text-sm font-bold">{item.quantity.toLocaleString("fa-IR")}</span>
                       <button type="button" onClick={() => setQuantity(item.partId, item.sellerId, item.quantity - 1)} className="flex size-8 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100" aria-label="کاهش تعداد"><Minus className="size-4" /></button>
                     </div>
                     <button type="button" onClick={() => removeItem(item.partId, item.sellerId)} className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`حذف ${item.name}`}><Trash2 className="size-4" /></button>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </section>
 
             <aside className="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/40 lg:sticky lg:top-24">

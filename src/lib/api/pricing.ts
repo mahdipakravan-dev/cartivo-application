@@ -1,9 +1,18 @@
 import { apiFetch } from "./fetch";
 import type { components } from "./generated/schema";
+import type { SellerShippingMethod } from "@/lib/seller-shipping";
 
 export type EffectivePrice = components["schemas"]["EffectivePriceResponse"];
 export type PriceLock = components["schemas"]["PriceLockResponse"];
-export type SellerOffer = components["schemas"]["SellerOfferResponse"];
+type GeneratedSellerOffer = components["schemas"]["SellerOfferResponse"];
+export type SellerOffer = Omit<
+  GeneratedSellerOffer,
+  "shippingCostRial" | "shippingMethod" | "sellerDetails"
+> & {
+  shippingCostRial?: number | null;
+  shippingMethod?: SellerShippingMethod | null;
+  sellerDetails?: string | null;
+};
 export type PriceHistoryPage = components["schemas"]["PageResponsePartAveragePriceHistoryResponse"];
 export type PriceHistoryPoint = components["schemas"]["PartAveragePriceHistoryResponse"];
 

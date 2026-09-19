@@ -1106,6 +1106,10 @@ export interface components {
             sellerId?: number;
             sellerName?: string;
             priceRial?: number;
+            shippingCostRial?: number;
+            /** @enum {string} */
+            shippingMethod?: "SELLER_DELIVERY" | "POST" | "COURIER" | "FREIGHT";
+            sellerDetails?: string;
             /** Format: int32 */
             inventoryQuantity?: number;
             /** Format: int32 */

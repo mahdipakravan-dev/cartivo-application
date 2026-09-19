@@ -6,14 +6,19 @@ import { useForm } from "react-hook-form";
 import { ArrowRight, Check, CreditCard, LoaderCircle, MapPin, Plus, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SellerShippingSummary } from "@/components/cart/seller-shipping-summary";
 import { createAddress, getAddresses, getPaymentMethods, type CustomerAddress, type CustomerAddressRequest, type PaymentMethod } from "@/lib/api/checkout";
 import { createOrder, findMatchingRecentOrder, getMyOrders, type Order, type OrderRequest } from "@/lib/api/orders";
-import { createPriceLock, getPartSellerOffers, validatePriceLock, type PriceLock } from "@/lib/api/pricing";
+import { createPriceLock, getPartSellerOffers, validatePriceLock, type PriceLock, type SellerOffer } from "@/lib/api/pricing";
 import { clearAccessToken, getAccessToken } from "@/lib/api/auth-token";
 import { isApiError } from "@/lib/api/fetch";
 import { ROUTES } from "@/lib/routes";
 import { cartLineKey, type CartItem, useCartStore } from "@/lib/store/cart-store";
 import { cn } from "@/lib/utils";
+import {
+  calculateMerchandiseTotalRial,
+  getAvailableQuantityError,
+} from "@/lib/seller-shipping";
 
 type AddressForm = CustomerAddressRequest;
 
@@ -53,16 +58,23 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
       checkoutItems.map((item) => [cartLineKey(item.partId, item.sellerId), item.displayedUnitPriceRial]),
     ),
   );
+  const [sellerOffers, setSellerOffers] = useState<Record<string, SellerOffer>>({});
   const [invalidLines, setInvalidLines] = useState<Record<string, string>>({});
   const [lockNotice, setLockNotice] = useState("");
   const [error, setError] = useState("");
   const form = useForm<AddressForm>({
     defaultValues: { city: "", county: "", fullAddress: "", plaque: "", recipientPhoneNumber: "", description: "" },
   });
-  const lockedTotal = checkoutItems.reduce((sum, item) => {
-    const key = cartLineKey(item.partId, item.sellerId);
-    return sum + (priceLocks[key]?.lockedPrice ?? sellerPrices[key] ?? item.displayedUnitPriceRial) * item.quantity;
-  }, 0);
+  const lockedTotal = calculateMerchandiseTotalRial(
+    checkoutItems.map((item) => {
+      const key = cartLineKey(item.partId, item.sellerId);
+      return {
+        unitPriceRial: priceLocks[key]?.lockedPrice ?? sellerPrices[key] ?? item.displayedUnitPriceRial,
+        quantity: item.quantity,
+        shippingCostRial: sellerOffers[key]?.shippingCostRial,
+      };
+    }),
+  );
   const hasInvalidLines = Object.keys(invalidLines).length > 0;
   const allPricesLocked = checkoutItems.every((item) =>
     isUsablePriceLock(priceLocks[cartLineKey(item.partId, item.sellerId)], item),
@@ -102,6 +114,7 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
     }
 
     const nextSellerPrices: Record<string, number> = {};
+    const nextSellerOffers: Record<string, SellerOffer> = {};
     const nextInvalidLines = offerResults.reduce<Record<string, string>>((result, offerResult, index) => {
       const item = checkoutItems[index];
       if (!item) return result;
@@ -112,13 +125,17 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
         const offer = offerResult.value.find((candidate) => candidate.sellerId === item.sellerId);
         if (offer?.priceRial == null) result[key] = "پیشنهاد این فروشنده دیگر فعال نیست.";
         else {
+          nextSellerOffers[key] = offer;
           nextSellerPrices[key] = offer.priceRial;
           updateItemPrice(item.partId, item.sellerId, offer.priceRial);
+          const quantityError = getAvailableQuantityError(item.quantity, offer.availableQuantity);
+          if (quantityError) result[key] = quantityError;
         }
       }
       return result;
     }, {});
     setSellerPrices((current) => ({ ...current, ...nextSellerPrices }));
+    setSellerOffers(nextSellerOffers);
     setInvalidLines(nextInvalidLines);
 
     const { locks, failures, authenticationRequired } = collectPriceLocks(checkoutItems, lockResults);
@@ -285,6 +302,8 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
               <div className="sm:col-span-2 flex gap-2"><Button type="submit" disabled={form.formState.isSubmitting} className="h-10 rounded-xl">{form.formState.isSubmitting && <LoaderCircle className="animate-spin" />} ذخیره و انتخاب آدرس</Button>{addresses.length > 0 && <Button type="button" variant="ghost" onClick={() => setCreatingAddress(false)}>انصراف</Button>}</div>
             </form>
           )}
+
+          <SellerShippingSummary items={checkoutItems} offers={sellerOffers} />
         </section>
 
         <section className="rounded-[1.75rem] border border-slate-100 bg-white p-5 sm:p-7">
@@ -392,7 +411,16 @@ async function refreshInvalidLines(items: CartItem[], setInvalidLines: (lines: R
     if (!item) return result;
     const key = cartLineKey(item.partId, item.sellerId);
     if (offerResult.status === "rejected") result[key] = errorMessage(offerResult.reason, "پیشنهاد فروشنده قابل بررسی نیست.");
-    else if (!offerResult.value.some((offer) => offer.sellerId === item.sellerId && offer.priceRial != null)) result[key] = "این پیشنهاد منقضی یا حذف شده است.";
+    else {
+      const offer = offerResult.value.find(
+        (candidate) => candidate.sellerId === item.sellerId && candidate.priceRial != null,
+      );
+      if (!offer) result[key] = "این پیشنهاد منقضی یا حذف شده است.";
+      else {
+        const quantityError = getAvailableQuantityError(item.quantity, offer.availableQuantity);
+        if (quantityError) result[key] = quantityError;
+      }
+    }
     return result;
   }, {});
   setInvalidLines(invalid);

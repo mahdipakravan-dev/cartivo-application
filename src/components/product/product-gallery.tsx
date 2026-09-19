@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ImageIcon, Package } from "lucide-react";
+import { History, ImageIcon, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ProductPriceHistoryDialog } from "./product-price-history-dialog";
 
-export function ProductGallery({ images, name }: { images: string[]; name: string }) {
+export function ProductGallery({ images, name, partId }: { images: string[]; name: string; partId?: number }) {
   const [selected, setSelected] = useState(0);
   const [failed, setFailed] = useState(false);
+  const [priceHistoryOpen, setPriceHistoryOpen] = useState(false);
   const activeImage = images[selected];
 
   return (
@@ -23,7 +25,25 @@ export function ProductGallery({ images, name }: { images: string[]; name: strin
           </div>
         )}
         <span className="absolute right-5 top-5 rounded-full border border-white bg-white/90 px-3 py-1.5 text-xs font-bold text-slate-500 shadow-sm backdrop-blur">کالای اصل</span>
+        {partId != null && (
+          <button
+            type="button"
+            onClick={() => setPriceHistoryOpen(true)}
+            className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white bg-white/90 px-3 py-1.5 text-xs font-bold text-[#14305A] shadow-sm backdrop-blur transition hover:bg-white"
+          >
+            <History className="size-4 text-cyan-700" />
+            نمایش میانگین قیمت
+          </button>
+        )}
       </div>
+
+      {partId != null && (
+        <ProductPriceHistoryDialog
+          open={priceHistoryOpen}
+          partId={partId}
+          onOpenChange={setPriceHistoryOpen}
+        />
+      )}
 
       {images.length > 1 && (
         <div className="mt-4 flex gap-3 overflow-x-auto pb-1">
