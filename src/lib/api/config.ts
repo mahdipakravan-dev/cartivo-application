@@ -9,8 +9,11 @@
 export const SERVER_BASE_URL =
   process.env.API_BASE_URL ?? "http://localhost:8080";
 
+console.log("----SERVER----- " , SERVER_BASE_URL)
+
 export const CLIENT_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+console.log("----CLIENT----- " , CLIENT_BASE_URL)
 
 export const DEFAULT_HEADERS: Record<string, string> = {
   Accept: "application/json",
