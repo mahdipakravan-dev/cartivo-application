@@ -4,21 +4,20 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   ChevronLeft,
-  CircleHelp,
+  CarFront,
   Cog,
   Headphones,
-  Heart,
   Menu,
-  MessageSquare,
   Search,
   ShoppingCart,
   UserRound,
   X,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
 import { getAccessToken } from "@/lib/api/auth-token";
+import { getGarageVehicles } from "@/lib/api/garage";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
 import {
   getTopLevelPartHref,
@@ -128,7 +127,9 @@ export function SiteHeader({
   const [accountOpen, setAccountOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [defaultVehicleName, setDefaultVehicleName] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const quantity = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
   const isAbsolute = (variant === "transparent-background" && pathname === ROUTES.home) || variant === "abslute-on-header";
   const navigationItems = topLevelParts.flatMap<TopLevelNavigationItem>((part) => {
@@ -140,17 +141,52 @@ export function SiteHeader({
       : [];
   });
 
-  console.log({
-    topLevelParts,
-    navigationItems
-  })
-
   useEffect(() => {
     const sync = () => setAuthenticated(Boolean(getAccessToken()));
     sync();
     window.addEventListener("cartivo-auth-change", sync);
     return () => window.removeEventListener("cartivo-auth-change", sync);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const syncGarage = () => {
+      if (!authenticated) {
+        setDefaultVehicleName("");
+        return;
+      }
+
+      getGarageVehicles()
+        .then((garageVehicles) => {
+          if (!active) return;
+          const selected =
+            garageVehicles.find((item) => item.isDefault) ?? garageVehicles[0];
+          setDefaultVehicleName(selected?.vehicle?.displayName ?? "");
+        })
+        .catch(() => active && setDefaultVehicleName(""));
+    };
+
+    syncGarage();
+    window.addEventListener("cartivo-garage-change", syncGarage);
+    return () => {
+      active = false;
+      window.removeEventListener("cartivo-garage-change", syncGarage);
+    };
+  }, [authenticated]);
+
+  const openGarage = () => {
+    if (authenticated) {
+      window.dispatchEvent(new Event("cartivo-show-garage"));
+      router.push(`${ROUTES.profile}?tab=cars`);
+      return;
+    }
+    window.sessionStorage.setItem(
+      "cartivo_post_login_action",
+      "garage",
+    );
+    setAccountOpen(true);
+  };
 
   useEffect(() => {
     const syncPinnedState = () => setCategoryBarPinned(window.scrollY >= 72);
@@ -176,6 +212,22 @@ export function SiteHeader({
           </button>
 
           <div className="mr-auto flex shrink-0 items-center gap-1" dir="rtl">
+            <button
+              type="button"
+              onClick={openGarage}
+              className={cn(
+                "flex h-10 items-center justify-center gap-2 rounded-lg px-2 hover:bg-slate-100",
+                !defaultVehicleName && "w-10",
+              )}
+              aria-label={defaultVehicleName || "افزودن خودرو به گاراژ"}
+            >
+              <CarFront className="size-5 shrink-0" />
+              {defaultVehicleName && (
+                <span className="hidden max-w-32 truncate text-xs font-bold sm:block">
+                  {defaultVehicleName}
+                </span>
+              )}
+            </button>
             {authenticated ? (
               <Link href={ROUTES.profile} className="flex size-10 items-center justify-center rounded-lg hover:bg-slate-100" aria-label="حساب کاربری"><UserRound className="size-5" /></Link>
             ) : (

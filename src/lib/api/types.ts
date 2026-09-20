@@ -11,9 +11,45 @@ export type CustomerFrontofficeUpdateRequest =
 export type PageResponse = components["schemas"]["PageResponse"];
 export type BrandFrontofficeResponse =
   components["schemas"]["BrandFrontofficeResponse"];
-export type CarFrontofficeDetailResponse =
-  components["schemas"]["CarFrontofficeDetailResponse"];
-export type CarResponse = components["schemas"]["CarResponse"];
+
+/**
+ * Compatibility view used by the existing catalog routes. Vehicle variants
+ * now supply these fields instead of the removed `/frontoffice/cars` API.
+ */
+export interface CarFrontofficeDetailResponse {
+  id?: number;
+  brand?: string;
+  model?: string;
+  trimLevel?: string;
+  bodyType?:
+    | "SEDAN"
+    | "HATCHBACK"
+    | "SUV"
+    | "CROSSOVER"
+    | "PICKUP"
+    | "VAN"
+    | "COUPE"
+    | "MINIVAN";
+  description?: string;
+  imageUrls?: string[];
+}
+
+export interface CarResponse {
+  id?: number;
+  model?: string;
+  trimLevel?: string;
+  bodyType?: CarFrontofficeDetailResponse["bodyType"];
+  imageUrls?: string[];
+  slug?: string;
+  brand?: {
+    id?: number;
+    englishName?: string;
+    persianName?: string;
+    slug?: string;
+    iconUrl?: string;
+    countryCode?: string;
+  };
+}
 export type PartFrontofficeResponse =
   components["schemas"]["PartFrontofficeResponse"];
 export type CategorySummaryResponse =

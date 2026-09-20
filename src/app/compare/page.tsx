@@ -45,7 +45,7 @@ export default async function ComparePage({
           </ol>
         </nav>
 
-        <section className="overflow-hidden rounded-[2rem] bg-[#14305A] px-6 py-8 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-8 sm:py-10">
+        <section className="overflow-hidden rounded-[2rem] bg-primary px-6 py-8 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-8 sm:py-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-cyan-100">
             <Scale className="size-4" />
             ابزار مقایسه
@@ -157,7 +157,7 @@ function CompareProductCard({
       </div>
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        <Link href={ROUTES.partDetail(String(part.id))} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#14305A] px-4 text-sm font-bold text-white">
+        <Link href={ROUTES.partDetail(String(part.id))} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-white">
           مشاهده محصول
           <ChevronLeft className="size-4" />
         </Link>
@@ -235,10 +235,10 @@ function orderState(part?: PartFrontofficeResponse | null) {
 
 function compatibleCars(part?: PartFrontofficeResponse | null) {
   if (!part) return "هنوز انتخاب نشده";
-  const cars = part.cars?.filter(Boolean) ?? [];
-  if (cars.length === 0) return "ثبت نشده";
-  return cars
-    .map((car) => [car.brand?.persianName || car.brand?.englishName, car.model, car.trimLevel].filter(Boolean).join(" "))
+  const fitments = part.fitments?.filter(Boolean) ?? [];
+  if (fitments.length === 0) return "ثبت نشده";
+  return fitments
+    .map((fitment) => [fitment.generationName, fitment.variantName].filter(Boolean).join(" — "))
     .join("، ");
 }
 

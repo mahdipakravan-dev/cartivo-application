@@ -14,18 +14,18 @@ export function ProductCard({ part, variant = "horizontal" }: ProductCardProps) 
   if (part.id == null) return null;
   const primaryImage = part.imageUrls?.find(Boolean);
   const brandName = part.partBrand?.persianName || part.partBrand?.englishName;
-  const compatibleCar = part.cars?.find(Boolean);
-  const compatibleCarName = compatibleCar
-    ? [compatibleCar.brand?.persianName || compatibleCar.brand?.englishName, compatibleCar.model]
+  const compatibleFitment = part.fitments?.find(Boolean);
+  const compatibleCarName = compatibleFitment
+    ? [compatibleFitment.generationName, compatibleFitment.variantName]
         .filter(Boolean)
-        .join(" ")
+        .join(" — ")
     : null;
 
   return (
     <Link
       href={ROUTES.partDetail(String(part.id))}
       className={cn(
-        "group relative grid overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white shadow-[0_8px_30px_rgb(15_23_42/0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_18px_45px_rgb(15_48_90/0.11)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+        "group relative grid overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white shadow-[0_8px_30px_rgb(15_23_42/0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_18px_45px_color-mix(in_oklab,var(--primary)_11%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         variant === "horizontal"
           ? "min-h-[220px] sm:grid-cols-[minmax(150px,38%)_1fr]"
           : "grid-rows-[210px_1fr]",
@@ -65,11 +65,11 @@ export function ProductCard({ part, variant = "horizontal" }: ProductCardProps) 
             {brandName && (
               <p className="mb-1.5 truncate text-[10px] font-bold text-cyan-700">{brandName}</p>
             )}
-            <h3 className="line-clamp-2 text-sm font-extrabold leading-6 text-slate-800 transition-colors group-hover:text-[#14305A] sm:text-base sm:leading-7">
+            <h3 className="line-clamp-2 text-sm font-extrabold leading-6 text-slate-800 transition-colors group-hover:text-primary sm:text-base sm:leading-7">
               {part.name || "قطعه خودرو"}
             </h3>
           </div>
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-[#14305A] group-hover:text-white">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
             <ArrowLeft className="size-3.5 transition-transform group-hover:-translate-x-0.5" />
           </span>
         </div>
@@ -78,8 +78,8 @@ export function ProductCard({ part, variant = "horizontal" }: ProductCardProps) 
           <div className="mt-3 flex min-w-0 items-center gap-1.5 text-[10px] text-slate-400">
             <CarFront className="size-3.5 shrink-0 text-slate-300" />
             <span className="truncate">مناسب برای {compatibleCarName}</span>
-            {(part.cars?.length ?? 0) > 1 && (
-              <span className="shrink-0">+{((part.cars?.length ?? 1) - 1).toLocaleString("fa-IR")}</span>
+            {(part.fitments?.length ?? 0) > 1 && (
+              <span className="shrink-0">+{((part.fitments?.length ?? 1) - 1).toLocaleString("fa-IR")}</span>
             )}
           </div>
         )}
@@ -88,7 +88,7 @@ export function ProductCard({ part, variant = "horizontal" }: ProductCardProps) 
           <div>
             <span className="block text-[10px] text-slate-400">قیمت محصول</span>
             {part.price != null ? (
-              <p className="mt-1 whitespace-nowrap text-base font-black text-[#14305A] sm:text-lg">
+              <p className="mt-1 whitespace-nowrap text-base font-black text-primary sm:text-lg">
                 {part.price.toLocaleString("fa-IR")}
                 <span className="mr-1 text-[11px] font-medium text-slate-400">ریال</span>
               </p>
@@ -96,7 +96,7 @@ export function ProductCard({ part, variant = "horizontal" }: ProductCardProps) 
               <p className="mt-1 text-sm font-bold text-slate-500">تماس بگیرید</p>
             )}
           </div>
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#14305A] text-white shadow-lg shadow-blue-950/15 transition-colors group-hover:bg-blue-700">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/15 transition-colors group-hover:bg-primary/90">
             <ShoppingBag className="size-4" />
           </span>
         </div>

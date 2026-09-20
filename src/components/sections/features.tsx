@@ -24,15 +24,15 @@ export function ImageTextTile({
       className={cn(
         "relative isolate flex min-h-36 items-center overflow-hidden rounded-2xl px-4 py-5",
         primary
-          ? "bg-[#14305A] text-white shadow-[0_14px_35px_rgb(15_48_90/0.14)]"
-          : "border border-slate-100 bg-slate-100/80 text-[#14305A]",
+          ? "bg-primary text-primary-foreground shadow-[0_14px_35px_color-mix(in_oklab,var(--primary)_14%,transparent)]"
+          : "border border-slate-100 bg-slate-100/80 text-primary",
       )}
     >
       <div className={cn("absolute -right-12 size-36 rounded-full blur-2xl", primary ? "bg-cyan-300/10" : "bg-white/80")} />
       <div
         className={cn(
           "relative z-10 flex size-20 shrink-0 items-center justify-center rounded-2xl",
-          primary ? "bg-white/10 text-cyan-100" : "bg-white text-[#14305A] shadow-sm",
+          primary ? "bg-white/10 text-cyan-100" : "bg-white text-primary shadow-sm",
         )}
       >
         <Icon className="size-10" strokeWidth={1.8} />

@@ -282,7 +282,7 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {addresses.map((address) => address.id != null && (
                 <button key={address.id} type="button" onClick={() => setAddressId(address.id!)} className={cn("relative rounded-2xl border p-4 text-right transition", addressId === address.id ? "border-[#14305A] bg-blue-50/50 ring-2 ring-blue-100" : "border-slate-200 hover:border-slate-300")}>
-                  {addressId === address.id && <span className="absolute left-3 top-3 flex size-5 items-center justify-center rounded-full bg-[#14305A] text-white"><Check className="size-3" /></span>}
+                  {addressId === address.id && <span className="absolute left-3 top-3 flex size-5 items-center justify-center rounded-full bg-primary text-white"><Check className="size-3" /></span>}
                   <p className="font-bold text-slate-800">{address.city}، {address.county}</p>
                   <p className="mt-2 line-clamp-2 text-xs leading-6 text-slate-500">{address.fullAddress}، پلاک {address.plaque}</p>
                   <p dir="ltr" className="mt-2 text-right text-xs text-slate-400">{address.recipientPhoneNumber}</p>
@@ -312,7 +312,7 @@ export function CheckoutStep({ items, onBack, onSuccess }: CheckoutStepProps) {
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {paymentMethods.map((method) => method.id != null && (
                 <button key={method.id} type="button" onClick={() => setPaymentMethodId(method.id!)} className={cn("flex items-center gap-3 rounded-2xl border p-4 text-right transition", paymentMethodId === method.id ? "border-[#14305A] bg-blue-50/50 ring-2 ring-blue-100" : "border-slate-200 hover:border-slate-300")}>
-                  <span className={cn("flex size-5 items-center justify-center rounded-full border", paymentMethodId === method.id ? "border-[#14305A] bg-[#14305A] text-white" : "border-slate-300")}>{paymentMethodId === method.id && <Check className="size-3" />}</span>
+                  <span className={cn("flex size-5 items-center justify-center rounded-full border", paymentMethodId === method.id ? "border-[#14305A] bg-primary text-white" : "border-slate-300")}>{paymentMethodId === method.id && <Check className="size-3" />}</span>
                   <div><p className="text-sm font-bold text-slate-800">{method.persianName || method.englishName || "روش پرداخت"}</p>{method.persianName && method.englishName && <p className="mt-1 text-[10px] text-slate-400">{method.englishName}</p>}</div>
                 </button>
               ))}

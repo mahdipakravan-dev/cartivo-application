@@ -141,7 +141,7 @@ export function BasketPage() {
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div><p className="text-xs font-bold text-blue-700">خرید امن و سریع</p><h1 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">{step === "cart" ? "سبد خرید شما" : "اطلاعات ارسال و پرداخت"}</h1></div>
-          <div className="flex items-center gap-2 text-xs font-bold"><span className="flex size-7 items-center justify-center rounded-full bg-[#14305A] text-white">۱</span><span className={step === "cart" ? "text-[#14305A]" : "text-slate-400"}>سبد خرید</span><span className="h-px w-8 bg-slate-200" /><span className={step === "checkout" ? "flex size-7 items-center justify-center rounded-full bg-[#14305A] text-white" : "flex size-7 items-center justify-center rounded-full bg-slate-200 text-slate-500"}>۲</span><span className={step === "checkout" ? "text-[#14305A]" : "text-slate-400"}>ارسال و پرداخت</span></div>
+          <div className="flex items-center gap-2 text-xs font-bold"><span className="flex size-7 items-center justify-center rounded-full bg-primary text-white">۱</span><span className={step === "cart" ? "text-[#14305A]" : "text-slate-400"}>سبد خرید</span><span className="h-px w-8 bg-slate-200" /><span className={step === "checkout" ? "flex size-7 items-center justify-center rounded-full bg-primary text-white" : "flex size-7 items-center justify-center rounded-full bg-slate-200 text-slate-500"}>۲</span><span className={step === "checkout" ? "text-[#14305A]" : "text-slate-400"}>ارسال و پرداخت</span></div>
         </div>
 
         {items.length === 0 ? (

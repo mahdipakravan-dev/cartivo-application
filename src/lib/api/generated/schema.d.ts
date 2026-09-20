@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/frontoffice/me/garage/{id}/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["makeDefault"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/customers/me": {
         parameters: {
             query?: never;
@@ -138,6 +154,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/me/garage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List my cars */
+        get: operations["list"];
+        put?: never;
+        /** Add a car to my cars */
+        post: operations["create_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/customer-addresses": {
         parameters: {
             query?: never;
@@ -146,10 +180,10 @@ export interface paths {
             cookie?: never;
         };
         /** List my delivery addresses */
-        get: operations["list"];
+        get: operations["list_1"];
         put?: never;
         /** Create a delivery address */
-        post: operations["create_4"];
+        post: operations["create_5"];
         delete?: never;
         options?: never;
         head?: never;
@@ -193,6 +227,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/me/garage/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch: operations["update_1"];
+        trace?: never;
+    };
     "/api/frontoffice/reviews/cars/{carId}": {
         parameters: {
             query?: never;
@@ -218,7 +268,7 @@ export interface paths {
             cookie?: never;
         };
         /** List active payment methods */
-        get: operations["list_1"];
+        get: operations["list_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -477,94 +527,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/frontoffice/cars": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List active cars with pagination and filters */
-        get: operations["list_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/frontoffice/cars/detail": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a car detail by id */
-        get: operations["getById_3"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/frontoffice/brands": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List active brands with pagination and filters */
-        get: operations["listActiveBrands"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/frontoffice/brands/top": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List top 10 active brands with icon and cars, filterable by country */
-        get: operations["listTopBrands"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/frontoffice/brand": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a brand detail by id or slug
-         * @description Exactly one of id or slug must be provided
-         */
-        get: operations["getByIdOrSlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/frontoffice/brand-parts": {
         parameters: {
             query?: never;
@@ -590,7 +552,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a single active part brand by id */
-        get: operations["getById_4"];
+        get: operations["getById_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -683,6 +645,65 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @description A catalog car saved by the authenticated customer */
+        CustomerCarResponse: {
+            /** Format: int64 */
+            id?: number;
+            vehicle?: components["schemas"]["ResolvedVehicle"];
+            vin?: string;
+            plateNumber?: string;
+            nickname?: string;
+            color?: string;
+            /** Format: int32 */
+            mileage?: number;
+            isDefault?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        ResolvedVehicle: {
+            /** Format: int64 */
+            modelYearId?: number;
+            /** Format: int32 */
+            year?: number;
+            /** @enum {string} */
+            calendarType?: "PERSIAN" | "GREGORIAN";
+            brand?: components["schemas"]["SelectorBrand"];
+            model?: components["schemas"]["SelectorModel"];
+            generation?: components["schemas"]["SelectorGeneration"];
+            variant?: components["schemas"]["SelectorVariant"];
+            displayName?: string;
+        };
+        SelectorBrand: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            englishName?: string;
+            logoUrl?: string;
+        };
+        SelectorGeneration: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            code?: string;
+        };
+        SelectorModel: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            englishName?: string;
+        };
+        SelectorVariant: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            displayName?: string;
+            generation?: components["schemas"]["SelectorGeneration"];
+            engineCode?: string;
+            /** @enum {string} */
+            transmissionType?: "MANUAL" | "AUTOMATIC" | "CVT" | "DCT" | "AMT" | "OTHER";
+        };
         /** @description Payload for a customer to update their own profile - phone number is the login identity and cannot be changed here */
         CustomerFrontofficeUpdateRequest: {
             /** @example John */
@@ -965,6 +986,22 @@ export interface components {
             code?: string;
             percent?: number;
         };
+        /** @description Add a catalog car to the authenticated customer's cars */
+        CustomerCarCreateRequest: {
+            /**
+             * Format: int64
+             * @description ID of an active car from the public car catalog
+             * @example 1
+             */
+            carModelYearId: number;
+            vin?: string;
+            plateNumber?: string;
+            nickname?: string;
+            color?: string;
+            /** Format: int32 */
+            mileage?: number;
+            isDefault?: boolean;
+        };
         /** @description Verify an OTP code and log in / register the customer */
         OtpVerifyRequest: {
             /** @example +989120000000 */
@@ -995,6 +1032,16 @@ export interface components {
         OtpRequestResponse: {
             /** @example Verification code sent */
             message?: string;
+        };
+        CustomerCarUpdateRequest: {
+            /** Format: int64 */
+            carModelYearId?: number;
+            vin?: string;
+            plateNumber?: string;
+            nickname?: string;
+            color?: string;
+            /** Format: int32 */
+            mileage?: number;
         };
         /** @description Standard paginated response wrapper */
         PageResponse: {
@@ -1035,28 +1082,6 @@ export interface components {
             iconUrl?: string;
             imageUrls?: string[];
         };
-        /** @description Car brand info */
-        CarBrandResponse: {
-            /** Format: int64 */
-            id?: number;
-            englishName?: string;
-            persianName?: string;
-            slug?: string;
-            iconUrl?: string;
-            countryCode?: string;
-        };
-        /** @description Compatible car info */
-        CarResponse: {
-            /** Format: int64 */
-            id?: number;
-            model?: string;
-            trimLevel?: string;
-            /** @enum {string} */
-            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
-            slug?: string;
-            brand?: components["schemas"]["CarBrandResponse"];
-            imageUrls?: string[];
-        };
         /** @description Compact category information embedded in part responses */
         CategorySummaryResponse: {
             /** Format: int64 */
@@ -1074,6 +1099,30 @@ export interface components {
             slug?: string;
             iconUrl?: string;
             countryCode?: string;
+        };
+        PartFitmentResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            generationId?: number;
+            generationName?: string;
+            /** Format: int64 */
+            variantId?: number;
+            variantName?: string;
+            /** Format: int32 */
+            yearFrom?: number;
+            /** Format: int32 */
+            yearTo?: number;
+            /** @enum {string} */
+            calendarType?: "PERSIAN" | "GREGORIAN";
+            engineCode?: string;
+            /** @enum {string} */
+            source?: "MANUFACTURER" | "IMPORT" | "ADMIN" | "LEGACY_MIGRATION" | "DEMO";
+            /** @enum {string} */
+            confidence?: "LOW" | "MEDIUM" | "HIGH" | "VERIFIED";
+            /** Format: date-time */
+            verifiedAt?: string;
+            notes?: string;
         };
         /** @description Part representation returned to the customer-facing site/app */
         PartFrontofficeResponse: {
@@ -1096,7 +1145,7 @@ export interface components {
             position?: "INTERIOR" | "EXTERIOR" | "BOTH";
             price?: number;
             partBrand?: components["schemas"]["PartBrandResponse"];
-            cars?: components["schemas"]["CarResponse"][];
+            fitments?: components["schemas"]["PartFitmentResponse"][];
             imageUrls?: string[];
             categories?: components["schemas"]["CategorySummaryResponse"][];
             manufacturerYears?: number[];
@@ -1245,18 +1294,6 @@ export interface components {
             partBrandName?: string;
             manufacturerYears?: number[];
         };
-        /** @description Single car detail returned to the customer-facing site/app */
-        CarFrontofficeDetailResponse: {
-            /** Format: int64 */
-            id?: number;
-            brand?: string;
-            model?: string;
-            trimLevel?: string;
-            /** @enum {string} */
-            bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
-            description?: string;
-            imageUrls?: string[];
-        };
         /** @description Part brand (manufacturer) representation returned to the customer-facing site/app - public fields only */
         PartBrandFrontofficeResponse: {
             /**
@@ -1318,6 +1355,28 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    makeDefault: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerCarResponse"];
+                };
+            };
+        };
+    };
     getMyProfile: {
         parameters: {
             query?: {
@@ -1698,12 +1757,60 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CustomerAddressResponse"][];
+                    "application/json": components["schemas"]["CustomerCarResponse"][];
                 };
             };
         };
     };
     create_4: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerCarCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerCarResponse"];
+                };
+            };
+        };
+    };
+    list_1: {
+        parameters: {
+            query?: {
+                id?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerAddressResponse"][];
+                };
+            };
+        };
+    };
+    create_5: {
         parameters: {
             query?: {
                 id?: number;
@@ -1795,6 +1902,52 @@ export interface operations {
             };
         };
     };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomerCarUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerCarResponse"];
+                };
+            };
+        };
+    };
     listForCar: {
         parameters: {
             query?: {
@@ -1851,7 +2004,7 @@ export interface operations {
             };
         };
     };
-    list_1: {
+    list_2: {
         parameters: {
             query?: {
                 /**
@@ -2600,239 +2753,6 @@ export interface operations {
             };
         };
     };
-    list_2: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Filter by brand id (exact match)
-                 * @example 1
-                 */
-                brandId?: number;
-                /**
-                 * @description Filter by brand slug (exact match)
-                 * @example toyota
-                 */
-                brandSlug?: string;
-                /**
-                 * @description Filter by model (case-insensitive partial match)
-                 * @example Corolla
-                 */
-                model?: string;
-                /**
-                 * @description Filter by trim level (case-insensitive partial match)
-                 * @example GLX
-                 */
-                trimLevel?: string;
-                /**
-                 * @description Filter by body type (exact match)
-                 * @example SEDAN
-                 */
-                bodyType?: "SEDAN" | "HATCHBACK" | "SUV" | "CROSSOVER" | "PICKUP" | "VAN" | "COUPE" | "MINIVAN";
-                /**
-                 * @description Page number, zero-based
-                 * @example 0
-                 */
-                page?: number;
-                /**
-                 * @description Number of items per page (capped by project config)
-                 * @example 20
-                 */
-                size?: number;
-                /**
-                 * @description Field name to sort by
-                 * @example createdAt
-                 */
-                sortBy?: string;
-                /**
-                 * @description Sort direction
-                 * @example DESC
-                 */
-                sortDir?: "ASC" | "DESC";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Page of active cars */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PageResponse"];
-                };
-            };
-        };
-    };
-    getById_3: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Brand ID
-                 * @example 1
-                 */
-                id?: number;
-                /**
-                 * @description Brand slug
-                 * @example toyota
-                 */
-                slug?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Car found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CarFrontofficeDetailResponse"];
-                };
-            };
-            /** @description Car not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listActiveBrands: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Filter by english name (case-insensitive partial match)
-                 * @example Toyota
-                 */
-                englishName?: string;
-                /**
-                 * @description Filter by persian name (case-insensitive partial match)
-                 * @example تویوتا
-                 */
-                persianName?: string;
-                /**
-                 * @description Filter by ISO country code (exact match)
-                 * @example JP
-                 */
-                countryCode?: string;
-                /**
-                 * @description Page number, zero-based
-                 * @example 0
-                 */
-                page?: number;
-                /**
-                 * @description Number of items per page (capped by project config)
-                 * @example 20
-                 */
-                size?: number;
-                /**
-                 * @description Field name to sort by
-                 * @example createdAt
-                 */
-                sortBy?: string;
-                /**
-                 * @description Sort direction
-                 * @example DESC
-                 */
-                sortDir?: "ASC" | "DESC";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Page of active brands */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PageResponse"];
-                };
-            };
-        };
-    };
-    listTopBrands: {
-        parameters: {
-            query?: {
-                countryCode?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of top brands */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BrandFrontofficeResponse"];
-                };
-            };
-        };
-    };
-    getByIdOrSlug: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Brand ID
-                 * @example 1
-                 */
-                id?: number;
-                /**
-                 * @description Brand slug
-                 * @example toyota
-                 */
-                slug?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Brand found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BrandFrontofficeResponse"];
-                };
-            };
-            /** @description Neither id nor slug was provided */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Brand not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     list_3: {
         parameters: {
             query?: {
@@ -2899,7 +2819,7 @@ export interface operations {
             };
         };
     };
-    getById_4: {
+    getById_3: {
         parameters: {
             query?: never;
             header?: never;

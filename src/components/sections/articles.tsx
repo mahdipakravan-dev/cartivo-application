@@ -14,7 +14,7 @@ function formatDate(value?: string) {
 function ArticleCard({ article, featured = false }: { article: BlogPreview; featured?: boolean }) {
   const content = (
     <>
-      <div className="relative min-h-52 overflow-hidden bg-[#14305A] sm:min-h-56">
+      <div className="relative min-h-52 overflow-hidden bg-primary sm:min-h-56">
         {article.imageUrl ? (
           <Image src={article.imageUrl} alt={article.title} fill sizes={featured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 1024px) 50vw, 25vw"} className="object-cover transition-transform duration-700 group-hover:scale-105" />
         ) : (
@@ -32,7 +32,7 @@ function ArticleCard({ article, featured = false }: { article: BlogPreview; feat
           <CalendarDays className="size-3.5" />
           {formatDate(article.publishedAt)}
         </div>
-        <h3 className={`mt-3 line-clamp-2 font-black leading-7 text-slate-800 transition-colors group-hover:text-[#14305A] ${featured ? "text-lg sm:text-xl" : "text-base"}`}>
+        <h3 className={`mt-3 line-clamp-2 font-black leading-7 text-slate-800 transition-colors group-hover:text-primary ${featured ? "text-lg sm:text-xl" : "text-base"}`}>
           {article.title}
         </h3>
         {article.excerpt && <p className="mt-2 line-clamp-2 text-xs leading-6 text-slate-400">{article.excerpt}</p>}
@@ -43,7 +43,7 @@ function ArticleCard({ article, featured = false }: { article: BlogPreview; feat
     </>
   );
 
-  const className = `group flex overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-[0_10px_35px_rgb(15_23_42/0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgb(15_48_90/0.1)] ${featured ? "flex-col md:grid md:grid-cols-[1.1fr_.9fr] lg:col-span-2" : "flex-col"}`;
+  const className = `group flex overflow-hidden rounded-[1.75rem] border border-slate-100 bg-white shadow-[0_10px_35px_rgb(15_23_42/0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_color-mix(in_oklab,var(--primary)_10%,transparent)] ${featured ? "flex-col md:grid md:grid-cols-[1.1fr_.9fr] lg:col-span-2" : "flex-col"}`;
   return article.slug ? <a href={ROUTES.blogDetail(article.slug)} className={className}>{content}</a> : <article className={className}>{content}</article>;
 }
 

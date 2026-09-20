@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BadgeCheck, Car, Check, ChevronLeft, Headphones, MapPin, RotateCcw, Scale, ShieldCheck, Truck } from "lucide-react";
-import type { PartFrontofficeResponse } from "@/lib/api/types";
+import type { CarResponse, PartFrontofficeResponse } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { ProductGallery } from "./product-gallery";
@@ -20,7 +20,16 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
   const images = part.imageUrls?.filter(Boolean) || [];
   const brand = part.partBrand?.persianName || part.partBrand?.englishName;
   const positionLabel = part.position ? POSITION_LABEL[part.position] : null;
-  const compatibleCars = part.cars?.filter(Boolean) || [];
+  const compatibleFitments = part.fitments?.filter(Boolean) || [];
+  const compatibleCars: CarResponse[] = compatibleFitments.flatMap((fitment) =>
+    fitment.variantId == null
+      ? []
+      : [{
+          id: fitment.variantId,
+          ...(fitment.generationName && { model: fitment.generationName }),
+          ...(fitment.variantName && { trimLevel: fitment.variantName }),
+        }],
+  );
   const relatedBlogs = part.id != null ? await getRelatedBlogs(part.id, 3) : [];
   const productUrl = ROUTES.partDetail(String(part.id));
   const jsonLd = {
@@ -70,11 +79,11 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
                     </li>
                   )}
                   <li className="flex items-center gap-2"><Check className="size-4 text-emerald-500" /> کنترل کیفیت و سلامت فیزیکی</li>
-                  {compatibleCars.length > 0 && (
+                  {compatibleFitments.length > 0 && (
                     <li className="flex items-start gap-2">
                       <Car className="mt-0.5 size-4 shrink-0 text-emerald-500" />
                       <span>
-                        سازگار با: {compatibleCars.map(c => [c.brand?.persianName || c.brand?.englishName, c.model, c.trimLevel].filter(Boolean).join(" ")).join("، ")}
+                        سازگار با: {compatibleFitments.map(fitment => formatFitment(fitment)).join("، ")}
                       </span>
                     </li>
                   )}
@@ -119,12 +128,12 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
                   <Spec label="Brand" value={part.partBrand.englishName} ltr />
                 )}
                 {positionLabel && <Spec label="موقعیت" value={positionLabel} />}
-                {compatibleCars.length > 0 && (
-                  <Spec label="خودروهای سازگار" value={compatibleCars.map(c => [c.brand?.persianName || c.brand?.englishName, c.model, c.trimLevel].filter(Boolean).join(" ")).join("، ")} />
+                {compatibleFitments.length > 0 && (
+                  <Spec label="خودروهای سازگار" value={compatibleFitments.map(fitment => formatFitment(fitment)).join("، ")} />
                 )}
               </dl>
             </article>
-            <aside className="h-full rounded-[1.75rem] bg-[#14305A] p-6 text-white">
+            <aside className="h-full rounded-[1.75rem] bg-primary p-6 text-white">
               <Headphones className="size-8 text-cyan-300" />
               <h2 className="mt-5 text-lg font-extrabold">برای انتخاب قطعه کمک می‌خواهید؟</h2>
               <p className="mt-3 text-sm leading-7 text-white/65">کارشناسان کارتیوو برای بررسی سازگاری قطعه با خودروی شما در کنارتان هستند.</p>
@@ -140,4 +149,14 @@ export async function ProductDetail({ part }: { part: PartFrontofficeResponse })
 
 function Spec({ label, value, ltr = false }: { label: string; value: string; ltr?: boolean }) {
   return <div className="grid grid-cols-[120px_1fr] gap-4 py-4 text-sm"><dt className="text-slate-400">{label}</dt><dd dir={ltr ? "ltr" : undefined} className="font-bold text-slate-700">{value}</dd></div>;
+}
+
+function formatFitment(fitment: NonNullable<PartFrontofficeResponse["fitments"]>[number]) {
+  const vehicle = [fitment.generationName, fitment.variantName]
+    .filter(Boolean)
+    .join(" — ");
+  const years = fitment.yearFrom || fitment.yearTo
+    ? [fitment.yearFrom, fitment.yearTo].filter(Boolean).join(" تا ")
+    : "";
+  return [vehicle, years].filter(Boolean).join("، ") || "خودرو";
 }

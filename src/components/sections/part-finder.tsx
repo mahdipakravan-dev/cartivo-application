@@ -21,12 +21,14 @@ import {
 interface PartFinderProps {
   brands?: BrandFrontofficeResponse[];
   className?: string;
+  layout?: "responsive" | "stacked";
   searchButtonClassName?: string;
 }
 
 export function PartFinder({
   brands = [],
   className,
+  layout = "responsive",
   searchButtonClassName,
 }: PartFinderProps) {
   const router = useRouter();
@@ -123,7 +125,12 @@ export function PartFinder({
   return (
     <div className={cn("w-full", className)} dir="rtl">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div
+          className={cn(
+            "flex flex-col gap-3",
+            layout === "responsive" && "sm:flex-row",
+          )}
+        >
           {PART_FINDER_FIELDS.map((field) => fields[field])}
         </div>
         <Button

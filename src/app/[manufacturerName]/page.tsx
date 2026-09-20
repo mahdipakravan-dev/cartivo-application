@@ -79,7 +79,7 @@ export default async function TopLevelCategoriesPage({
           </ol>
         </nav>
 
-        <header className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] px-6 py-12 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-14 lg:py-16">
+        <header className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-14 lg:py-16">
           <div className="absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
           <div className="absolute -bottom-32 left-1/4 size-72 rounded-full bg-blue-400/10 blur-3xl" />
           <div className="relative z-10 max-w-3xl">
@@ -198,7 +198,7 @@ function CategoryCard({
           <ImageOff className="size-14 text-slate-300" strokeWidth={1.4} />
         )}
         {selected && (
-          <span className="absolute left-3 top-3 flex size-8 items-center justify-center rounded-full bg-[#14305A] text-white shadow-lg">
+          <span className="absolute left-3 top-3 flex size-8 items-center justify-center rounded-full bg-primary text-white shadow-lg">
             <Check className="size-4" />
           </span>
         )}
@@ -245,7 +245,7 @@ function PageState({
         <Icon className="mx-auto size-12 text-amber-500" />
         <h1 className="mt-5 text-2xl font-black text-[#14305A]">{title}</h1>
         <p className="mt-3 text-sm leading-7 text-slate-500">{description}</p>
-        <Link href={ROUTES.home} className="mt-7 inline-flex rounded-xl bg-[#14305A] px-5 py-3 text-sm font-bold text-white">
+        <Link href={ROUTES.home} className="mt-7 inline-flex rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white">
           بازگشت به صفحه اصلی
         </Link>
       </div>

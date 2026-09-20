@@ -167,7 +167,7 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
                       {part.price?.toLocaleString("fa-IR")} ریال
                     </p>
                   </div>
-                  <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold ${active ? "bg-[#14305A] text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold ${active ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
                     {active ? "انتخاب شده" : "مقایسه"}
                   </span>
                 </button>

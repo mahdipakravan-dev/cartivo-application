@@ -43,7 +43,7 @@ export default async function PartBrandDetailPage({
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <nav aria-label="مسیر ناوبری" className="mb-6 overflow-hidden text-xs text-slate-400"><ol className="flex items-center gap-1.5 whitespace-nowrap"><li><Link href={ROUTES.home} className="hover:text-[#14305A]">خانه</Link></li><li><ChevronLeft className="size-3" /></li><li><Link href={ROUTES.partBrands} className="hover:text-[#14305A]">برندهای تولیدکننده</Link></li><li><ChevronLeft className="size-3" /></li><li className="truncate font-bold text-slate-600">{name}</li></ol></nav>
 
-        <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
+        <section className="relative isolate overflow-hidden rounded-[2rem] bg-primary shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
           <div className="absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
           <div className="grid min-h-[400px] lg:grid-cols-[1.08fr_.92fr]">
             <div className="relative z-10 flex items-center px-6 py-12 sm:px-10 lg:px-14">

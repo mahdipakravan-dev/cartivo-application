@@ -108,6 +108,10 @@ export function AccountDialog({ open, onOpenChange, onAuthenticationChange }: Ac
       if (postLoginAction === "part-request") {
         window.sessionStorage.removeItem("cartivo_post_login_action");
         window.dispatchEvent(new Event("cartivo-open-part-request"));
+      } else if (postLoginAction === "garage") {
+        window.sessionStorage.removeItem("cartivo_post_login_action");
+        window.dispatchEvent(new Event("cartivo-show-garage"));
+        router.push("/profile?tab=cars");
       } else {
         router.push("/profile");
       }
@@ -156,7 +160,7 @@ export function AccountDialog({ open, onOpenChange, onAuthenticationChange }: Ac
         <div className="px-6 pb-7 pt-7 sm:px-8">
           {step !== "profile" && (
             <div className="mb-7">
-              <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#14305A] text-white shadow-lg shadow-blue-950/20">
+              <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary text-white shadow-lg shadow-blue-950/20">
                 <ShieldCheck className="size-7" />
               </div>
               <h2 id="account-dialog-title" className="text-xl font-extrabold text-slate-900">ورود به حساب کارتیوو</h2>

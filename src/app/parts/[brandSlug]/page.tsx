@@ -121,7 +121,7 @@ export default async function PartsBrandPage({
             </ol>
           </nav>
 
-          <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
+          <section className="relative isolate overflow-hidden rounded-[2rem] bg-primary shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
             <div className="pointer-events-none absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-36 left-1/3 size-80 rounded-full bg-blue-400/10 blur-3xl" />
 

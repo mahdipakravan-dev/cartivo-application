@@ -12,14 +12,14 @@ function PartBrandItem({ brand }: { brand: PartBrandFrontofficeResponse }) {
 
   return (
     <Link href={href} className="group flex w-28 shrink-0 flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-ring">
-      <div className="relative flex size-24 items-center justify-center rounded-full border border-slate-100 bg-white p-4 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:border-cyan-200 group-hover:shadow-[0_14px_35px_rgb(15_48_90/0.1)]">
+      <div className="relative flex size-24 items-center justify-center rounded-full border border-slate-100 bg-white p-4 shadow-sm transition duration-300 group-hover:-translate-y-1 group-hover:border-cyan-200 group-hover:shadow-[0_14px_35px_color-mix(in_oklab,var(--primary)_10%,transparent)]">
         {brand.iconUrl ? (
           <Image src={brand.iconUrl} alt={`لوگوی ${name}`} fill sizes="96px" className="object-contain p-5 transition-transform duration-300 group-hover:scale-110" />
         ) : (
           <Factory className="size-8 text-slate-300 transition-colors group-hover:text-cyan-700" />
         )}
       </div>
-      <h3 className="mt-3 w-full truncate text-xs font-bold text-slate-600 transition-colors group-hover:text-[#14305A]">{name}</h3>
+      <h3 className="mt-3 w-full truncate text-xs font-bold text-slate-600 transition-colors group-hover:text-primary">{name}</h3>
       {brand.partCount != null && (
         <p className="mt-1 text-[10px] text-slate-400">{brand.partCount.toLocaleString("fa-IR")} قطعه</p>
       )}

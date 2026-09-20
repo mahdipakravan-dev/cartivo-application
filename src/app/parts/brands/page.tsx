@@ -70,7 +70,7 @@ export default async function BrandsPage() {
             </ol>
           </nav>
 
-          <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
+          <section className="relative isolate overflow-hidden rounded-[2rem] bg-primary shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
             <div className="pointer-events-none absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-32 left-1/3 size-72 rounded-full bg-blue-400/10 blur-3xl" />
             <div className="grid min-h-[390px] lg:grid-cols-[1.05fr_.95fr]">

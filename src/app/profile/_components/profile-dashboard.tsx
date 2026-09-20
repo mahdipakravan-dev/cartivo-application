@@ -2,14 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GarageVehicleForm } from "@/components/garage/garage-vehicle-form";
 import { getProfile, updateProfile, type CustomerProfile, type ProfileUpdate } from "@/lib/api/auth";
 import { clearAccessToken, getAccessToken } from "@/lib/api/auth-token";
 import { getMyOrders, getOrder, type Order } from "@/lib/api/orders";
 import { getPartRequests, type PartRequest } from "@/lib/api/part-requests";
+import { getGarageVehicles, type GarageVehicle } from "@/lib/api/garage";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, ChevronLeft, CircleUserRound,
+  ArrowLeft, BadgeCheck, CalendarDays, CarFront, CheckCircle2, ChevronLeft, CircleUserRound,
   ClipboardList, LoaderCircle, LogOut, Mail, MapPin, Package, Phone, ReceiptText, Save, ShoppingBag,
   UserRound,
 } from "lucide-react";
@@ -17,7 +19,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-type Tab = "profile" | "orders" | "requests";
+type Tab = "profile" | "cars" | "orders" | "requests";
 type ProfileForm = { firstName: string; lastName: string; email: string; nationalCode: string };
 type ProfileFeedback = { type: "success" | "error"; message: string } | null;
 
@@ -41,6 +43,7 @@ export function ProfileDashboard() {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [partRequests, setPartRequests] = useState<PartRequest[]>([]);
+  const [garageVehicles, setGarageVehicles] = useState<GarageVehicle[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingOrder, setLoadingOrder] = useState(false);
@@ -50,19 +53,28 @@ export function ProfileDashboard() {
   const form = useForm<ProfileForm>({ defaultValues: { firstName: "", lastName: "", email: "", nationalCode: "" } });
 
   useEffect(() => {
+    const showGarage = () => setTab("cars");
+    if (new URLSearchParams(window.location.search).get("tab") === "cars") showGarage();
+    window.addEventListener("cartivo-show-garage", showGarage);
+    return () => window.removeEventListener("cartivo-show-garage", showGarage);
+  }, []);
+
+  useEffect(() => {
     if (!getAccessToken()) {
       setLoading(false);
       return;
     }
     getProfile()
       .then(async (customer) => {
-        const [orderPage, requests] = await Promise.all([
+        const [orderPage, requests, cars] = await Promise.all([
           getMyOrders({ page: 0, size: 50 }),
           customer.id != null ? getPartRequests(customer.id) : Promise.resolve([]),
+          getGarageVehicles(),
         ]);
         setProfile(customer);
         setOrders(orderPage.content ?? []);
         setPartRequests(requests);
+        setGarageVehicles(cars);
         form.reset({ firstName: customer.firstName || "", lastName: customer.lastName || "", email: customer.email || "", nationalCode: customer.nationalCode || "" });
       })
       .catch((reason) => {
@@ -70,6 +82,18 @@ export function ProfileDashboard() {
       })
       .finally(() => setLoading(false));
   }, [form]);
+
+  useEffect(() => {
+    const refreshCars = () => {
+      if (!getAccessToken()) return;
+      getGarageVehicles()
+        .then(setGarageVehicles)
+        .catch(() => undefined);
+    };
+    window.addEventListener("cartivo-garage-change", refreshCars);
+    return () =>
+      window.removeEventListener("cartivo-garage-change", refreshCars);
+  }, []);
 
   const saveProfile = async (values: ProfileForm) => {
     setError("");
@@ -126,7 +150,7 @@ export function ProfileDashboard() {
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <nav aria-label="مسیر ناوبری" className="mb-6 text-xs text-slate-400"><ol className="flex items-center gap-1.5"><li><Link href={ROUTES.home} className="hover:text-[#14305A]">خانه</Link></li><li><ChevronLeft className="size-3" /></li><li className="font-bold text-slate-600">حساب کاربری</li></ol></nav>
 
-        <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] px-6 py-9 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-12">
+        <section className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-9 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-12">
           <div className="absolute -right-20 -top-28 size-72 rounded-full bg-cyan-300/10 blur-3xl" />
           <div className="relative flex flex-col justify-between gap-7 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4"><div className="flex size-16 items-center justify-center rounded-2xl border border-white/15 bg-white/10"><CircleUserRound className="size-8 text-cyan-200" /></div><div><p className="text-xs font-bold text-cyan-200">حساب کاربری من</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">{displayName}</h1><p dir="ltr" className="mt-1 text-right text-xs text-white/45">{localPhone(profile?.phoneNumber)}</p></div></div>
@@ -137,6 +161,7 @@ export function ProfileDashboard() {
         <div className="mt-8 grid gap-6 lg:grid-cols-[250px_1fr]">
           <aside className="h-fit rounded-[1.5rem] border border-slate-100 bg-white p-3 shadow-sm">
             <NavButton active={tab === "profile"} icon={UserRound} label="اطلاعات حساب" onClick={() => { setTab("profile"); setSelectedOrder(null); }} />
+            <NavButton active={tab === "cars"} icon={CarFront} label="خودروهای من" badge={garageVehicles.length} onClick={() => { setTab("cars"); setSelectedOrder(null); }} />
             <NavButton active={tab === "orders"} icon={ShoppingBag} label="سفارش‌های من" badge={orders.length} onClick={() => setTab("orders")} />
             <NavButton active={tab === "requests"} icon={ClipboardList} label="درخواست‌های قطعه" badge={partRequests.length} onClick={() => { setTab("requests"); setSelectedOrder(null); }} />
             <div className="my-2 h-px bg-slate-100" />
@@ -147,6 +172,16 @@ export function ProfileDashboard() {
             {error && <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
             {tab === "profile" ? (
               <ProfileFormView form={form} profile={profile} saved={saved} feedback={profileFeedback} onSubmit={saveProfile} onInvalid={handleInvalidProfileSubmit} />
+            ) : tab === "cars" ? (
+              <GarageVehiclesList
+                vehicles={garageVehicles}
+                onCreated={(created) =>
+                  setGarageVehicles((current) => [
+                    created,
+                    ...current.filter((item) => item.id !== created.id),
+                  ])
+                }
+              />
             ) : tab === "requests" ? (
               <PartRequestsList requests={partRequests} />
             ) : selectedOrder || loadingOrder ? (
@@ -158,6 +193,63 @@ export function ProfileDashboard() {
         </div>
       </div>
     </main>
+  );
+}
+
+function GarageVehiclesList({
+  vehicles,
+  onCreated,
+}: {
+  vehicles: GarageVehicle[];
+  onCreated: (vehicle: GarageVehicle) => void;
+}) {
+  return (
+    <div>
+      <Header
+        eyebrow="گاراژ شخصی"
+        title="خودروهای من"
+        subtitle="خودروهای ذخیره‌شده برای دسترسی سریع به قطعات سازگار را اینجا مدیریت کنید."
+      />
+      <GarageVehicleForm onCreated={onCreated} />
+
+      <div className="mt-9 border-t border-slate-100 pt-7">
+        <h3 className="text-base font-black text-slate-800">خودروهای ذخیره‌شده</h3>
+        {vehicles.length === 0 ? (
+          <div className="mt-4 flex flex-col items-center rounded-2xl border border-dashed border-slate-200 py-12 text-center">
+            <CarFront className="size-10 text-slate-200" />
+            <p className="mt-3 text-sm font-bold text-slate-500">هنوز خودرویی ذخیره نکرده‌اید</p>
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {vehicles.map((garageVehicle, index) => {
+              const vehicle = garageVehicle.vehicle;
+              const name = vehicle?.displayName || [
+                vehicle?.brand?.name,
+                vehicle?.model?.name,
+                vehicle?.variant?.name,
+              ].filter(Boolean).join(" ") || "خودرو";
+              return (
+                <article key={garageVehicle.id ?? index} className="flex items-center gap-4 rounded-2xl border border-slate-100 p-4 transition hover:border-cyan-200 hover:shadow-sm">
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary"><CarFront className="size-6" /></span>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-black text-slate-800">{name}</h3>
+                    <p className="mt-1 text-xs text-slate-400">
+                      سال تولید: {vehicle?.year?.toLocaleString("fa-IR", { useGrouping: false }) ?? "—"}
+                      {garageVehicle.isDefault ? " • پیش‌فرض" : ""}
+                    </p>
+                    {(garageVehicle.nickname || garageVehicle.color || garageVehicle.mileage != null) && (
+                      <p className="mt-1 truncate text-[11px] text-slate-400">
+                        {[garageVehicle.nickname, garageVehicle.color, garageVehicle.mileage != null ? `${garageVehicle.mileage.toLocaleString("fa-IR")} کیلومتر` : ""].filter(Boolean).join(" • ")}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -184,10 +276,10 @@ function OrderDetail({ order, loading, onBack }: { order: Order | null; loading:
   return <div><button onClick={onBack} className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#14305A]"><ChevronLeft className="size-4 rotate-180" /> بازگشت به سفارش‌ها</button><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><Header eyebrow={`سفارش #${order.id?.toLocaleString("fa-IR")}`} title="جزئیات سفارش" subtitle={formatDate(order.createdAt)} /><span className={cn("w-fit rounded-full px-3 py-2 text-xs font-bold", status.className)}>{status.label}</span></div><div className="mt-7 divide-y divide-slate-100 rounded-2xl border border-slate-100">{order.items?.map((item, index) => <div key={`${item.partId}-${item.sellerId}-${index}`} className="flex items-center justify-between gap-4 p-4"><div><p className="text-sm font-bold text-slate-700">{item.partName || "قطعه خودرو"}</p><p className="mt-1 text-xs font-bold text-cyan-700">{item.sellerName || `فروشنده #${item.sellerId ?? "—"}`}</p><p className="mt-1 text-xs text-slate-400">{item.quantity?.toLocaleString("fa-IR")} عدد × {formatPrice(item.unitPriceRial)}</p></div><p className="shrink-0 text-sm font-black text-[#14305A]">{formatPrice(item.lineTotalRial)}</p></div>)}</div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Info icon={MapPin} label="آدرس تحویل" value={[order.address?.city, order.address?.fullAddress, order.address?.plaque && `پلاک ${order.address.plaque}`].filter(Boolean).join("، ") || "—"} /><Info icon={ReceiptText} label="روش پرداخت" value={order.paymentMethod?.persianName || order.paymentMethod?.englishName || "—"} /></div><div className="mt-5 rounded-2xl bg-slate-50 p-5"><dl className="space-y-3 text-sm"><div className="flex justify-between"><dt className="text-slate-500">جمع کالاها</dt><dd>{formatPrice(order.subtotalAmountRial)}</dd></div>{order.voucher && <div className="flex justify-between text-emerald-700"><dt>کد تخفیف</dt><dd>{order.voucher.code || "—"} ({formatPercent(order.voucher.percent)})</dd></div>}{order.discountAmountRial != null && order.discountAmountRial > 0 && <div className="flex justify-between text-emerald-700"><dt>مبلغ تخفیف</dt><dd>− {formatPrice(order.discountAmountRial)}</dd></div>}<div className="flex justify-between border-t border-slate-200 pt-3"><dt className="text-sm text-slate-500">مبلغ نهایی سفارش</dt><dd className="text-xl font-black text-[#14305A]">{formatPrice(order.totalAmountRial)}</dd></div></dl></div></div>;
 }
 
-function LoginRequired() { return <main className="flex min-h-[75vh] items-center justify-center bg-[#f8fafc] px-4 pt-20"><div className="max-w-md rounded-[2rem] border border-slate-100 bg-white p-8 text-center shadow-xl"><div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-[#14305A] text-white"><CircleUserRound className="size-8" /></div><h1 className="mt-5 text-2xl font-black text-slate-900">وارد حساب خود شوید</h1><p className="mt-3 text-sm leading-7 text-slate-500">برای مشاهده پروفایل و سفارش‌ها ابتدا وارد شوید.</p><Button onClick={() => window.dispatchEvent(new Event("cartivo-open-auth"))} className="mt-6 h-12 w-full rounded-xl">ورود به حساب</Button></div></main>; }
+function LoginRequired() { return <main className="flex min-h-[75vh] items-center justify-center bg-[#f8fafc] px-4 pt-20"><div className="max-w-md rounded-[2rem] border border-slate-100 bg-white p-8 text-center shadow-xl"><div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-primary text-white"><CircleUserRound className="size-8" /></div><h1 className="mt-5 text-2xl font-black text-slate-900">وارد حساب خود شوید</h1><p className="mt-3 text-sm leading-7 text-slate-500">برای مشاهده پروفایل و سفارش‌ها ابتدا وارد شوید.</p><Button onClick={() => window.dispatchEvent(new Event("cartivo-open-auth"))} className="mt-6 h-12 w-full rounded-xl">ورود به حساب</Button></div></main>; }
 function Header({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle: string }) { return <div><p className="text-xs font-bold text-cyan-700">{eyebrow}</p><h2 className="mt-1 text-2xl font-black text-slate-900">{title}</h2><p className="mt-2 text-sm text-slate-400">{subtitle}</p></div>; }
 function Field({ label, icon: Icon, children, hint, error }: { label: string; icon: typeof UserRound; children: React.ReactNode; hint?: string | undefined; error?: string | undefined }) { return <label className="text-xs font-bold text-slate-600"><span className="mb-2 flex items-center gap-1.5"><Icon className="size-3.5 text-slate-400" />{label}</span>{children}{error ? <span className="mt-2 block text-xs font-medium text-red-600">{error}</span> : hint ? <span className="mt-2 block text-[11px] font-medium text-slate-400">{hint}</span> : null}</label>; }
-function NavButton({ active, icon: Icon, label, badge, onClick }: { active: boolean; icon: typeof UserRound; label: string; badge?: number; onClick: () => void }) { return <button onClick={onClick} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition", active ? "bg-[#14305A] text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800")}><Icon className="size-4" />{label}{badge != null && <span className={cn("mr-auto rounded-full px-2 py-0.5 text-[10px]", active ? "bg-white/15" : "bg-slate-100")}>{badge.toLocaleString("fa-IR")}</span>}</button>; }
+function NavButton({ active, icon: Icon, label, badge, onClick }: { active: boolean; icon: typeof UserRound; label: string; badge?: number; onClick: () => void }) { return <button onClick={onClick} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition", active ? "bg-primary text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-800")}><Icon className="size-4" />{label}{badge != null && <span className={cn("mr-auto rounded-full px-2 py-0.5 text-[10px]", active ? "bg-white/15" : "bg-slate-100")}>{badge.toLocaleString("fa-IR")}</span>}</button>; }
 function Stat({ value, label }: { value: string; label: string }) { return <div className="min-w-24 rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 text-center"><p className="font-black text-white">{value}</p><p className="mt-1 text-[10px] text-white/45">{label}</p></div>; }
 function Info({ icon: Icon, label, value }: { icon: typeof MapPin; label: string; value: string }) { return <div className="rounded-2xl border border-slate-100 p-4"><p className="flex items-center gap-2 text-xs font-bold text-slate-400"><Icon className="size-4" />{label}</p><p className="mt-2 text-sm leading-6 text-slate-700">{value}</p></div>; }
 function formatPrice(value?: number) { return value == null ? "—" : `${value.toLocaleString("fa-IR")} ریال`; }

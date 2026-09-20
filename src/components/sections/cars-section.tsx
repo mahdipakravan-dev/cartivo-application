@@ -125,7 +125,7 @@ function CarCard({
             {car.trimLevel || "مشاهده قطعات سازگار"}
           </p>
         </div>
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition group-hover/car:bg-[#14305A] group-hover/car:text-white">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition group-hover/car:bg-primary group-hover/car:text-white">
           <ChevronLeft className="size-4" />
         </span>
       </div>

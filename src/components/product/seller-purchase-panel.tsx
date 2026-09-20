@@ -203,7 +203,7 @@ export function SellerPurchasePanel({
                   <span className="block text-base font-black text-[#14305A]">{offer.priceRial.toLocaleString("fa-IR")}</span>
                   <span className="text-[10px] text-slate-400">ریال</span>
                 </span>
-                {selected && <span className="absolute -left-2 -top-2 flex size-6 items-center justify-center rounded-full bg-[#14305A] text-white"><Check className="size-3.5" /></span>}
+                {selected && <span className="absolute -left-2 -top-2 flex size-6 items-center justify-center rounded-full bg-primary text-white"><Check className="size-3.5" /></span>}
               </button>
             );
           })}

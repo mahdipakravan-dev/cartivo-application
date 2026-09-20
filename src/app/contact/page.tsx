@@ -61,7 +61,7 @@ export default function ContactPage() {
             <ol className="flex items-center gap-1.5"><li><Link href={ROUTES.home} className="hover:text-[#14305A]">خانه</Link></li><li><ChevronLeft className="size-3" /></li><li className="font-bold text-slate-600">تماس با ما</li></ol>
           </nav>
 
-          <header className="relative isolate overflow-hidden rounded-[2rem] bg-[#14305A] shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
+          <header className="relative isolate overflow-hidden rounded-[2rem] bg-primary shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
             <div className="absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
             <div className="grid lg:min-h-[470px] lg:grid-cols-[1fr_1.05fr]">
               <div className="relative z-10 flex items-center px-6 py-12 sm:px-10 lg:px-14">
@@ -84,7 +84,7 @@ export default function ContactPage() {
             <div className="rounded-[1.75rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
               <p className="text-xs font-bold text-cyan-700">پشتیبانی کارتیوو</p><h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">چطور می‌توانیم کمک کنیم؟</h2><p className="mt-3 text-sm leading-7 text-slate-500">مسیر ارتباطی مناسب را انتخاب کنید؛ تیم ما تلاش می‌کند در کوتاه‌ترین زمان پاسخ شما را بدهد.</p>
               <div className="mt-7 space-y-3"><SupportRow icon={ShieldCheck} title="راهنمای انتخاب قطعه" description="بررسی سازگاری قطعه با برند و مدل خودرو" /><SupportRow icon={Send} title="پیگیری سفارش" description="بررسی وضعیت آماده‌سازی، ارسال و تحویل" /><SupportRow icon={MessageCircleMore} title="پیشنهاد و بازخورد" description="شنیدن تجربه شما برای بهتر شدن کارتیوو" /></div>
-              <div className="mt-7 rounded-2xl bg-[#14305A] p-5 text-white"><CalendarClock className="size-6 text-cyan-300" /><h3 className="mt-3 font-black">پاسخ‌گویی در روزهای کاری</h3><p className="mt-2 text-sm leading-7 text-white/55">پیام‌های خارج از ساعات کاری ثبت می‌شوند و در اولین فرصت بررسی خواهند شد.</p></div>
+              <div className="mt-7 rounded-2xl bg-primary p-5 text-white"><CalendarClock className="size-6 text-cyan-300" /><h3 className="mt-3 font-black">پاسخ‌گویی در روزهای کاری</h3><p className="mt-2 text-sm leading-7 text-white/55">پیام‌های خارج از ساعات کاری ثبت می‌شوند و در اولین فرصت بررسی خواهند شد.</p></div>
             </div>
 
             <div>
@@ -96,7 +96,7 @@ export default function ContactPage() {
           </section>
 
           <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-slate-100 px-6 py-9 sm:px-9">
-            <Sparkles className="absolute left-8 top-8 size-12 text-cyan-700/10" /><div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-center"><div><p className="text-xs font-bold text-cyan-700">قبل از تماس</p><h2 className="mt-2 text-xl font-black text-[#14305A] sm:text-2xl">قطعه موردنظرتان را پیدا نکرده‌اید؟</h2><p className="mt-2 text-sm text-slate-500">درخواست قطعه ثبت کنید تا نتیجه بررسی از طریق پیامک و پروفایل اطلاع داده شود.</p></div><Link href="/#part-request" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#14305A] px-5 text-sm font-bold text-white">ثبت درخواست قطعه <ArrowLeft className="size-4" /></Link></div>
+            <Sparkles className="absolute left-8 top-8 size-12 text-cyan-700/10" /><div className="relative flex flex-col justify-between gap-5 sm:flex-row sm:items-center"><div><p className="text-xs font-bold text-cyan-700">قبل از تماس</p><h2 className="mt-2 text-xl font-black text-[#14305A] sm:text-2xl">قطعه موردنظرتان را پیدا نکرده‌اید؟</h2><p className="mt-2 text-sm text-slate-500">درخواست قطعه ثبت کنید تا نتیجه بررسی از طریق پیامک و پروفایل اطلاع داده شود.</p></div><Link href="/#part-request" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white">ثبت درخواست قطعه <ArrowLeft className="size-4" /></Link></div>
           </section>
         </div>
       </main>

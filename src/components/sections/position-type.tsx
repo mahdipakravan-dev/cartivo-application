@@ -18,7 +18,7 @@ function PositionCard({ title, description, href, parts, kind }: PositionCardPro
   return (
     <Link
       href={href}
-      className="group relative isolate min-h-[340px] overflow-hidden rounded-[2rem] bg-[#14305A] p-6 shadow-[0_18px_50px_rgb(15_48_90/0.1)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgb(15_48_90/0.16)] sm:p-8"
+      className="group relative isolate min-h-[340px] overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground shadow-[0_18px_50px_color-mix(in_oklab,var(--primary)_10%,transparent)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_color-mix(in_oklab,var(--primary)_16%,transparent)] sm:p-8"
     >
       <div className="absolute -left-20 -top-20 size-64 rounded-full bg-cyan-300/10 blur-3xl" />
       <div className="relative z-10 max-w-[58%]">
