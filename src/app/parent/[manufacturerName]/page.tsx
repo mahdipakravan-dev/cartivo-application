@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, ChevronLeft, ImageOff, Layers3, PackageSearch, TriangleAlert } from "lucide-react";
+import { ChevronLeft, ImageOff, Layers3, PackageSearch, TriangleAlert } from "lucide-react";
 import { getAllCategoriesByParent } from "@/lib/api/categories";
 import { searchAllParts } from "@/lib/api/parts";
 import type { CategorySummaryResponse } from "@/lib/api/types";
@@ -12,7 +12,6 @@ interface TopLevelCategoriesPageProps {
   params: Promise<{ manufacturerName: string }>;
   searchParams: Promise<{
     parentId?: string | string[];
-    categoryId?: string | string[];
   }>;
 }
 
@@ -34,7 +33,6 @@ export default async function TopLevelCategoriesPage({
   const [{ manufacturerName: encodedManufacturerName }, query] = await Promise.all([params, searchParams]);
   const manufacturerName = decodeRouteSegment(encodedManufacturerName);
   const parentId = parseParentId(query.parentId);
-  const categoryId = parseOptionalId(query.categoryId);
 
   if (parentId === null) {
     return (
@@ -48,10 +46,7 @@ export default async function TopLevelCategoriesPage({
 
   const [result, parts] = await Promise.all([
     getAllCategoriesByParent(parentId),
-    searchAllParts({
-      parentId,
-      ...(categoryId != null ? { categoryId } : {}),
-    }),
+    searchAllParts({ parentPartIds: [parentId] }),
   ]);
 
   if (result.status === "error") {
@@ -63,10 +58,6 @@ export default async function TopLevelCategoriesPage({
       />
     );
   }
-
-  const selectedCategory = categoryId == null
-    ? null
-    : result.items.find((category) => category.id === categoryId) ?? null;
 
   return (
     <main className="bg-[#f8fafc] pb-20 pt-12 sm:pt-28">
@@ -108,8 +99,6 @@ export default async function TopLevelCategoriesPage({
                   key={category.id ?? `${category.name}-${index}`}
                   category={category}
                   manufacturerName={manufacturerName}
-                  parentId={parentId}
-                  selected={category.id != null && category.id === categoryId}
                 />
               ))}
             </div>
@@ -126,26 +115,16 @@ export default async function TopLevelCategoriesPage({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold text-cyan-700">
-                {selectedCategory ? "نتایج دسته‌بندی انتخاب‌شده" : `قطعات ${manufacturerName}`}
+                قطعات {manufacturerName}
               </p>
               <h2 id="manufacturer-parts-title" className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
-                {selectedCategory
-                  ? selectedCategory.persianName || selectedCategory.name || "قطعات دسته‌بندی"
-                  : "همه قطعات"}
+                همه قطعات
               </h2>
               <p className="mt-2 text-sm text-slate-400">
                 {parts.length.toLocaleString("fa-IR")} قطعه برای نمایش پیدا شد.
               </p>
             </div>
 
-            {categoryId != null && (
-              <Link
-                href={buildCategoryHref(manufacturerName, parentId)}
-                className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-[#14305A] transition hover:border-cyan-200"
-              >
-                نمایش همه قطعات
-              </Link>
-            )}
           </div>
 
           {parts.length > 0 ? (
@@ -159,9 +138,7 @@ export default async function TopLevelCategoriesPage({
               <PackageSearch className="mx-auto size-12 text-slate-300" />
               <h3 className="mt-4 text-lg font-black text-slate-700">قطعه‌ای پیدا نشد</h3>
               <p className="mt-2 text-sm text-slate-500">
-                {categoryId != null
-                  ? "در این دسته‌بندی قطعه فعالی برای نمایش وجود ندارد."
-                  : "برای این تولیدکننده هنوز قطعه فعالی ثبت نشده است."}
+                برای این تولیدکننده هنوز قطعه فعالی ثبت نشده است.
               </p>
             </div>
           )}
@@ -174,13 +151,9 @@ export default async function TopLevelCategoriesPage({
 function CategoryCard({
   category,
   manufacturerName,
-  parentId,
-  selected,
 }: {
   category: CategorySummaryResponse;
   manufacturerName: string;
-  parentId: number;
-  selected: boolean;
 }) {
   const label = category.persianName?.trim() || category.name?.trim() || "دسته‌بندی بدون نام";
   const content = (
@@ -197,11 +170,6 @@ function CategoryCard({
         ) : (
           <ImageOff className="size-14 text-slate-300" strokeWidth={1.4} />
         )}
-        {selected && (
-          <span className="absolute left-3 top-3 flex size-8 items-center justify-center rounded-full bg-primary text-white shadow-lg">
-            <Check className="size-4" />
-          </span>
-        )}
       </div>
       <div className="p-5">
         <h3 className="text-base font-black text-[#14305A]">{label}</h3>
@@ -214,12 +182,8 @@ function CategoryCard({
 
   return category.id != null ? (
     <Link
-      href={buildCategoryHref(manufacturerName, parentId, category.id)}
-      scroll={false}
-      className={`group overflow-hidden rounded-[1.5rem] border bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgb(15_48_90/0.12)] ${
-        selected ? "border-[#14305A] ring-2 ring-blue-100" : "border-slate-100"
-      }`}
-      aria-current={selected ? "true" : undefined}
+      href={ROUTES.parentCategory(manufacturerName, category.id)}
+      className="group overflow-hidden rounded-[1.5rem] border border-slate-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgb(15_48_90/0.12)]"
     >
       {content}
     </Link>
@@ -257,21 +221,6 @@ function parseParentId(value: string | string[] | undefined): number | null {
   if (typeof value !== "string" || !/^\d+$/.test(value)) return null;
   const parentId = Number(value);
   return Number.isSafeInteger(parentId) && parentId > 0 ? parentId : null;
-}
-
-function parseOptionalId(value: string | string[] | undefined): number | null {
-  if (value === undefined) return null;
-  return parseParentId(value);
-}
-
-function buildCategoryHref(
-  manufacturerName: string,
-  parentId: number,
-  categoryId?: number,
-): string {
-  const params = new URLSearchParams({ parentId: String(parentId) });
-  if (categoryId != null) params.set("categoryId", String(categoryId));
-  return `/${encodeURIComponent(manufacturerName)}?${params.toString()}`;
 }
 
 function decodeRouteSegment(value: string): string {

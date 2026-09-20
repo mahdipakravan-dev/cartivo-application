@@ -1,6 +1,7 @@
 import { apiClient } from "./client";
 import type { PartFrontofficeResponse, PaginatedResult, PageResponse } from "./types";
 import { collectPaginatedItems } from "../catalog-navigation";
+import { SERVER_BASE_URL } from "./config";
 
 function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T> {
   return {
@@ -17,11 +18,12 @@ function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T
 export interface PartSearchParams {
   brandIds?: number[];
   carIds?: number[];
+  modelId?: number;
   partBrandIds?: number[];
   parentPartIds?: number[];
-  parentId?: number;
   categoryId?: number;
-  positionType?: "INTERIOR" | "EXTERIOR";
+  categoryIds?: number[];
+  positionType?: "INTERIOR" | "EXTERIOR" | "BOTH";
   minPrice?: number;
   maxPrice?: number;
   page?: number;
@@ -33,6 +35,29 @@ export interface PartSearchParams {
 export type PartSearchParamsUpdate = {
   [K in keyof PartSearchParams]: PartSearchParams[K] | undefined;
 };
+
+/** Fetch top-level parts that have compatible children for a vehicle brand. */
+export async function getBrandTopLevelParts(
+  brandId: number,
+): Promise<PartFrontofficeResponse[]> {
+  try {
+    const url = new URL("/api/frontoffice/parts", SERVER_BASE_URL);
+    url.searchParams.set("brandId", String(brandId));
+    url.searchParams.set("page", "0");
+    url.searchParams.set("size", "100");
+    url.searchParams.set("sort", "name,asc");
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "force-cache",
+      next: { tags: ["frontoffice-catalog", `vehicle-brand-parts:${brandId}`] },
+    });
+    if (!response.ok) throw new Error(`Failed to fetch brand parts (${response.status})`);
+    const page = await response.json() as PageResponse;
+    return (page.content ?? []) as PartFrontofficeResponse[];
+  } catch {
+    return [];
+  }
+}
 
 /** Fetch every purchasable part matching the supplied catalog filters. */
 export async function searchAllParts(
@@ -76,10 +101,11 @@ export async function searchParts(
 
     if (params.brandIds?.length) query.brandIds = params.brandIds;
     if (params.carIds?.length) query.carIds = params.carIds;
+    if (params.modelId != null) query.modelId = params.modelId;
     if (params.partBrandIds?.length) query.partBrandIds = params.partBrandIds;
     if (params.parentPartIds?.length) query.parentPartIds = params.parentPartIds;
-    if (params.parentId != null) query.parentId = params.parentId;
     if (params.categoryId != null) query.categoryId = params.categoryId;
+    if (params.categoryIds?.length) query.categoryIds = params.categoryIds;
     if (params.positionType) query.positionType = params.positionType;
     if (params.minPrice != null) query.minPrice = params.minPrice;
     if (params.maxPrice != null) query.maxPrice = params.maxPrice;

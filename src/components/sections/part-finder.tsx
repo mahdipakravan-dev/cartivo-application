@@ -13,10 +13,6 @@ import type {
 } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import {
-  PART_FINDER_FIELDS,
-  PRODUCTION_YEAR_OPTIONS,
-} from "./part-finder-config";
 
 interface PartFinderProps {
   brands?: BrandFrontofficeResponse[];
@@ -32,7 +28,6 @@ export function PartFinder({
   searchButtonClassName,
 }: PartFinderProps) {
   const router = useRouter();
-  const [selectedYear, setSelectedYear] = useState("");
   const [selectedBrandSlug, setSelectedBrandSlug] = useState("");
   const [selectedCarId, setSelectedCarId] = useState("");
   const [cars, setCars] = useState<CarFrontofficeDetailResponse[]>([]);
@@ -79,24 +74,17 @@ export function PartFinder({
         .filter((car) => car.id != null)
         .map((car) => ({
           value: String(car.id),
-          label: `${car.model ?? ""}${car.trimLevel ? ` ${car.trimLevel}` : ""}`,
+          label: car.displayName || [
+            car.model,
+            car.trimLevel,
+            car.year?.toLocaleString("fa-IR", { useGrouping: false }),
+          ].filter(Boolean).join(" — "),
         })),
     [cars]
   );
 
-  const fields = {
-    year: (
-      <SearchableSelect
-        key="year"
-        options={PRODUCTION_YEAR_OPTIONS}
-        value={selectedYear}
-        onValueChange={setSelectedYear}
-        placeholder="سال تولید"
-        searchPlaceholder="جستجوی سال تولید..."
-        className="flex-1"
-      />
-    ),
-    brand: (
+  const fields = [
+    (
       <SearchableSelect
         key="brand"
         options={brandOptions}
@@ -107,7 +95,7 @@ export function PartFinder({
         className="flex-1"
       />
     ),
-    car: (
+    (
       <SearchableSelect
         key="car"
         options={carOptions}
@@ -120,7 +108,7 @@ export function PartFinder({
         className="flex-1"
       />
     ),
-  };
+  ];
 
   return (
     <div className={cn("w-full", className)} dir="rtl">
@@ -131,11 +119,11 @@ export function PartFinder({
             layout === "responsive" && "sm:flex-row",
           )}
         >
-          {PART_FINDER_FIELDS.map((field) => fields[field])}
+          {fields}
         </div>
         <Button
           size="lg"
-          disabled={!selectedYear || !selectedBrandSlug || !selectedCarId}
+          disabled={!selectedBrandSlug || !selectedCarId}
           onClick={() =>
             router.push(ROUTES.partsCar(selectedBrandSlug, selectedCarId))
           }

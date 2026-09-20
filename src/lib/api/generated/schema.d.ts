@@ -294,6 +294,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/frontoffice/parts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active top-level Parts available for a vehicle brand */
+        get: operations["listByBrand"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/frontoffice/parts/{parentPartId}/children": {
         parameters: {
             query?: never;
@@ -408,7 +425,7 @@ export interface paths {
         };
         /**
          * Search purchasable parts across the whole catalog
-         * @description The core catalog search: filters by compatible car ids, compatible car brand ids, part-brand ids, parent category ids, category position, and a min/max price range. Only active, priced, leaf parts are returned.
+         * @description The core catalog search: filters by compatible car ids, vehicle model id, compatible car brand ids, part-brand ids, parent Part ids, assigned category ids, category position, and a min/max price range. Only active, priced, in-stock leaf parts are returned.
          */
         get: operations["search"];
         put?: never;
@@ -517,8 +534,68 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List active categories for a top-level Part */
-        get: operations["listFrontofficeCategoriesByParent"];
+        /**
+         * List categories and all related parts for a selected vehicle and top-level Part
+         * @description carId is the exact carModelYearId returned by /api/frontoffice/cars.
+         */
+        get: operations["listFrontofficeNavigationCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an active category by id
+         * @description Returns the category directly, without requiring its parent Part id.
+         */
+        get: operations["getFrontofficeCategoryById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/cars": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List active, exact vehicle selections for a brand
+         * @description Each returned id is a carModelYearId and can be sent to the Garage API.
+         */
+        get: operations["cars"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/frontoffice/brands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List active vehicle brands */
+        get: operations["brands"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1090,6 +1167,35 @@ export interface components {
             persianName?: string;
             imageUrl?: string;
         };
+        /** @description Standard paginated response wrapper */
+        PageResponsePartFrontofficeResponse: {
+            /** @description Items of the current page */
+            content?: components["schemas"]["PartFrontofficeResponse"][];
+            /**
+             * Format: int32
+             * @description Current page number, zero-based
+             */
+            page?: number;
+            /**
+             * Format: int32
+             * @description Number of items per page
+             */
+            size?: number;
+            /**
+             * Format: int64
+             * @description Total number of items in the dataset
+             */
+            totalElements?: number;
+            /**
+             * Format: int32
+             * @description Total number of pages
+             */
+            totalPages?: number;
+            /** @description Whether a next page exists */
+            hasNext?: boolean;
+            /** @description Whether a previous page exists */
+            hasPrevious?: boolean;
+        };
         /** @description Part manufacturer/brand info */
         PartBrandResponse: {
             /** Format: int64 */
@@ -1293,6 +1399,137 @@ export interface components {
             parentPartName?: string;
             partBrandName?: string;
             manufacturerYears?: number[];
+        };
+        /** @description Public category representation */
+        CategoryFrontofficeResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            persianName?: string;
+            imageUrl?: string;
+            parts?: components["schemas"]["PartSearchFrontofficeResponse"][];
+        };
+        /** @description Standard paginated response wrapper */
+        PageResponseCategoryFrontofficeResponse: {
+            /** @description Items of the current page */
+            content?: components["schemas"]["CategoryFrontofficeResponse"][];
+            /**
+             * Format: int32
+             * @description Current page number, zero-based
+             */
+            page?: number;
+            /**
+             * Format: int32
+             * @description Number of items per page
+             */
+            size?: number;
+            /**
+             * Format: int64
+             * @description Total number of items in the dataset
+             */
+            totalElements?: number;
+            /**
+             * Format: int32
+             * @description Total number of pages
+             */
+            totalPages?: number;
+            /** @description Whether a next page exists */
+            hasNext?: boolean;
+            /** @description Whether a previous page exists */
+            hasPrevious?: boolean;
+        };
+        /** @description Purchasable part representation returned by the public search endpoint */
+        PartSearchFrontofficeResponse: {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            id?: number;
+            /** @example Door Lock */
+            name?: string;
+            /**
+             * @example MECHANICAL
+             * @enum {string}
+             */
+            makingType?: "ELECTRICAL" | "MECHANICAL";
+            /** @example Front Door Lock Assembly */
+            businessName?: string;
+            /**
+             * Factory Serial Number
+             * @example DL-206-FL
+             */
+            partNumber?: string;
+            /** @example OEM-9675505380 */
+            manufacturerCode?: string;
+            /** @example SecureLock Pro */
+            commercialName?: string;
+            /** @example Bosch */
+            manufacturerName?: string;
+            /**
+             * @example PIECE
+             * @enum {string}
+             */
+            unit?: "PIECE" | "PAIR" | "SET" | "PACKAGE" | "CARTON" | "LITER";
+            /** @example OEM door lock mechanism */
+            description?: string;
+            /** @example 1250000 */
+            price?: number;
+            /**
+             * Format: int64
+             * @example 3
+             */
+            partBrandId?: number;
+            /** @example Bosch */
+            partBrandName?: string;
+            /** @example http://localhost:8080/files/uploads/bosch.jpg */
+            partBrandIcon?: string;
+            /**
+             * Format: int64
+             * @example 5
+             */
+            parentPartId?: number;
+            /** @example Door */
+            parentPartName?: string;
+            /**
+             * @example EXTERIOR
+             * @enum {string}
+             */
+            position?: "INTERIOR" | "EXTERIOR" | "BOTH";
+            /** @description Normalized vehicle fitments */
+            fitments?: components["schemas"]["PartFitmentResponse"][];
+            /** @description Image URLs, in display order */
+            imageUrls?: string[];
+            categories?: components["schemas"]["CategorySummaryResponse"][];
+            manufacturerYears?: number[];
+        };
+        /** @description Standard paginated response wrapper */
+        PageResponseResolvedVehicle: {
+            /** @description Items of the current page */
+            content?: components["schemas"]["ResolvedVehicle"][];
+            /**
+             * Format: int32
+             * @description Current page number, zero-based
+             */
+            page?: number;
+            /**
+             * Format: int32
+             * @description Number of items per page
+             */
+            size?: number;
+            /**
+             * Format: int64
+             * @description Total number of items in the dataset
+             */
+            totalElements?: number;
+            /**
+             * Format: int32
+             * @description Total number of pages
+             */
+            totalPages?: number;
+            /** @description Whether a next page exists */
+            hasNext?: boolean;
+            /** @description Whether a previous page exists */
+            hasPrevious?: boolean;
         };
         /** @description Part brand (manufacturer) representation returned to the customer-facing site/app - public fields only */
         PartBrandFrontofficeResponse: {
@@ -2080,6 +2317,48 @@ export interface operations {
             };
         };
     };
+    listByBrand: {
+        parameters: {
+            query: {
+                brandId: number;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponsePartFrontofficeResponse"];
+                };
+            };
+        };
+    };
     listChildren: {
         parameters: {
             query?: {
@@ -2343,6 +2622,11 @@ export interface operations {
                  */
                 brandIds?: number[];
                 /**
+                 * @description Only parts compatible with this vehicle model id
+                 * @example 7
+                 */
+                modelId?: number;
+                /**
                  * @description Only parts manufactured by one of these part-brand ids
                  * @example [
                  *       3
@@ -2356,6 +2640,19 @@ export interface operations {
                  *     ]
                  */
                 parentPartIds?: number[];
+                /**
+                 * @description Only parts assigned to this catalog category id
+                 * @example 12
+                 */
+                categoryId?: number;
+                /**
+                 * @description Only parts assigned to at least one of these catalog category ids
+                 * @example [
+                 *       12,
+                 *       13
+                 *     ]
+                 */
+                categoryIds?: number[];
                 /**
                  * @description Only parts whose parent category has this position
                  * @example EXTERIOR
@@ -2689,7 +2986,7 @@ export interface operations {
             };
         };
     };
-    listFrontofficeCategoriesByParent: {
+    listFrontofficeNavigationCategories: {
         parameters: {
             query: {
                 /**
@@ -2717,6 +3014,9 @@ export interface operations {
                  * @example DESC
                  */
                 sortDir?: "ASC" | "DESC";
+                carId: number;
+                brandId: number;
+                partId: number;
             };
             header?: never;
             path?: never;
@@ -2730,7 +3030,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PageResponse"];
+                    "application/json": components["schemas"]["PageResponseCategoryFrontofficeResponse"] | components["schemas"]["PageResponse"];
                 };
             };
             /** @description The supplied Part is not top-level */
@@ -2749,6 +3049,105 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getFrontofficeCategoryById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Category ID
+                 * @example 12
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active category found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryFrontofficeResponse"];
+                };
+            };
+            /** @description Category not found or inactive */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cars: {
+        parameters: {
+            query: {
+                brandId: number;
+                /**
+                 * @description Page number, zero-based
+                 * @example 0
+                 */
+                page?: number;
+                /**
+                 * @description Number of items per page (capped by project config)
+                 * @example 20
+                 */
+                size?: number;
+                /**
+                 * @description Field name to sort by
+                 * @example createdAt
+                 */
+                sortBy?: string;
+                /**
+                 * @description Sort direction
+                 * @example DESC
+                 */
+                sortDir?: "ASC" | "DESC";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageResponseResolvedVehicle"];
+                };
+            };
+        };
+    };
+    brands: {
+        parameters: {
+            query?: {
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SelectorBrand"][];
                 };
             };
         };

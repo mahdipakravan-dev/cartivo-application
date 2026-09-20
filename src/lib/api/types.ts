@@ -18,6 +18,15 @@ export type BrandFrontofficeResponse =
  */
 export interface CarFrontofficeDetailResponse {
   id?: number;
+  modelYearId?: number;
+  year?: number;
+  calendarType?: "PERSIAN" | "GREGORIAN";
+  displayName?: string;
+  modelId?: number;
+  baseModelName?: string;
+  modelEnglishName?: string;
+  generationId?: number;
+  variantId?: number;
   brand?: string;
   model?: string;
   trimLevel?: string;

@@ -18,7 +18,7 @@ export function getTopLevelPartHref(
   const manufacturerName = cleanText(part.manufacturerName);
   if (typeof part.id !== "number" || !Number.isSafeInteger(part.id) ) return null;
 
-  return `/${encodeURIComponent(manufacturerName || "")}?parentId=${part.id}`;
+  return `/parent/${encodeURIComponent(manufacturerName || "")}?parentId=${part.id}`;
 }
 
 export function getTopLevelPartLabel(

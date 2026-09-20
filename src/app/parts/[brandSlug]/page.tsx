@@ -144,7 +144,7 @@ export default async function PartsBrandPage({
                     {cars.length > 0 && (
                       <a href="#brand-cars" className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-5 text-sm font-extrabold text-[#14305A] shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-cyan-50">
                         <CarFront className="size-4" />
-                        انتخاب مدل خودرو
+                        انتخاب خودرو
                         <ArrowDownLeft className="size-4" />
                       </a>
                     )}
@@ -178,7 +178,7 @@ export default async function PartsBrandPage({
                 </div>
                 <div className="absolute bottom-9 right-10 flex items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-xs font-bold text-white/75 shadow-xl backdrop-blur-md">
                   <CarFront className="size-4 text-cyan-300" />
-                  {cars.length.toLocaleString("fa-IR")} مدل خودرو
+                  {cars.length.toLocaleString("fa-IR")} خودرو
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ export default async function PartsBrandPage({
             <div>
               <p className="text-xs font-bold text-cyan-700">انتخاب خودرو</p>
               <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
-                مدل‌های {brand.persianName}
+                خودروهای {brand.persianName}
               </h2>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 مدل دقیق خودروی خود را انتخاب کنید تا فقط قطعات سازگار نمایش داده شوند.
@@ -200,7 +200,7 @@ export default async function PartsBrandPage({
             </div>
             <div className="flex w-fit items-center gap-2 rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs font-bold text-slate-500">
               <CarFront className="size-4 text-cyan-700" />
-              {cars.length.toLocaleString("fa-IR")} مدل موجود
+              {cars.length.toLocaleString("fa-IR")} خودرو موجود
             </div>
           </div>
 

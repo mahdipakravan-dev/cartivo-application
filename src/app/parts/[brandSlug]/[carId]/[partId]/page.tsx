@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { brandSlug, carId, partId } = await params;
   const [brand, car, part] = await Promise.all([
     getBrandBySlug(brandSlug),
-    getCarByIdOrSlug(carId),
+    getCarByIdOrSlug(carId, brandSlug),
     getPartById(partId),
   ]);
 
@@ -48,7 +48,7 @@ export default async function PartsPartPage({
 
   const [brand, car, part] = await Promise.all([
     getBrandBySlug(brandSlug),
-    getCarByIdOrSlug(carId),
+    getCarByIdOrSlug(carId, brandSlug),
     getPartById(Number(partId)),
   ]);
 
@@ -97,7 +97,7 @@ export default async function PartsPartPage({
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link href={ROUTES.partsBrand(brandSlug)} className="transition-colors hover:text-slate-600">
+                <Link href={ROUTES.brandDetail(brandSlug)} className="transition-colors hover:text-slate-600">
                   {brand.persianName}
                 </Link>
               </li>

@@ -19,6 +19,7 @@ function CarPill({
   const carName = [brandName, car.model, car.trimLevel]
     .filter(Boolean)
     .join(" ");
+  const year = car.year?.toLocaleString("fa-IR", { useGrouping: false });
 
   return (
     <a
@@ -58,7 +59,7 @@ function CarPill({
           {car.model || "مدل خودرو"}
         </p>
         <p className="mt-0.5 truncate text-[11px] text-slate-400">
-          {car.trimLevel || "مشاهده قطعات"}
+          {[car.trimLevel, year].filter(Boolean).join(" — ") || "مشاهده قطعات"}
         </p>
       </div>
       <ChevronLeft className="size-3.5 shrink-0 text-slate-300 transition-colors group-hover/car:text-[#14305A]" />
@@ -79,6 +80,7 @@ function CarCard({
   const carName = [brandName, car.model, car.trimLevel]
     .filter(Boolean)
     .join(" ");
+  const year = car.year?.toLocaleString("fa-IR", { useGrouping: false });
 
   return (
     <a
@@ -122,7 +124,7 @@ function CarCard({
             {car.model || "مدل خودرو"}
           </h3>
           <p className="mt-0.5 truncate text-[10px] text-slate-400">
-            {car.trimLevel || "مشاهده قطعات سازگار"}
+            {[car.trimLevel, year].filter(Boolean).join(" — ") || "مشاهده قطعات سازگار"}
           </p>
         </div>
         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition group-hover/car:bg-primary group-hover/car:text-white">

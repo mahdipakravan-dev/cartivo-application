@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import { ArrowDownLeft, BadgeCheck, CarFront, ChevronLeft, Package, Search, Wrench } from "lucide-react";
-import { getBrandBySlug, getCarsByBrand, getCarByIdOrSlug } from "@/lib/api/brands";
-import { searchParts } from "@/lib/api/parts";
+import { getBrandBySlug, getCarByIdOrSlug } from "@/lib/api/brands";
+import { getBrandTopLevelParts } from "@/lib/api/parts";
+import { getVehicleCategories } from "@/lib/api/categories";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
-import { parseSearchParams } from "@/lib/search-params";
 import { JsonLd } from "@/lib/seo/json-ld";
-import { SearchResults } from "@/components/sections/product-search/search-results";
+import { ProductCard } from "@/components/product-card";
 
 const BODY_TYPE_LABELS: Record<string, string> = {
   SEDAN: "سدان",
@@ -31,18 +30,18 @@ export async function generateMetadata({
   const { brandSlug, carId } = await params;
   const [brand, car] = await Promise.all([
     getBrandBySlug(brandSlug),
-    getCarByIdOrSlug(carId),
+    getCarByIdOrSlug(carId, brandSlug),
   ]);
 
   if (!brand || !car) return { title: "خودرو یافت نشد" };
 
   return {
-    title: `قطعات یدکی ${car.brand} ${car.model} | ${siteConfig.name}`,
-    description: `خرید قطعات یدکی ${car.brand} ${car.model} (${car.trimLevel ?? ""}) با مقایسه قیمت فروشندگان.`,
+    title: `قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} | ${siteConfig.name}`,
+    description: `خرید قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} با مقایسه قیمت فروشندگان.`,
     alternates: { canonical: ROUTES.partsCar(brandSlug, carId) },
     openGraph: {
-      title: `قطعات یدکی ${car.brand} ${car.model} | ${siteConfig.name}`,
-      description: `لیست قطعات یدکی ${car.brand} ${car.model} در کارتیوو.`,
+      title: `قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} | ${siteConfig.name}`,
+      description: `لیست قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} در کارتیوو.`,
       url: ROUTES.partsCar(brandSlug, carId),
       type: "website",
       ...(car.imageUrls?.[0] ? { images: [{ url: car.imageUrls[0] }] } : {}),
@@ -59,19 +58,26 @@ export default async function PartsCarPage({
 }) {
   const { brandSlug, carId } = await params;
   const sp = await searchParams;
-  const filters = parseSearchParams(sp);
 
   const [brand, car] = await Promise.all([
     getBrandBySlug(brandSlug),
-    getCarByIdOrSlug(carId),
+    getCarByIdOrSlug(carId, brandSlug),
   ]);
 
   if (!brand || !car) notFound();
 
   const primaryImage = car.imageUrls?.[0];
-  const carName = [brand.persianName, car.model, car.trimLevel].filter(Boolean).join(" ");
-  filters.carIds = [car.id!];
-  const results = await searchParts(filters);
+  const carName = car.displayName || [brand.persianName, car.model, car.trimLevel, car.year].filter(Boolean).join(" ");
+  const topLevelParts = brand.id == null ? [] : await getBrandTopLevelParts(brand.id);
+  const rawPartId = Array.isArray(sp.partId) ? sp.partId[0] : sp.partId;
+  const requestedPartId = rawPartId ? Number(rawPartId) : null;
+  const selectedPart = topLevelParts.find((part) => part.id === requestedPartId) ?? topLevelParts[0];
+  const categories = brand.id != null && car.id != null && selectedPart?.id != null
+    ? await getVehicleCategories({ carId: car.id, brandId: brand.id, partId: selectedPart.id })
+    : [];
+  const compatiblePartCount = new Set(
+    categories.flatMap((category) => category.parts.map((part) => part.id).filter((id): id is number => id != null)),
+  ).size;
 
   const carJsonLd = {
     "@context": "https://schema.org",
@@ -97,13 +103,23 @@ export default async function PartsCarPage({
               </li>
               <li aria-hidden="true"><ChevronLeft className="size-3" /></li>
               <li>
-                <Link href={ROUTES.partsBrand(brandSlug)} className="transition-colors hover:text-[#14305A]">
+                <Link href={ROUTES.brandDetail(brandSlug)} className="transition-colors hover:text-[#14305A]">
                   {brand.persianName}
                 </Link>
               </li>
+              {car.modelId != null && (
+                <>
+                  <li aria-hidden="true"><ChevronLeft className="size-3" /></li>
+                  <li>
+                    <Link href={ROUTES.partsModel(brandSlug, car.modelId)} className="transition-colors hover:text-[#14305A]">
+                      {car.baseModelName || car.model}
+                    </Link>
+                  </li>
+                </>
+              )}
               <li aria-hidden="true"><ChevronLeft className="size-3" /></li>
               <li aria-current="page" className="truncate font-bold text-slate-600">
-                {car.model}
+                {car.displayName || car.model}
               </li>
             </ol>
           </nav>
@@ -132,6 +148,11 @@ export default async function PartsCarPage({
                       <CarFront className="size-3.5 text-cyan-300" />
                       {brand.persianName}
                     </span>
+                    {car.year != null && (
+                      <span className="rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/65">
+                        سال {car.year.toLocaleString("fa-IR", { useGrouping: false })}
+                      </span>
+                    )}
                     {car.bodyType && (
                       <span className="rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/65">
                         {BODY_TYPE_LABELS[car.bodyType] ?? car.bodyType}
@@ -139,7 +160,7 @@ export default async function PartsCarPage({
                     )}
                     <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-bold text-white/65">
                       <Package className="size-3.5 text-cyan-300" />
-                      {results.totalElements.toLocaleString("fa-IR")} قطعه
+                      {compatiblePartCount.toLocaleString("fa-IR")} قطعه
                     </span>
                   </div>
 
@@ -155,8 +176,8 @@ export default async function PartsCarPage({
                       مشاهده قطعات سازگار
                       <ArrowDownLeft className="size-4" />
                     </a>
-                    <Link href={ROUTES.partsBrand(brandSlug)} className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 text-sm font-bold text-white transition hover:bg-white/15">
-                      مدل‌های دیگر
+                    <Link href={car.modelId != null ? ROUTES.partsModel(brandSlug, car.modelId) : ROUTES.brandDetail(brandSlug)} className="inline-flex h-12 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 text-sm font-bold text-white transition hover:bg-white/15">
+                      {car.modelId != null ? "همه قطعات این مدل" : "مدل‌های دیگر"}
                     </Link>
                   </div>
                 </div>
@@ -192,25 +213,54 @@ export default async function PartsCarPage({
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <div className="mb-7 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <p className="text-xs font-bold text-cyan-700">قطعات سازگار</p>
-              <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">قطعات {brand.persianName} {car.model}</h2>
+              <p className="text-xs font-bold text-cyan-700">انتخاب گروه قطعه</p>
+              <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">قطعات سازگار با {car.displayName || `${brand.persianName} ${car.model}`}</h2>
             </div>
-            <p className="text-sm text-slate-400">نتایج بر اساس خودروی انتخاب‌شده فیلتر شده‌اند.</p>
+            <p className="text-sm text-slate-400">نتایج برای همین مدل و سال تولید نمایش داده می‌شوند.</p>
           </div>
-          <Suspense
-            fallback={
-              <div className="py-16 text-center text-sm text-slate-400">
-                در حال بارگذاری...
+
+          {topLevelParts.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 py-14 text-center text-sm text-slate-400">گروه قطعه‌ای برای این برند یافت نشد.</div>
+          ) : (
+            <>
+              <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+                {topLevelParts.map((part) => (
+                  <Link
+                    key={part.id}
+                    href={`${ROUTES.partsCar(brandSlug, carId)}?partId=${part.id}#compatible-parts`}
+                    scroll={false}
+                    className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${part.id === selectedPart?.id ? "border-primary bg-primary text-primary-foreground" : "border-slate-200 bg-white text-slate-600 hover:border-cyan-200"}`}
+                  >
+                    {part.name || "گروه قطعه"}
+                  </Link>
+                ))}
               </div>
-            }
-          >
-            <SearchResults
-              initialParams={filters}
-              cars={[]}
-              results={results}
-              brandSlug={brandSlug}
-            />
-          </Suspense>
+
+              {categories.length === 0 ? (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-200 py-14 text-center">
+                  <Package className="mx-auto size-10 text-slate-200" />
+                  <p className="mt-3 text-sm font-bold text-slate-500">قطعه سازگاری در این گروه ثبت نشده است</p>
+                </div>
+              ) : (
+                <div className="mt-7 space-y-9">
+                  {categories.map((category, index) => (
+                    <section key={category.id ?? index}>
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-bold text-cyan-700">{selectedPart?.name}</p>
+                          <h3 className="mt-1 text-xl font-black text-slate-800">{category.persianName || category.name || "دسته‌بندی قطعات"}</h3>
+                        </div>
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-500">{category.parts.length.toLocaleString("fa-IR")} محصول</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {category.parts.map((part) => <ProductCard key={part.id} part={part} variant="vertical" />)}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
       </main>

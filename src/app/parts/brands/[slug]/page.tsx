@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getBrandBySlug, getCarsByBrand } from "@/lib/api/brands";
+import { getBrandBySlug, getCarModelsByBrand, type CatalogCarModel } from "@/lib/api/brands";
 import { searchParts } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
@@ -11,7 +11,6 @@ import { parseSearchParams } from "@/lib/search-params";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { SectionHeader } from "@/components/ui/section-header";
 import { SearchResults } from "@/components/sections/product-search/search-results";
-import type { CarFrontofficeDetailResponse } from "@/lib/api/types";
 
 export async function generateMetadata({
   params,
@@ -36,36 +35,24 @@ export async function generateMetadata({
   };
 }
 
-function CarItem({ car, brandSlug }: { car: CarFrontofficeDetailResponse; brandSlug: string }) {
-  const primaryImage = car.imageUrls?.[0];
-
+function ModelItem({ model, brandSlug }: { model: CatalogCarModel; brandSlug: string }) {
   return (
     <Link
-      href={`${ROUTES.brandDetail(brandSlug)}/cars/${car.id}`}
+      href={ROUTES.partsModel(brandSlug, model.id)}
       className="group/car flex shrink-0 flex-col items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      aria-label={`${car.brand} ${car.model} — مشاهده جزئیات`}
+      aria-label={`${model.name} — مشاهده مدل خودرو`}
     >
       <div className="relative flex h-26 w-26 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm shadow-slate-100/50 transition-all duration-300 group-hover/car:-translate-y-1 group-hover/car:border-slate-200 group-hover/car:shadow-lg group-hover/car:shadow-slate-200/60">
-        {primaryImage ? (
-          <Image
-            src={primaryImage}
-            alt={`${car.brand} ${car.model}`}
-            width={80}
-            height={80}
-            className=" object-cover transition-transform duration-300 group-hover/car:scale-110"
-            loading="lazy"
-          />
-        ) : (
-          <span className="text-lg font-bold text-slate-300 transition-colors group-hover/car:text-slate-500">
-            {car.model?.slice(0, 3)}
-          </span>
-        )}
+        <span className="text-lg font-bold text-slate-300 transition-colors group-hover/car:text-slate-500">
+          {model.name.slice(0, 3)}
+        </span>
       </div>
 
       <div className="max-w-[8rem] text-center">
         <span className="block truncate text-xs font-medium text-slate-500 transition-colors group-hover/car:text-slate-800">
-          {car.model}
+          {model.name}
         </span>
+        <span className="mt-1 block text-[10px] text-slate-400">{model.cars.length.toLocaleString("fa-IR")} نسخه و سال</span>
       </div>
     </Link>
   );
@@ -82,14 +69,13 @@ export default async function BrandDetailPage({
   const sp = await searchParams;
   const filters = parseSearchParams(sp);
 
-  const [brand, carsResult] = await Promise.all([
+  const [brand, models] = await Promise.all([
     getBrandBySlug(slug),
-    getCarsByBrand(slug),
+    getCarModelsByBrand(slug),
   ]);
 
   if (!brand) notFound();
 
-  const cars = carsResult.items;
   filters.brandIds = [brand.id!];
   const results = await searchParts(filters);
 
@@ -106,13 +92,13 @@ export default async function BrandDetailPage({
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `خودروهای ${brand.persianName}`,
-    numberOfItems: cars.length,
-    itemListElement: cars.map((car, index) => ({
+    numberOfItems: models.length,
+    itemListElement: models.map((model, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
         "@type": "Car",
-        name: `${car.brand} ${car.model}`,
+        name: model.name,
         brand: { "@type": "Brand", name: brand.persianName },
       },
     })),
@@ -157,7 +143,7 @@ export default async function BrandDetailPage({
               <p className="mt-2 text-lg text-white/50">{brand.englishName}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
-                  {cars.length.toLocaleString("fa-IR")} مدل خودرو
+                  {models.length.toLocaleString("fa-IR")} مدل خودرو
                 </span>
                 {brand.countryCode && (
                   <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
@@ -176,13 +162,13 @@ export default async function BrandDetailPage({
       <section className="py-8 sm:py-8">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title="خودروها" />
-          {cars.length === 0 ? (
+          {models.length === 0 ? (
             <p className="mt-8 text-center text-sm text-slate-400">خودرویی برای این برند یافت نشد.</p>
           ) : (
             <div className="mt-8 -mx-4 px-4 sm:mx-0 sm:px-0">
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide sm:flex-wrap sm:justify-start sm:gap-5">
-                {cars.map((car) => (
-                  <CarItem key={car.id} car={car} brandSlug={slug} />
+                {models.map((model) => (
+                  <ModelItem key={model.id} model={model} brandSlug={slug} />
                 ))}
               </div>
             </div>
@@ -197,7 +183,7 @@ export default async function BrandDetailPage({
           <Suspense fallback={<div className="text-center text-sm text-slate-400 py-16">در حال بارگذاری...</div>}>
             <SearchResults
               initialParams={filters}
-              cars={cars}
+              cars={models.flatMap((model) => model.cars)}
               results={results}
               brandSlug={slug}
             />

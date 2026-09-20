@@ -1,37 +1,60 @@
+import { apiFetch } from "./fetch";
 import { SERVER_BASE_URL } from "./config";
-import {
-  getVehicleModels,
-  getVehicleVariants,
-  type VehicleBrand,
-  type VehicleModel,
-  type VehicleVariant,
-} from "./vehicle-selector";
+import type { components } from "./generated/schema";
 import type {
   BrandFrontofficeResponse,
   CarFrontofficeDetailResponse,
   PaginatedResult,
 } from "./types";
 
-const SELECTOR_PATH = "/api/public/vehicle-selector";
+type CatalogBrandResponse = components["schemas"]["SelectorBrand"];
 
-async function selectorFetch<T>(
+interface CatalogCarResponse {
+  modelYearId: number;
+  year: number;
+  calendarType: "PERSIAN" | "GREGORIAN";
+  brand?: components["schemas"]["SelectorBrand"];
+  model?: components["schemas"]["SelectorModel"];
+  generation?: components["schemas"]["SelectorGeneration"];
+  variant?: components["schemas"]["SelectorVariant"];
+  displayName?: string;
+}
+
+interface CatalogPage<T> {
+  content?: T[];
+  page?: number;
+  size?: number;
+  totalElements?: number;
+  totalPages?: number;
+  hasNext?: boolean;
+  hasPrevious?: boolean;
+}
+
+export interface CatalogCarModel {
+  id: number;
+  name: string;
+  englishName?: string;
+  cars: CarFrontofficeDetailResponse[];
+}
+
+async function frontofficeFetch<T>(
   path: string,
   params?: Record<string, string | number | undefined>,
 ): Promise<T> {
-  const url = new URL(`${SELECTOR_PATH}/${path}`, SERVER_BASE_URL);
+  const url = new URL(`/api/frontoffice/${path}`, SERVER_BASE_URL);
   Object.entries(params ?? {}).forEach(([key, value]) => {
     if (value != null && value !== "") url.searchParams.set(key, String(value));
   });
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
     cache: "force-cache",
-    next: { tags: ["vehicle-selector"] },
+    next: { tags: ["frontoffice-catalog"] },
   });
-  if (!response.ok) throw new Error(`Vehicle selector request failed (${response.status})`);
+  if (!response.ok) throw new Error(`Frontoffice catalog request failed (${response.status})`);
   return response.json() as Promise<T>;
 }
 
-function toCatalogBrand(brand: VehicleBrand): BrandFrontofficeResponse {
+function toCatalogBrand(brand: CatalogBrandResponse): BrandFrontofficeResponse {
   return {
     ...(brand.id != null && { id: brand.id, slug: String(brand.id) }),
     ...(brand.name && { persianName: brand.name }),
@@ -40,22 +63,28 @@ function toCatalogBrand(brand: VehicleBrand): BrandFrontofficeResponse {
   };
 }
 
-function toCatalogCar(
-  brand: VehicleBrand,
-  model: VehicleModel,
-  variant: VehicleVariant,
-): CarFrontofficeDetailResponse {
-  const brandName = brand.name || brand.englishName;
-  const modelName = variant.generation?.name || model.name || model.englishName;
+function toCatalogCar(car: CatalogCarResponse): CarFrontofficeDetailResponse {
+  const modelName = car.generation?.name || car.model?.name || car.model?.englishName;
   const description = [
-    variant.engineCode && `کد موتور: ${variant.engineCode}`,
-    variant.transmissionType && `گیربکس: ${variant.transmissionType}`,
+    car.variant?.engineCode && `کد موتور: ${car.variant.engineCode}`,
+    car.variant?.transmissionType && `گیربکس: ${car.variant.transmissionType}`,
   ].filter(Boolean).join(" • ");
   return {
-    ...(variant.id != null && { id: variant.id }),
-    ...(brandName && { brand: brandName }),
+    id: car.modelYearId,
+    modelYearId: car.modelYearId,
+    year: car.year,
+    calendarType: car.calendarType,
+    ...(car.displayName && { displayName: car.displayName }),
+    ...((car.brand?.name || car.brand?.englishName) && {
+      brand: car.brand?.name || car.brand?.englishName,
+    }),
     ...(modelName && { model: modelName }),
-    ...(variant.name && { trimLevel: variant.name }),
+    ...(car.variant?.name && { trimLevel: car.variant.name }),
+    ...(car.model?.id != null && { modelId: car.model.id }),
+    ...(car.model?.name && { baseModelName: car.model.name }),
+    ...(car.model?.englishName && { modelEnglishName: car.model.englishName }),
+    ...(car.generation?.id != null && { generationId: car.generation.id }),
+    ...(car.variant?.id != null && { variantId: car.variant.id }),
     ...(description && { description }),
   };
 }
@@ -74,25 +103,43 @@ function paginate<T>(items: T[], page = 0, size = 20): PaginatedResult<T> {
   };
 }
 
-async function getSelectorBrands(search?: string) {
-  return selectorFetch<VehicleBrand[]>("brands", { search });
+async function getCatalogBrands(search?: string) {
+  return frontofficeFetch<CatalogBrandResponse[]>("brands", { search });
 }
 
-async function getSelectorModels(brandId: number) {
-  return selectorFetch<VehicleModel[]>("models", { brandId });
-}
-
-async function getSelectorVariants(modelId: number) {
-  return selectorFetch<VehicleVariant[]>("variants", { modelId });
+async function getAllCatalogCars(brandId: number): Promise<CatalogCarResponse[]> {
+  const first = await frontofficeFetch<CatalogPage<CatalogCarResponse>>("cars", {
+    brandId,
+    page: 0,
+    size: 100,
+    sort: "year,desc",
+  });
+  const items = [...(first.content ?? [])];
+  const totalPages = first.totalPages ?? 1;
+  if (totalPages > 1) {
+    const remaining = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, index) =>
+        frontofficeFetch<CatalogPage<CatalogCarResponse>>("cars", {
+          brandId,
+          page: index + 1,
+          size: 100,
+          sort: "year,desc",
+        }),
+      ),
+    );
+    remaining.forEach((page) => items.push(...(page.content ?? [])));
+  }
+  return items;
 }
 
 export async function getBrands(params?: {
   page?: number;
   size?: number;
   sort?: string;
+  search?: string;
 }): Promise<PaginatedResult<BrandFrontofficeResponse>> {
   try {
-    const brands = (await getSelectorBrands()).map(toCatalogBrand);
+    const brands = (await getCatalogBrands(params?.search)).map(toCatalogBrand);
     return paginate(brands, params?.page ?? 0, params?.size ?? 20);
   } catch {
     return paginate([], params?.page ?? 0, params?.size ?? 20);
@@ -100,11 +147,15 @@ export async function getBrands(params?: {
 }
 
 export async function getAllBrands(): Promise<BrandFrontofficeResponse[]> {
-  return (await getBrands({ page: 0, size: Number.MAX_SAFE_INTEGER })).items;
+  try {
+    return (await getCatalogBrands()).map(toCatalogBrand);
+  } catch {
+    return [];
+  }
 }
 
 export async function getTopBrands(): Promise<BrandFrontofficeResponse[]> {
-  return (await getBrands({ page: 0, size: 10 })).items;
+  return (await getAllBrands()).slice(0, 10);
 }
 
 export async function getBrandBySlug(
@@ -117,50 +168,55 @@ export async function getBrandBySlug(
 export async function getCarsByBrand(
   brandSlug: string,
 ): Promise<PaginatedResult<CarFrontofficeDetailResponse>> {
+  const brandId = Number(brandSlug);
+  if (!Number.isFinite(brandId)) return paginate([], 0, 100);
   try {
-    const brandId = Number(brandSlug);
-    if (!Number.isFinite(brandId)) return paginate([], 0, 50);
-    const brands = await getSelectorBrands();
-    const brand = brands.find((item) => item.id === brandId);
-    if (!brand) return paginate([], 0, 50);
-    const models = await getSelectorModels(brandId);
-    const variants = await Promise.all(
-      models.map(async (model) =>
-        model.id == null
-          ? []
-          : (await getSelectorVariants(model.id)).map((variant) =>
-              toCatalogCar(brand, model, variant),
-            ),
-      ),
-    );
-    return paginate(variants.flat(), 0, 50);
+    const cars = (await getAllCatalogCars(brandId)).map(toCatalogCar);
+    return paginate(cars, 0, Math.max(cars.length, 1));
   } catch {
-    return paginate([], 0, 50);
+    return paginate([], 0, 100);
   }
+}
+
+export async function getCarModelsByBrand(
+  brandSlug: string,
+): Promise<CatalogCarModel[]> {
+  const { items: cars } = await getCarsByBrand(brandSlug);
+  const models = new Map<number, CatalogCarModel>();
+  cars.forEach((car) => {
+    if (car.modelId == null) return;
+    const existing = models.get(car.modelId);
+    if (existing) {
+      existing.cars.push(car);
+      return;
+    }
+    models.set(car.modelId, {
+      id: car.modelId,
+      name: car.baseModelName || car.model || `مدل ${car.modelId}`,
+      ...(car.modelEnglishName && { englishName: car.modelEnglishName }),
+      cars: [car],
+    });
+  });
+  return [...models.values()].sort((left, right) =>
+    left.name.localeCompare(right.name, "fa"),
+  );
 }
 
 export async function getCarByIdOrSlug(
   idOrSlug: string | number,
+  brandSlug: string,
 ): Promise<CarFrontofficeDetailResponse | null> {
-  const variantId = Number(idOrSlug);
-  if (!Number.isFinite(variantId)) return null;
+  const modelYearId = Number(idOrSlug);
+  const brandId = Number(brandSlug);
+  if (!Number.isFinite(modelYearId) || !Number.isFinite(brandId)) return null;
   try {
-    const brands = await getSelectorBrands();
-    for (const brand of brands) {
-      if (brand.id == null) continue;
-      const models = await getSelectorModels(brand.id);
-      for (const model of models) {
-        if (model.id == null) continue;
-        const variant = (await getSelectorVariants(model.id)).find(
-          (item) => item.id === variantId,
-        );
-        if (variant) return toCatalogCar(brand, model, variant);
-      }
-    }
+    const car = (await getAllCatalogCars(brandId)).find(
+      (item) => item.modelYearId === modelYearId,
+    );
+    return car ? toCatalogCar(car) : null;
   } catch {
     return null;
   }
-  return null;
 }
 
 export async function fetchCarsByBrand(
@@ -169,21 +225,11 @@ export async function fetchCarsByBrand(
   const brandId = Number(brandSlug);
   if (!Number.isFinite(brandId)) return [];
   try {
-    const models = await getVehicleModels(brandId);
-    const variants = await Promise.all(
-      models.map(async (model) =>
-        model.id == null
-          ? []
-          : (await getVehicleVariants(model.id)).map((variant) => ({
-              ...(variant.id != null && { id: variant.id }),
-              ...((variant.generation?.name || model.name || model.englishName) && {
-                model: variant.generation?.name || model.name || model.englishName,
-              }),
-              ...(variant.name && { trimLevel: variant.name }),
-            })),
-      ),
+    const first = await apiFetch<CatalogPage<CatalogCarResponse>>(
+      "/api/frontoffice/cars",
+      { params: { brandId, page: 0, size: 100, sort: "year,desc" } },
     );
-    return variants.flat();
+    return (first.content ?? []).map(toCatalogCar);
   } catch {
     return [];
   }

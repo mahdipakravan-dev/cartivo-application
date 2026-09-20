@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/config/site";
 import { getAllBrands } from "@/lib/api/brands";
+import { ROUTES } from "@/lib/routes";
 
 /**
  * نقشه‌ی سایت داینامیک — در build تولید و روی /sitemap.xml سرو می‌شود.
@@ -11,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const brands = await getAllBrands();
 
   const brandEntries: MetadataRoute.Sitemap = brands.map((brand) => ({
-    url: `${siteConfig.url}/brands/${brand.slug}`,
+    url: `${siteConfig.url}${ROUTES.brandDetail(brand.slug ?? "")}`,
     changeFrequency: "weekly",
     priority: 0.8,
   }));
@@ -23,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${siteConfig.url}/brands`,
+      url: `${siteConfig.url}${ROUTES.brands}`,
       changeFrequency: "weekly",
       priority: 0.9,
     },

@@ -170,7 +170,7 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
                   className="h-4 w-4 shrink-0 rounded border-slate-300 text-primary focus:ring-primary/20"
                 />
                 <span className="truncate text-slate-600">
-                  {car.model}
+                  {car.displayName || [car.model, car.trimLevel, car.year].filter(Boolean).join(" — ")}
                 </span>
               </label>
             ))}
@@ -186,7 +186,7 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
             return (
               <ActiveTag
                 key={`car-${id}`}
-                label={car?.model ?? String(id)}
+                label={car?.displayName ?? car?.model ?? String(id)}
                 onRemove={() => toggleArrayFilter("carIds", id)}
               />
             );
