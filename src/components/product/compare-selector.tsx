@@ -16,7 +16,10 @@ interface CompareSelectorProps {
 
 type CompareSearchPart = SearchPart & { id: number; price: number };
 
-export function CompareSelector({ basePartId, selectedTargetId }: CompareSelectorProps) {
+export function CompareSelector({
+  basePartId,
+  selectedTargetId,
+}: CompareSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -41,23 +44,35 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
       globalSearch(normalized)
         .then(async (data) => {
           if (!active) return;
-          const parts = (data.parts ?? []).filter((part): part is SearchPart & { id: number } => part.id != null);
+          const parts = (data.parts ?? []).filter(
+            (part): part is SearchPart & { id: number } => part.id != null,
+          );
           const pricedParts = await Promise.all(
             parts.map(async (part) => {
               try {
-                const details = await apiFetch<PartFrontofficeResponse>(`/api/frontoffice/parts/${part.id}`);
-                return details.price != null ? { ...part, price: details.price } : null;
+                const details = await apiFetch<PartFrontofficeResponse>(
+                  `/api/frontoffice/parts/${part.id}`,
+                );
+                return details.price != null
+                  ? { ...part, price: details.price }
+                  : null;
               } catch {
                 return null;
               }
             }),
           );
           if (!active) return;
-          setResults(pricedParts.filter((part): part is CompareSearchPart => part != null));
+          setResults(
+            pricedParts.filter(
+              (part): part is CompareSearchPart => part != null,
+            ),
+          );
         })
         .catch((reason) => {
           if (!active) return;
-          setError(reason instanceof Error ? reason.message : "جست‌وجو انجام نشد.");
+          setError(
+            reason instanceof Error ? reason.message : "جست‌وجو انجام نشد.",
+          );
         })
         .finally(() => {
           if (active) setLoading(false);
@@ -71,8 +86,7 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
   }, [query]);
 
   const filteredResults = useMemo(
-    () =>
-      results.filter((part) => part.id != null && part.id !== basePartId),
+    () => results.filter((part) => part.id != null && part.id !== basePartId),
     [basePartId, results],
   );
 
@@ -88,17 +102,24 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
   };
 
   return (
-    <section className="rounded-[1.75rem] border border-slate-100 bg-white p-5 shadow-[0_16px_50px_rgb(15_23_42/0.045)] sm:p-6">
+    <section className="rounded-[1.75rem]  bg-white p-5 shadow-[0_16px_50px_rgb(15_23_42/0.045)] sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold text-cyan-700">انتخاب محصول دوم</p>
-          <h2 className="mt-2 text-xl font-black text-slate-900">برای مقایسه، قطعه دیگری انتخاب کنید</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-500">
-            نام قطعه یا برند سازنده را وارد کنید. نتیجه‌ها از بین محصولات موجود نمایش داده می‌شوند.
+          <p className="text-xs font-bold text-accent">انتخاب محصول دوم</p>
+          <h2 className="mt-2 text-xl font-black text-dark">
+            برای مقایسه، قطعه دیگری انتخاب کنید
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-text-secondary">
+            نام قطعه یا برند سازنده را وارد کنید. نتیجه‌ها از بین محصولات موجود
+            نمایش داده می‌شوند.
           </p>
         </div>
         {selectedTargetId != null && (
-          <Button variant="outline" onClick={() => updateTarget(undefined)} className="h-10 rounded-xl px-4">
+          <Button
+            variant="outline"
+            onClick={() => updateTarget(undefined)}
+            className="h-10 rounded-xl px-4"
+          >
             <X className="size-4" />
             حذف انتخاب
           </Button>
@@ -106,21 +127,21 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
       </div>
 
       <div className="relative mt-5">
-        <Search className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-text-secondary" />
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="مثلاً لنت ترمز جلو یا بوش"
-          className="h-12 rounded-xl border-slate-200 bg-slate-50 pr-10 pl-10 text-sm"
+          className="h-12 rounded-xl border-border bg-background pr-10 pl-10 text-sm"
         />
         {loading ? (
-          <LoaderCircle className="absolute left-4 top-1/2 size-4 -translate-y-1/2 animate-spin text-cyan-700" />
+          <LoaderCircle className="absolute left-4 top-1/2 size-4 -translate-y-1/2 animate-spin text-accent" />
         ) : query ? (
           <button
             type="button"
             onClick={() => setQuery("")}
             aria-label="پاک کردن جست‌وجو"
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary"
           >
             <X className="size-4" />
           </button>
@@ -129,8 +150,8 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
 
       <div className="mt-4 min-h-24">
         {query.trim().length < 2 ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-500">
-            <Scale className="size-5 text-slate-300" />
+          <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-background px-4 py-4 text-sm text-text-secondary">
+            <Scale className="size-5 text-text-secondary" />
             حداقل دو حرف وارد کنید تا قطعات قابل مقایسه را ببینید.
           </div>
         ) : error ? (
@@ -139,8 +160,8 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
             {error}
           </div>
         ) : !loading && filteredResults.length === 0 ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-500">
-            <SearchX className="size-5 text-slate-300" />
+          <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border bg-background px-4 py-4 text-sm text-text-secondary">
+            <SearchX className="size-5 text-text-secondary" />
             نتیجه‌ای برای این جست‌وجو پیدا نشد.
           </div>
         ) : (
@@ -154,20 +175,28 @@ export function CompareSelector({ basePartId, selectedTargetId }: CompareSelecto
                   onClick={() => updateTarget(part.id!)}
                   className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-right transition ${
                     active
-                      ? "border-cyan-200 bg-cyan-50/70"
-                      : "border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50"
+                      ? "border-accent bg-accent/10"
+                      : "border-border bg-white hover:border-border hover:bg-background"
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-black text-slate-800">{part.name || "قطعه خودرو"}</p>
-                    <p className="mt-1 truncate text-xs text-slate-500">
-                      {[part.partBrandName, part.parentPartName].filter(Boolean).join(" • ") || part.description || "مشاهده جزئیات"}
+                    <p className="truncate text-sm font-black text-dark">
+                      {part.name || "قطعه خودرو"}
                     </p>
-                    <p className="mt-1 text-xs font-bold text-[#14305A]">
+                    <p className="mt-1 truncate text-xs text-text-secondary">
+                      {[part.partBrandName, part.parentPartName]
+                        .filter(Boolean)
+                        .join(" • ") ||
+                        part.description ||
+                        "مشاهده جزئیات"}
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-[var(--primary)]">
                       {part.price?.toLocaleString("fa-IR")} ریال
                     </p>
                   </div>
-                  <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold ${active ? "bg-primary text-white" : "bg-slate-100 text-slate-500"}`}>
+                  <span
+                    className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold ${active ? "bg-primary text-white" : "bg-border/20 text-text-secondary"}`}
+                  >
                     {active ? "انتخاب شده" : "مقایسه"}
                   </span>
                 </button>

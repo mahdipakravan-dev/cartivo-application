@@ -57,22 +57,22 @@ export default async function ModelPage({
   const results = await searchParts(effectiveFilters);
 
   return (
-    <main className="bg-[#f8fafc] pb-20 pt-24 sm:pt-28">
+    <main className="bg-[var(--background)] pb-20 pt-24 sm:pt-28">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-        <nav aria-label="مسیر ناوبری" className="mb-6 text-xs text-slate-400">
+        <nav aria-label="مسیر ناوبری" className="mb-6 text-xs text-text-secondary">
           <ol className="flex items-center gap-1.5">
             <li><Link href={ROUTES.home} className="hover:text-primary">خانه</Link></li>
             <li><ChevronLeft className="size-3" /></li>
             <li><Link href={ROUTES.brandDetail(brandSlug)} className="hover:text-primary">{brand.persianName}</Link></li>
             <li><ChevronLeft className="size-3" /></li>
-            <li className="font-bold text-slate-600">{model.name}</li>
+            <li className="font-bold text-text-muted">{model.name}</li>
           </ol>
         </nav>
 
         <header className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-14 lg:py-16">
-          <div className="absolute -right-24 -top-32 size-80 rounded-full bg-cyan-300/10 blur-3xl" />
+          <div className="absolute -right-24 -top-32 size-80 rounded-full bg-accent/10 blur-3xl" />
           <div className="relative z-10 max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-cyan-100">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-accent">
               <CarFront className="size-4" /> مدل خودرو، بدون وابستگی به سال
             </span>
             <h1 className="mt-6 text-3xl font-black sm:text-4xl lg:text-5xl">{brand.persianName} {model.name}</h1>
@@ -86,34 +86,34 @@ export default async function ModelPage({
         <section className="pt-10 sm:pt-12" aria-labelledby="model-configurations-title">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold text-cyan-700">تیپ و سال تولید</p>
-              <h2 id="model-configurations-title" className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">نسخه‌های {model.name}</h2>
+              <p className="text-xs font-bold text-accent">تیپ و سال تولید</p>
+              <h2 id="model-configurations-title" className="mt-2 text-2xl font-black text-dark sm:text-3xl">نسخه‌های {model.name}</h2>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-500 shadow-sm">
+            <span className="inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-bold text-text-secondary shadow-sm">
               <Layers3 className="size-4" /> {model.cars.length.toLocaleString("fa-IR")} انتخاب
             </span>
           </div>
           <CarsSection cars={model.cars} brandSlug={brandSlug} brandName={brand.persianName ?? ""} />
         </section>
 
-        <section className="border-t border-slate-200/70 pt-10 sm:pt-12" aria-labelledby="model-parts-title">
+        <section className="border-t border-border/70 pt-10 sm:pt-12" aria-labelledby="model-parts-title">
           <div className="mb-7">
-            <p className="text-xs font-bold text-cyan-700">همه سال‌ها و تیپ‌ها</p>
-            <h2 id="model-parts-title" className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+            <p className="text-xs font-bold text-accent">همه سال‌ها و تیپ‌ها</p>
+            <h2 id="model-parts-title" className="mt-2 text-2xl font-black text-dark sm:text-3xl">
               قطعات سازگار با {brand.persianName} {model.name}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
+            <p className="mt-2 text-sm leading-6 text-text-secondary">
               این فهرست از قطعات سازگار با حداقل یکی از نسخه‌های این مدل ساخته شده است.
             </p>
           </div>
 
           {modelCarIds.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-14 text-center">
-              <PackageSearch className="mx-auto size-10 text-slate-200" />
-              <p className="mt-3 text-sm font-bold text-slate-500">نسخه‌ای برای دریافت قطعات این مدل ثبت نشده است</p>
+            <div className="rounded-2xl border border-dashed border-border bg-white py-14 text-center">
+              <PackageSearch className="mx-auto size-10 text-text-secondary" />
+              <p className="mt-3 text-sm font-bold text-text-secondary">نسخه‌ای برای دریافت قطعات این مدل ثبت نشده است</p>
             </div>
           ) : (
-            <Suspense fallback={<div className="py-16 text-center text-sm text-slate-400">در حال بارگذاری...</div>}>
+            <Suspense fallback={<div className="py-16 text-center text-sm text-text-secondary">در حال بارگذاری...</div>}>
               <SearchResults initialParams={filters} cars={model.cars} results={results} />
             </Suspense>
           )}

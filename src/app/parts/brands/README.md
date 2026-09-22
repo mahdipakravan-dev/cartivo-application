@@ -17,17 +17,17 @@ build) سرو می‌کند و همه‌ی سیگنال‌های سئو را ا�
 
 ## سئو — چه چیزهایی و کجا؟
 
-| سیگنال | محل پیاده‌سازی |
-|---|---|
-| `<title>` و description یکتا | `metadata` بالای `page.tsx` (با template سراسری `%s | کارتیوو` از layout ترکیب می‌شود) |
-| Canonical | `alternates.canonical: "/brands"` — با `metadataBase` مطلق می‌شود |
-| Open Graph | `metadata.openGraph` |
-| JSON-LD `BreadcrumbList` | داخل `page.tsx` از طریق کامپوننت Shared `lib/seo/json-ld.tsx` |
-| JSON-LD `ItemList` از `Brand` | همان‌جا — به گوگل می‌گوید این صفحه لیست برند است و به صفحات `brands/[slug]` لینک می‌دهد |
-| Breadcrumb قابل مشاهده | `nav aria-label` + `aria-current="page"` — هم‌راستا با JSON-LD (الزام گوگل) |
-| H1 یکتا | یک `<h1>` در header صفحه؛ نام برندها در کارت‌ها `<h2>` هستند |
-| HTML معنایی | `ul/li` برای لیست، لینک کامل روی کارت با `aria-label` |
-| حضور در sitemap | `src/app/sitemap.ts` هم `/brands` و هم تک‌تک `brands/[slug]` را از همین fetcher تولید می‌کند |
+| سیگنال                        | محل پیاده‌سازی                                                                               |
+| ----------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------- |
+| `<title>` و description یکتا  | `metadata` بالای `page.tsx` (با template سراسری `%s                                          | کارتیوُ` از layout ترکیب می‌شود) |
+| Canonical                     | `alternates.canonical: "/brands"` — با `metadataBase` مطلق می‌شود                            |
+| Open Graph                    | `metadata.openGraph`                                                                         |
+| JSON-LD `BreadcrumbList`      | داخل `page.tsx` از طریق کامپوننت Shared `lib/seo/json-ld.tsx`                                |
+| JSON-LD `ItemList` از `Brand` | همان‌جا — به گوگل می‌گوید این صفحه لیست برند است و به صفحات `brands/[slug]` لینک می‌دهد      |
+| Breadcrumb قابل مشاهده        | `nav aria-label` + `aria-current="page"` — هم‌راستا با JSON-LD (الزام گوگل)                  |
+| H1 یکتا                       | یک `<h1>` در header صفحه؛ نام برندها در کارت‌ها `<h2>` هستند                                 |
+| HTML معنایی                   | `ul/li` برای لیست، لینک کامل روی کارت با `aria-label`                                        |
+| حضور در sitemap               | `src/app/sitemap.ts` هم `/brands` و هم تک‌تک `brands/[slug]` را از همین fetcher تولید می‌کند |
 
 ## ساختار فایل‌ها
 

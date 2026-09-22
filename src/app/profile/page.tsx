@@ -3,7 +3,7 @@ import { ProfileDashboard } from "./_components/profile-dashboard";
 
 export const metadata: Metadata = {
   title: "حساب کاربری من",
-  description: "مشاهده و ویرایش اطلاعات حساب و پیگیری سفارش‌های کارتیوو.",
+  description: "مشاهده و ویرایش اطلاعات حساب و پیگیری سفارش‌های کارتیوُ.",
   robots: { index: false, follow: false },
 };
 

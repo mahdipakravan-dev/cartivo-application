@@ -65,13 +65,13 @@ export default async function PartsPartPage({
     },
     ...(part.price != null
       ? {
-        offers: {
-          "@type": "Offer",
-          price: part.price,
-          priceCurrency: "IRR",
-          availability: "https://schema.org/InStock",
-        },
-      }
+          offers: {
+            "@type": "Offer",
+            price: part.price,
+            priceCurrency: "IRR",
+            availability: "https://schema.org/InStock",
+          },
+        }
       : {}),
   };
 
@@ -82,33 +82,48 @@ export default async function PartsPartPage({
       <section className="py-8 sm:py-12">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav aria-label="مسیر ناوبری" className="mb-8 text-sm text-slate-400">
+          <nav
+            aria-label="مسیر ناوبری"
+            className="mb-8 text-sm text-text-secondary"
+          >
             <ol className="flex items-center gap-2">
               <li>
-                <Link href={ROUTES.home} className="transition-colors hover:text-slate-600">
+                <Link
+                  href={ROUTES.home}
+                  className="transition-colors hover:text-text-muted"
+                >
                   خانه
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link href={ROUTES.parts} className="transition-colors hover:text-slate-600">
+                <Link
+                  href={ROUTES.parts}
+                  className="transition-colors hover:text-text-muted"
+                >
                   قطعات
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link href={ROUTES.brandDetail(brandSlug)} className="transition-colors hover:text-slate-600">
+                <Link
+                  href={ROUTES.brandDetail(brandSlug)}
+                  className="transition-colors hover:text-text-muted"
+                >
                   {brand.persianName}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link href={ROUTES.partsCar(brandSlug, carId)} className="transition-colors hover:text-slate-600">
+                <Link
+                  href={ROUTES.partsCar(brandSlug, carId)}
+                  className="transition-colors hover:text-text-muted"
+                >
                   {car.model}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li aria-current="page" className="font-medium text-slate-700">
+              <li aria-current="page" className="font-medium text-text-muted">
                 {part.name}
               </li>
             </ol>
@@ -125,18 +140,18 @@ export default async function PartsPartPage({
                       <Package className="h-8 w-8 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                      <h1 className="text-2xl font-extrabold tracking-tight text-dark sm:text-3xl">
                         {part.name}
                       </h1>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                        <span className="rounded-full  bg-background px-3 py-1 text-xs font-medium text-text-muted">
                           {brand.persianName}
                         </span>
-                        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                        <span className="rounded-full  bg-background px-3 py-1 text-xs font-medium text-text-muted">
                           {car.brand} {car.model}
                         </span>
                         {car.trimLevel && (
-                          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                          <span className="rounded-full  bg-background px-3 py-1 text-xs font-medium text-text-muted">
                             {car.trimLevel}
                           </span>
                         )}
@@ -145,47 +160,63 @@ export default async function PartsPartPage({
                   </div>
 
                   {/* Part Details */}
-                  <div className="mt-8 border-t border-slate-100 pt-8">
-                    <h2 className="text-lg font-bold text-slate-800">مشخصات قطعه</h2>
+                  <div className="mt-8 border-t border-border pt-8">
+                    <h2 className="text-lg font-bold text-dark">مشخصات قطعه</h2>
                     <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <dt className="text-xs font-medium text-slate-400">نام قطعه</dt>
-                        <dd className="mt-1 text-sm font-semibold text-slate-800">{part.name}</dd>
+                      <div className="rounded-xl bg-background p-4">
+                        <dt className="text-xs font-medium text-text-secondary">
+                          نام قطعه
+                        </dt>
+                        <dd className="mt-1 text-sm font-semibold text-dark">
+                          {part.name}
+                        </dd>
                       </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <dt className="text-xs font-medium text-slate-400">شناسه</dt>
-                        <dd className="mt-1 text-sm font-semibold text-slate-800">{part.id}</dd>
+                      <div className="rounded-xl bg-background p-4">
+                        <dt className="text-xs font-medium text-text-secondary">
+                          شناسه
+                        </dt>
+                        <dd className="mt-1 text-sm font-semibold text-dark">
+                          {part.id}
+                        </dd>
                       </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <dt className="text-xs font-medium text-slate-400">خودروی سازگار</dt>
-                        <dd className="mt-1 text-sm font-semibold text-slate-800">
+                      <div className="rounded-xl bg-background p-4">
+                        <dt className="text-xs font-medium text-text-secondary">
+                          خودروی سازگار
+                        </dt>
+                        <dd className="mt-1 text-sm font-semibold text-dark">
                           {car.brand} {car.model}
                           {car.trimLevel ? ` ${car.trimLevel}` : ""}
                         </dd>
                       </div>
-                      <div className="rounded-xl bg-slate-50 p-4">
-                        <dt className="text-xs font-medium text-slate-400">برند خودرو</dt>
-                        <dd className="mt-1 text-sm font-semibold text-slate-800">{brand.persianName}</dd>
+                      <div className="rounded-xl bg-background p-4">
+                        <dt className="text-xs font-medium text-text-secondary">
+                          برند خودرو
+                        </dt>
+                        <dd className="mt-1 text-sm font-semibold text-dark">
+                          {brand.persianName}
+                        </dd>
                       </div>
                     </dl>
                   </div>
 
                   {/* Compatible Car */}
-                  <div className="mt-8 border-t border-slate-100 pt-8">
-                    <h2 className="text-lg font-bold text-slate-800">خودروی سازگار</h2>
+                  <div className="mt-8 border-t border-border pt-8">
+                    <h2 className="text-lg font-bold text-dark">
+                      خودروی سازگار
+                    </h2>
                     <Link
                       href={ROUTES.partsCar(brandSlug, carId)}
-                      className="mt-4 block rounded-xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-slate-200 hover:shadow-sm"
+                      className="mt-4 block rounded-xl  bg-background p-4 transition-all hover:border-border hover:shadow-sm"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
-                          <Package className="h-6 w-6 text-slate-400" />
+                          <Package className="h-6 w-6 text-text-secondary" />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-800">
+                          <p className="text-sm font-bold text-dark">
                             {car.brand} {car.model}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-text-secondary">
                             {car.trimLevel && `${car.trimLevel} • `}
                             مشاهده همه قطعات
                           </p>
@@ -202,20 +233,23 @@ export default async function PartsPartPage({
               <div className="sticky top-24 space-y-4">
                 <Card>
                   <CardContent className="p-6">
-                    <SellerPurchasePanel partId={part.id!} name={part.name || "قطعه خودرو"} />
+                    <SellerPurchasePanel
+                      partId={part.id!}
+                      name={part.name || "قطعه خودرو"}
+                    />
 
                     {/* Features */}
-                    <div className="mt-6 space-y-3 border-t border-slate-100 pt-6">
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <div className="mt-6 space-y-3 border-t border-border pt-6">
+                      <div className="flex items-center gap-2 text-xs text-text-secondary">
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span>اصالت کالا تضمین شده</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Shield className="h-4 w-4 text-blue-500" />
+                      <div className="flex items-center gap-2 text-xs text-text-secondary">
+                        <Shield className="h-4 w-4 text-accent" />
                         <span>گارانتی بازگشت ۷ روزه</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                        <Truck className="h-4 w-4 text-orange-500" />
+                      <div className="flex items-center gap-2 text-xs text-text-secondary">
+                        <Truck className="h-4 w-4 text-accent" />
                         <span>ارسال سریع به سراسر کشور</span>
                       </div>
                     </div>
@@ -227,16 +261,16 @@ export default async function PartsPartPage({
                   <CardContent className="p-4">
                     <Link
                       href={ROUTES.partsCar(brandSlug, carId)}
-                      className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-50"
+                      className="group flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-background"
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 group-hover:bg-primary/5">
-                        <Package className="h-5 w-5 text-slate-400 group-hover:text-primary" />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-border/20 group-hover:bg-primary/5">
+                        <Package className="h-5 w-5 text-text-secondary group-hover:text-primary" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-medium text-slate-600">
+                        <p className="truncate text-xs font-medium text-text-muted">
                           {car.brand} {car.model}
                         </p>
-                        <p className="text-[10px] text-slate-400">
+                        <p className="text-[10px] text-text-secondary">
                           مشاهده همه قطعات این خودرو
                         </p>
                       </div>

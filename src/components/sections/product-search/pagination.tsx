@@ -13,7 +13,11 @@ interface PaginationProps {
   totalElements: number;
 }
 
-export function Pagination({ initialParams, totalPages, totalElements }: PaginationProps) {
+export function Pagination({
+  initialParams,
+  totalPages,
+  totalElements,
+}: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -40,7 +44,7 @@ export function Pagination({ initialParams, totalPages, totalElements }: Paginat
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-text-secondary">
         {totalElements.toLocaleString("fa-IR")} نتیجه
       </p>
 
@@ -48,7 +52,7 @@ export function Pagination({ initialParams, totalPages, totalElements }: Paginat
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 0 || isPending}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-slate-300 hover:text-slate-700 disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-500"
+          className="flex h-9 w-9 items-center justify-center rounded-xl  bg-white text-text-secondary transition-all hover:border-border hover:text-text-muted disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text-secondary"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -62,7 +66,7 @@ export function Pagination({ initialParams, totalPages, totalElements }: Paginat
               "flex h-9 min-w-9 items-center justify-center rounded-xl px-2 text-sm font-medium transition-all",
               p === currentPage
                 ? "border border-primary bg-primary text-primary-foreground shadow-sm"
-                : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300",
+                : " bg-white text-text-muted hover:border-border",
             )}
           >
             {(p + 1).toLocaleString("fa-IR")}
@@ -72,7 +76,7 @@ export function Pagination({ initialParams, totalPages, totalElements }: Paginat
         <button
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage >= totalPages - 1 || isPending}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-all hover:border-slate-300 hover:text-slate-700 disabled:opacity-30 disabled:hover:border-slate-200 disabled:hover:text-slate-500"
+          className="flex h-9 w-9 items-center justify-center rounded-xl  bg-white text-text-secondary transition-all hover:border-border hover:text-text-muted disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text-secondary"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>

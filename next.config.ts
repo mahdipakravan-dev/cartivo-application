@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // A lockfile also exists above this repository. Keep Turbopack scoped to this
+  // app so it does not mix manifests and modules from the parent workspace.
+  turbopack: {
+    root: process.cwd(),
+  },
   // خروجی استاندارد Node — در صورت نیاز به Docker می‌توانید "standalone" کنید
   // output: "standalone",
   images: {

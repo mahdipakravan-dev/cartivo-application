@@ -1,20 +1,20 @@
 # Cartivo Frontend — زیرساخت پایه (Basement)
 
-فرانت‌اند مارکت‌پلیس قطعات یدکی خودرو **کارتیوو**، ساخته‌شده روی آخرین نسخه‌ی پایدار Next.js با تمرکز کامل روی **سئو**، **تایپ‌سیفتی** و **اتصال تایپ‌شده به بک‌اند Spring Boot از طریق Swagger/OpenAPI**.
+فرانت‌اند مارکت‌پلیس قطعات یدکی خودرو **کارتیوُ**، ساخته‌شده روی آخرین نسخه‌ی پایدار Next.js با تمرکز کامل روی **سئو**، **تایپ‌سیفتی** و **اتصال تایپ‌شده به بک‌اند Spring Boot از طریق Swagger/OpenAPI**.
 
 ---
 
 ## استک فنی
 
-| ابزار | نسخه | نقش |
-|---|---|---|
-| Next.js | **16.2.x** (آخرین Stable — Turbopack پیش‌فرض) | فریم‌ورک، App Router |
-| React | 19.2 | UI |
-| TypeScript | 5.8 — حالت `strict` کامل | تایپ‌سیفتی |
-| Tailwind CSS | **v4** (CSS-first، بدون tailwind.config) | استایل |
-| shadcn/ui | سبک new-york | کامپوننت‌های پایه |
-| openapi-typescript + openapi-fetch | — | تولید تایپ و کلاینت از Swagger بک‌اند |
-| فونت وزیرمتن | از طریق `next/font` (self-hosted) | تایپوگرافی فارسی |
+| ابزار                              | نسخه                                          | نقش                                   |
+| ---------------------------------- | --------------------------------------------- | ------------------------------------- |
+| Next.js                            | **16.2.x** (آخرین Stable — Turbopack پیش‌فرض) | فریم‌ورک، App Router                  |
+| React                              | 19.2                                          | UI                                    |
+| TypeScript                         | 5.8 — حالت `strict` کامل                      | تایپ‌سیفتی                            |
+| Tailwind CSS                       | **v4** (CSS-first، بدون tailwind.config)      | استایل                                |
+| shadcn/ui                          | سبک new-york                                  | کامپوننت‌های پایه                     |
+| openapi-typescript + openapi-fetch | —                                             | تولید تایپ و کلاینت از Swagger بک‌اند |
+| فونت وزیرمتن                       | از طریق `next/font` (self-hosted)             | تایپوگرافی فارسی                      |
 
 > **چرا Next.js 16؟** آخرین نسخه‌ی پایدار است؛ Turbopack بایندلر پیش‌فرض build و dev است، `params` ها async هستند و فایل middleware به `proxy.ts` تغییر نام داده. کدهای این پروژه با همین قراردادها نوشته شده‌اند.
 
@@ -92,7 +92,7 @@ src/
 ## چک‌لیست سئو که در این Basement پیاده شده
 
 - [x] `lang="fa"` و `dir="rtl"` در سطح `<html>`
-- [x] `metadataBase` + قالب یکدست عنوان‌ها (`%s | کارتیوو`)
+- [x] `metadataBase` + قالب یکدست عنوان‌ها (`%s | کارتیوُ`)
 - [x] Canonical برای هر صفحه (`alternates.canonical`)
 - [x] Open Graph و Twitter Card سراسری + بازنویسی per-page
 - [x] `sitemap.xml` داینامیک از داده‌ی بک‌اند
@@ -107,13 +107,13 @@ src/
 
 ## اسکریپت‌ها
 
-| دستور | کار |
-|---|---|
-| `npm run dev` | اجرای توسعه (Turbopack) |
-| `npm run build` | build تولیدی — صفحات SSG همین‌جا ساخته می‌شوند |
-| `npm run openapi` | تولید تایپ‌ها از `http://localhost:8080/v3/api-docs` |
-| `npm run typecheck` | چک تایپ بدون build |
-| `npm run lint` | ESLint |
+| دستور               | کار                                                  |
+| ------------------- | ---------------------------------------------------- |
+| `npm run dev`       | اجرای توسعه (Turbopack)                              |
+| `npm run build`     | build تولیدی — صفحات SSG همین‌جا ساخته می‌شوند       |
+| `npm run openapi`   | تولید تایپ‌ها از `http://localhost:8080/v3/api-docs` |
+| `npm run typecheck` | چک تایپ بدون build                                   |
+| `npm run lint`      | ESLint                                               |
 
 ---
 

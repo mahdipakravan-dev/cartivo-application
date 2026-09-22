@@ -17,25 +17,28 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
-      <h2 className="text-xl font-bold sm:text-2xl" style={{ color: "#536175" }}>
+      <h2
+        className="text-xl font-bold sm:text-2xl"
+        style={{ color: "var(--text-muted)" }}
+      >
         {title}
       </h2>
 
       {href && (
         <Link
           href={href}
-          className="group flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-800"
+          className="group flex items-center gap-2 text-sm font-medium text-text-secondary transition-colors hover:text-dark"
         >
           <span className="hidden sm:inline">{linkText}</span>
           <span
             className={cn(
               "flex size-7 items-center justify-center",
-              "rounded-full border border-slate-200 bg-white",
-              "transition-all group-hover:border-slate-300 group-hover:shadow-md",
-              "group-hover:shadow-slate-200/50"
+              "rounded-full  bg-white",
+              "transition-all group-hover:border-border group-hover:shadow-md",
+              "group-hover:shadow-border/50",
             )}
           >
-            <ArrowLeft className="h-3.5 w-3.5 text-slate-600 transition-transform group-hover:-translate-x-0.5" />
+            <ArrowLeft className="h-3.5 w-3.5 text-text-muted transition-transform group-hover:-translate-x-0.5" />
           </span>
         </Link>
       )}

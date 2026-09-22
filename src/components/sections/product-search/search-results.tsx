@@ -41,16 +41,16 @@ export function SearchResults({
       <div className="flex-1 min-w-0">
         {/* Results Header */}
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-text-secondary">
             {results.totalElements.toLocaleString("fa-IR")} قطعه یافت شد
           </p>
         </div>
 
         {/* Product Grid */}
         {results.items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 py-16">
-            <Package className="h-12 w-12 text-slate-200" />
-            <p className="mt-3 text-sm text-slate-400">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16">
+            <Package className="h-12 w-12 text-text-secondary" />
+            <p className="mt-3 text-sm text-text-secondary">
               قطعه‌ای با فیلترهای انتخاب‌شده یافت نشد.
             </p>
           </div>

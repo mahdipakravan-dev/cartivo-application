@@ -20,14 +20,14 @@ function PositionCard({ title, description, href, parts, kind }: PositionCardPro
       href={href}
       className="group relative isolate min-h-[340px] overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground shadow-[0_18px_50px_color-mix(in_oklab,var(--primary)_10%,transparent)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_color-mix(in_oklab,var(--primary)_16%,transparent)] sm:p-8"
     >
-      <div className="absolute -left-20 -top-20 size-64 rounded-full bg-cyan-300/10 blur-3xl" />
+      <div className="absolute -left-20 -top-20 size-64 rounded-full bg-accent/10 blur-3xl" />
       <div className="relative z-10 max-w-[58%]">
-        <span className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-cyan-200">
+        <span className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-accent">
           <Icon className="size-5" />
         </span>
         <h3 className="mt-5 text-2xl font-black text-white">{title}</h3>
         <p className="mt-3 text-sm leading-7 text-white/60">{description}</p>
-        <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-cyan-200">
+        <span className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-accent">
           مشاهده قطعات
           <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
         </span>
@@ -41,7 +41,7 @@ function PositionCard({ title, description, href, parts, kind }: PositionCardPro
               {image ? (
                 <Image src={image} alt="" fill sizes="180px" className="object-contain p-3" />
               ) : (
-                <Package className="absolute inset-0 m-auto size-7 text-slate-200" />
+                <Package className="absolute inset-0 m-auto size-7 text-text-secondary" />
               )}
             </div>
           );
@@ -58,11 +58,11 @@ export async function PositionTypeSection() {
   ]);
 
   return (
-    <section className="bg-[#f8fafc] py-14 sm:py-16" aria-labelledby="position-title">
+    <section className="bg-[var(--background)] py-14 sm:py-16" aria-labelledby="position-title">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <p className="text-xs font-bold text-cyan-700">انتخاب بر اساس موقعیت</p>
-          <h2 id="position-title" className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">
+          <p className="text-xs font-bold text-accent">انتخاب بر اساس موقعیت</p>
+          <h2 id="position-title" className="mt-2 text-2xl font-black text-dark sm:text-3xl">
             قطعات داخلی و بیرونی خودرو
           </h2>
         </div>

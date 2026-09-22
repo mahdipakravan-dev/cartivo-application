@@ -25,7 +25,7 @@ export function AddToCartButton({ partId, sellerId, sellerName, name, displayedU
   };
 
   return (
-    <Button type="button" size="lg" onClick={add} className="mt-5 h-12 w-full rounded-xl text-base shadow-lg shadow-blue-950/15">
+    <Button type="button" size="lg" onClick={add} className="mt-5 h-12 w-full rounded-xl text-base shadow-lg shadow-primary/15">
       {added ? <><Check className="size-5" /> به سبد اضافه شد</> : <><ShoppingCart className="size-5" /> افزودن به سبد خرید</>}
     </Button>
   );
