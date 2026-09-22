@@ -3,7 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getBrandBySlug, getCarModelsByBrand, type CatalogCarModel } from "@/lib/api/brands";
+import {
+  getBrandBySlug,
+  getCarModelsByBrand,
+  type CatalogCarModel,
+} from "@/lib/api/brands";
 import { searchParts } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
@@ -27,7 +31,7 @@ export async function generateMetadata({
     alternates: { canonical: ROUTES.brandDetail(slug) },
     openGraph: {
       title: `قطعات یدکی ${brand.persianName} | ${siteConfig.name}`,
-      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیوو.`,
+      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیوُ.`,
       url: ROUTES.brandDetail(slug),
       type: "website",
       ...(brand.iconUrl ? { images: [{ url: brand.iconUrl }] } : {}),
@@ -35,24 +39,32 @@ export async function generateMetadata({
   };
 }
 
-function ModelItem({ model, brandSlug }: { model: CatalogCarModel; brandSlug: string }) {
+function ModelItem({
+  model,
+  brandSlug,
+}: {
+  model: CatalogCarModel;
+  brandSlug: string;
+}) {
   return (
     <Link
       href={ROUTES.partsModel(brandSlug, model.id)}
       className="group/car flex shrink-0 flex-col items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label={`${model.name} — مشاهده مدل خودرو`}
     >
-      <div className="relative flex h-26 w-26 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm shadow-slate-100/50 transition-all duration-300 group-hover/car:-translate-y-1 group-hover/car:border-slate-200 group-hover/car:shadow-lg group-hover/car:shadow-slate-200/60">
-        <span className="text-lg font-bold text-slate-300 transition-colors group-hover/car:text-slate-500">
+      <div className="relative flex h-26 w-26 items-center justify-center rounded-full  bg-white shadow-sm shadow-border/50 transition-all duration-300 group-hover/car:-translate-y-1 group-hover/car:border-border group-hover/car:shadow-lg group-hover/car:shadow-border/60">
+        <span className="text-lg font-bold text-text-secondary transition-colors group-hover/car:text-text-secondary">
           {model.name.slice(0, 3)}
         </span>
       </div>
 
       <div className="max-w-[8rem] text-center">
-        <span className="block truncate text-xs font-medium text-slate-500 transition-colors group-hover/car:text-slate-800">
+        <span className="block truncate text-xs font-medium text-text-secondary transition-colors group-hover/car:text-dark">
           {model.name}
         </span>
-        <span className="mt-1 block text-[10px] text-slate-400">{model.cars.length.toLocaleString("fa-IR")} نسخه و سال</span>
+        <span className="mt-1 block text-[10px] text-text-secondary">
+          {model.cars.length.toLocaleString("fa-IR")} نسخه و سال
+        </span>
       </div>
     </Link>
   );
@@ -110,36 +122,58 @@ export default async function BrandDetailPage({
       <JsonLd data={itemListJsonLd} />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-blue-500/10 blur-[100px]" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-dark via-dark to-dark">
+        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-accent/10 blur-[100px]" />
         <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-indigo-500/10 blur-[100px]" />
 
         <div className="relative container-cartivo px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <nav aria-label="مسیر ناوبری" className="mb-8 text-sm text-white/40">
             <ol className="flex items-center gap-2">
               <li>
-                <Link href={ROUTES.home} className="transition-colors hover:text-white/70">خانه</Link>
+                <Link
+                  href={ROUTES.home}
+                  className="transition-colors hover:text-white/70"
+                >
+                  خانه
+                </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link href={ROUTES.brands} className="transition-colors hover:text-white/70">برندها</Link>
+                <Link
+                  href={ROUTES.brands}
+                  className="transition-colors hover:text-white/70"
+                >
+                  برندها
+                </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li aria-current="page" className="font-medium text-white">{brand.persianName}</li>
+              <li aria-current="page" className="font-medium text-white">
+                {brand.persianName}
+              </li>
             </ol>
           </nav>
 
           <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
             <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-[2rem] border border-white/10 bg-white/10 shadow-xl shadow-black/10 backdrop-blur-sm sm:h-36 sm:w-36">
               {brand.iconUrl ? (
-                <Image src={brand.iconUrl} alt={`لوگوی ${brand.persianName}`} width={120} height={120} className="h-20 w-20 object-contain sm:h-24 sm:w-24" />
+                <Image
+                  src={brand.iconUrl}
+                  alt={`لوگوی ${brand.persianName}`}
+                  width={120}
+                  height={120}
+                  className="h-20 w-20 object-contain sm:h-24 sm:w-24"
+                />
               ) : (
-                <span className="text-3xl font-bold text-white/30">{brand.englishName?.slice(0, 3)}</span>
+                <span className="text-3xl font-bold text-white/30">
+                  {brand.englishName?.slice(0, 3)}
+                </span>
               )}
             </div>
 
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{brand.persianName}</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                {brand.persianName}
+              </h1>
               <p className="mt-2 text-lg text-white/50">{brand.englishName}</p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
@@ -155,7 +189,7 @@ export default async function BrandDetailPage({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#FBFCFD] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--background)] to-transparent" />
       </section>
 
       {/* Cars Section */}
@@ -163,7 +197,9 @@ export default async function BrandDetailPage({
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title="خودروها" />
           {models.length === 0 ? (
-            <p className="mt-8 text-center text-sm text-slate-400">خودرویی برای این برند یافت نشد.</p>
+            <p className="mt-8 text-center text-sm text-text-secondary">
+              خودرویی برای این برند یافت نشد.
+            </p>
           ) : (
             <div className="mt-8 -mx-4 px-4 sm:mx-0 sm:px-0">
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide sm:flex-wrap sm:justify-start sm:gap-5">
@@ -177,10 +213,16 @@ export default async function BrandDetailPage({
       </section>
 
       {/* Search Section */}
-      <section className="border-t border-slate-100 py-8 sm:py-12">
+      <section className="border-t border-border py-8 sm:py-12">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <SectionHeader title="جست‌وجوی قطعات" />
-          <Suspense fallback={<div className="text-center text-sm text-slate-400 py-16">در حال بارگذاری...</div>}>
+          <Suspense
+            fallback={
+              <div className="text-center text-sm text-text-secondary py-16">
+                در حال بارگذاری...
+              </div>
+            }
+          >
             <SearchResults
               initialParams={filters}
               cars={models.flatMap((model) => model.cars)}

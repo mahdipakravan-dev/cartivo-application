@@ -19,11 +19,11 @@ export function Hero({ bgSrc, videoSrc, className, children }: HeroProps) {
       )}
     >
       {/* Animated Gradient Mesh Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="absolute inset-0 bg-gradient-to-br from-dark via-dark to-dark">
         {/* Mesh gradient orbs */}
-        <div className="animate-pulse-slow absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-blue-500/15 blur-[120px]" />
+        <div className="animate-pulse-slow absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full bg-accent/15 blur-[120px]" />
         <div className="animate-pulse-slow absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[100px]" style={{ animationDelay: "2s" }} />
-        <div className="animate-pulse-slow absolute top-1/3 left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-cyan-500/8 blur-[100px]" style={{ animationDelay: "4s" }} />
+        <div className="animate-pulse-slow absolute top-1/3 left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-accent/8 blur-[100px]" style={{ animationDelay: "4s" }} />
 
         {/* Subtle grid pattern */}
         <div
@@ -69,7 +69,7 @@ export function Hero({ bgSrc, videoSrc, className, children }: HeroProps) {
             <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
               قطعه‌ی درست
               <br />
-              <span className="bg-gradient-to-l from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-l from-accent via-accent to-emerald-400 bg-clip-text text-transparent">
                 برای خودروی درست
               </span>
             </h1>
@@ -102,7 +102,7 @@ export function Hero({ bgSrc, videoSrc, className, children }: HeroProps) {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FBFCFD] to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--background)] to-transparent" />
     </section>
   );
 }

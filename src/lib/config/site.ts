@@ -5,7 +5,7 @@
  * این ماژول «Shared» است و در layout ،sitemap ،robots و صفحات استفاده می‌شود.
  */
 export const siteConfig = {
-  name: "کارتیوو",
+  name: "کارتیوُ",
   nameEn: "Cartivo",
   description:
     "مرجع خرید قطعات یدکی خودرو در ایران؛ مقایسه قیمت فروشندگان، جست‌وجو بر اساس خودرو و شماره فنی.",

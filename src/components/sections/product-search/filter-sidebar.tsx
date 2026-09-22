@@ -25,7 +25,11 @@ const SORT_OPTIONS = [
   { value: "name", label: "نام" },
 ];
 
-export function FilterSidebar({ initialParams, cars, className }: FilterSidebarProps) {
+export function FilterSidebar({
+  initialParams,
+  cars,
+  className,
+}: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -63,7 +67,7 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
     <aside className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+        <div className="flex items-center gap-2 text-sm font-bold text-dark">
           <SlidersHorizontal className="h-4 w-4" />
           فیلترها
           {activeCount > 0 && (
@@ -74,8 +78,18 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
         </div>
         {activeCount > 0 && (
           <button
-            onClick={() => applyFilters({ carIds: undefined, partBrandIds: undefined, parentPartIds: undefined, positionType: undefined, minPrice: undefined, maxPrice: undefined, page: 0 })}
-            className="text-xs text-slate-400 transition-colors hover:text-red-500"
+            onClick={() =>
+              applyFilters({
+                carIds: undefined,
+                partBrandIds: undefined,
+                parentPartIds: undefined,
+                positionType: undefined,
+                minPrice: undefined,
+                maxPrice: undefined,
+                page: 0,
+              })
+            }
+            className="text-xs text-text-secondary transition-colors hover:text-red-500"
           >
             پاک کردن همه
           </button>
@@ -90,8 +104,10 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
       <FilterSection title="مرتب‌سازی">
         <select
           value={initialParams.sortBy ?? ""}
-          onChange={(e) => applyFilters({ sortBy: e.target.value || undefined, page: 0 })}
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
+          onChange={(e) =>
+            applyFilters({ sortBy: e.target.value || undefined, page: 0 })
+          }
+          className="w-full rounded-xl  bg-white px-3 py-2.5 text-sm text-text-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
         >
           <option value="">پیش‌فرض</option>
           {SORT_OPTIONS.map((opt) => (
@@ -110,7 +126,10 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
               key={opt.value}
               onClick={() =>
                 applyFilters({
-                  positionType: initialParams.positionType === opt.value ? undefined : opt.value,
+                  positionType:
+                    initialParams.positionType === opt.value
+                      ? undefined
+                      : opt.value,
                   page: 0,
                 })
               }
@@ -118,7 +137,7 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
                 "flex-1 rounded-xl border px-3 py-2 text-xs font-medium transition-all",
                 initialParams.positionType === opt.value
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300",
+                  : "border-border bg-white text-text-muted hover:border-border",
               )}
             >
               {opt.label}
@@ -136,20 +155,22 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
             defaultValue={initialParams.minPrice ?? ""}
             onBlur={(e) => {
               const v = e.target.value ? Number(e.target.value) : undefined;
-              if (v !== initialParams.minPrice) applyFilters({ minPrice: v, page: 0 });
+              if (v !== initialParams.minPrice)
+                applyFilters({ minPrice: v, page: 0 });
             }}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
+            className="w-full rounded-xl  bg-white px-3 py-2.5 text-sm text-text-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
           />
-          <span className="shrink-0 text-slate-300">—</span>
+          <span className="shrink-0 text-text-secondary">—</span>
           <input
             type="number"
             placeholder="تا"
             defaultValue={initialParams.maxPrice ?? ""}
             onBlur={(e) => {
               const v = e.target.value ? Number(e.target.value) : undefined;
-              if (v !== initialParams.maxPrice) applyFilters({ maxPrice: v, page: 0 });
+              if (v !== initialParams.maxPrice)
+                applyFilters({ maxPrice: v, page: 0 });
             }}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
+            className="w-full rounded-xl  bg-white px-3 py-2.5 text-sm text-text-muted outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
           />
         </div>
       </FilterSection>
@@ -161,16 +182,19 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
             {cars.map((car) => (
               <label
                 key={car.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-slate-50"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-background"
               >
                 <input
                   type="checkbox"
                   checked={initialParams.carIds?.includes(car.id!) ?? false}
                   onChange={() => toggleArrayFilter("carIds", car.id!)}
-                  className="h-4 w-4 shrink-0 rounded border-slate-300 text-primary focus:ring-primary/20"
+                  className="h-4 w-4 shrink-0 rounded border-border text-primary focus:ring-primary/20"
                 />
-                <span className="truncate text-slate-600">
-                  {car.displayName || [car.model, car.trimLevel, car.year].filter(Boolean).join(" — ")}
+                <span className="truncate text-text-muted">
+                  {car.displayName ||
+                    [car.model, car.trimLevel, car.year]
+                      .filter(Boolean)
+                      .join(" — ")}
                 </span>
               </label>
             ))}
@@ -193,8 +217,12 @@ export function FilterSidebar({ initialParams, cars, className }: FilterSidebarP
           })}
           {initialParams.positionType && (
             <ActiveTag
-              label={initialParams.positionType === "INTERIOR" ? "داخلی" : "خارجی"}
-              onRemove={() => applyFilters({ positionType: undefined, page: 0 })}
+              label={
+                initialParams.positionType === "INTERIOR" ? "داخلی" : "خارجی"
+              }
+              onRemove={() =>
+                applyFilters({ positionType: undefined, page: 0 })
+              }
             />
           )}
           {initialParams.minPrice != null && (
@@ -226,9 +254,9 @@ function FilterSection({
 }) {
   return (
     <details open={defaultOpen} className="group">
-      <summary className="flex cursor-pointer items-center justify-between rounded-xl py-1 text-sm font-semibold text-slate-700 select-none">
+      <summary className="flex cursor-pointer items-center justify-between rounded-xl py-1 text-sm font-semibold text-text-muted select-none">
         {title}
-        <span className="text-slate-300 transition-transform group-open:rotate-180">
+        <span className="text-text-secondary transition-transform group-open:rotate-180">
           ▾
         </span>
       </summary>
@@ -237,11 +265,20 @@ function FilterSection({
   );
 }
 
-function ActiveTag({ label, onRemove }: { label: string; onRemove: () => void }) {
+function ActiveTag({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-xs font-medium text-primary">
       {label}
-      <button onClick={onRemove} className="rounded-full p-0.5 transition-colors hover:bg-primary/10">
+      <button
+        onClick={onRemove}
+        className="rounded-full p-0.5 transition-colors hover:bg-primary/10"
+      >
         <X className="h-3 w-3" />
       </button>
     </span>

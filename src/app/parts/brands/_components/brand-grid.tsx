@@ -30,7 +30,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
     const matchesQuery = !query.trim()
       ? true
       : brand.persianName?.toLowerCase().includes(query.toLowerCase()) ||
-      brand.englishName?.toLowerCase().includes(query.toLowerCase());
+        brand.englishName?.toLowerCase().includes(query.toLowerCase());
     const matchesCountry = !country || brand.countryCode === country;
     return matchesQuery && matchesCountry;
   });
@@ -45,18 +45,18 @@ export function BrandGrid({ brands }: BrandGridProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Search Input */}
         <div className="relative flex-1 sm:max-w-md">
-          <Search className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="نام برند را جست‌وجو کنید..."
-            className="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-11 pl-10 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/10"
+            className="w-full rounded-2xl  bg-white py-3 pr-11 pl-10 text-sm text-text-muted outline-none transition-all placeholder:text-text-secondary focus:border-primary focus:ring-2 focus:ring-primary/10"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-slate-300 transition-colors hover:text-slate-500"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-text-secondary transition-colors hover:text-text-secondary"
             >
               <X className="h-4 w-4" />
             </button>
@@ -66,7 +66,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
         {/* Country Filters */}
         {availableCountries.length > 0 && (
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4 shrink-0 text-slate-400" />
+            <SlidersHorizontal className="h-4 w-4 shrink-0 text-text-secondary" />
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => setCountry(null)}
@@ -74,7 +74,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
                   "rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
                   !country
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300",
+                    : "border-border bg-white text-text-secondary hover:border-border",
                 )}
               >
                 همه
@@ -82,12 +82,14 @@ export function BrandGrid({ brands }: BrandGridProps) {
               {availableCountries.map((cf) => (
                 <button
                   key={cf.code}
-                  onClick={() => setCountry(country === cf.code ? null : cf.code)}
+                  onClick={() =>
+                    setCountry(country === cf.code ? null : cf.code)
+                  }
                   className={cn(
                     "rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
                     country === cf.code
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300",
+                      : "border-border bg-white text-text-secondary hover:border-border",
                   )}
                 >
                   {cf.label}
@@ -100,19 +102,19 @@ export function BrandGrid({ brands }: BrandGridProps) {
 
       {/* Results count */}
       {(query || country) && (
-        <p className="mt-4 text-sm text-slate-400">
+        <p className="mt-4 text-sm text-text-secondary">
           {filtered.length.toLocaleString("fa-IR")} برند یافت شد
         </p>
       )}
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white/50 py-20">
-          <Search className="h-12 w-12 text-slate-200" />
-          <p className="mt-4 text-sm font-medium text-slate-400">
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white/50 py-20">
+          <Search className="h-12 w-12 text-text-secondary" />
+          <p className="mt-4 text-sm font-medium text-text-secondary">
             برندی یافت نشد
           </p>
-          <p className="mt-1 text-xs text-slate-300">
+          <p className="mt-1 text-xs text-text-secondary">
             فیلترها را تغییر دهید یا عبارت دیگری جست‌وجو کنید.
           </p>
         </div>
@@ -125,7 +127,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
               className="group/brand flex flex-col items-center gap-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={`${brand.persianName} — قطعات یدکی`}
             >
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm shadow-slate-100/50 transition-all duration-300 group-hover/brand:-translate-y-1 group-hover/brand:border-slate-200 group-hover/brand:shadow-lg group-hover/brand:shadow-slate-200/60">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full  bg-white shadow-sm shadow-border/50 transition-all duration-300 group-hover/brand:-translate-y-1 group-hover/brand:border-border group-hover/brand:shadow-lg group-hover/brand:shadow-border/60">
                 {brand.iconUrl ? (
                   <Image
                     src={brand.iconUrl}
@@ -136,13 +138,13 @@ export function BrandGrid({ brands }: BrandGridProps) {
                     loading="lazy"
                   />
                 ) : (
-                  <span className="text-lg font-bold text-slate-300 transition-colors group-hover/brand:text-slate-500">
+                  <span className="text-lg font-bold text-text-secondary transition-colors group-hover/brand:text-text-secondary">
                     {brand.englishName?.slice(0, 3) ?? ""}
                   </span>
                 )}
               </div>
 
-              <span className="max-w-[8rem] truncate text-center text-xs font-medium text-slate-500 transition-colors group-hover/brand:text-slate-800">
+              <span className="max-w-[8rem] truncate text-center text-xs font-medium text-text-secondary transition-colors group-hover/brand:text-dark">
                 {brand.persianName}
               </span>
             </Link>

@@ -14,7 +14,13 @@ export function BrandMarquee({ brands }: BrandMarqueeProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const dragState = useRef({ startX: 0, scrollLeft: 0, velocity: 0, lastX: 0, lastTime: 0 });
+  const dragState = useRef({
+    startX: 0,
+    scrollLeft: 0,
+    velocity: 0,
+    lastX: 0,
+    lastTime: 0,
+  });
 
   const doubled = brands;
 
@@ -56,42 +62,48 @@ export function BrandMarquee({ brands }: BrandMarqueeProps) {
     track.setPointerCapture(e.pointerId);
   }, []);
 
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const track = trackRef.current;
-    if (!track) return;
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging) return;
+      const track = trackRef.current;
+      if (!track) return;
 
-    const dx = e.clientX - dragState.current.startX;
-    const now = Date.now();
-    const dt = now - dragState.current.lastTime;
+      const dx = e.clientX - dragState.current.startX;
+      const now = Date.now();
+      const dt = now - dragState.current.lastTime;
 
-    if (dt > 0) {
-      dragState.current.velocity = (e.clientX - dragState.current.lastX) / dt;
-    }
-    dragState.current.lastX = e.clientX;
-    dragState.current.lastTime = now;
+      if (dt > 0) {
+        dragState.current.velocity = (e.clientX - dragState.current.lastX) / dt;
+      }
+      dragState.current.lastX = e.clientX;
+      dragState.current.lastTime = now;
 
-    track.scrollLeft = dragState.current.scrollLeft - dx;
-  }, [isDragging]);
+      track.scrollLeft = dragState.current.scrollLeft - dx;
+    },
+    [isDragging],
+  );
 
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
-    if (!isDragging) return;
-    const track = trackRef.current;
-    if (!track) return;
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging) return;
+      const track = trackRef.current;
+      if (!track) return;
 
-    setIsDragging(false);
-    track.releasePointerCapture(e.pointerId);
+      setIsDragging(false);
+      track.releasePointerCapture(e.pointerId);
 
-    // Momentum scroll
-    let velocity = dragState.current.velocity * 15;
-    const decelerate = () => {
-      if (Math.abs(velocity) < 0.1) return;
-      track.scrollLeft -= velocity;
-      velocity *= 0.95;
+      // Momentum scroll
+      let velocity = dragState.current.velocity * 15;
+      const decelerate = () => {
+        if (Math.abs(velocity) < 0.1) return;
+        track.scrollLeft -= velocity;
+        velocity *= 0.95;
+        requestAnimationFrame(decelerate);
+      };
       requestAnimationFrame(decelerate);
-    };
-    requestAnimationFrame(decelerate);
-  }, [isDragging]);
+    },
+    [isDragging],
+  );
 
   if (brands.length === 0) return null;
 
@@ -102,8 +114,8 @@ export function BrandMarquee({ brands }: BrandMarqueeProps) {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Fade edges */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#FBFCFD] to-transparent sm:w-20" />
-      {/* <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#FBFCFD] to-transparent sm:w-20" /> */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[var(--background)] to-transparent sm:w-20" />
+      {/* <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[var(--background)] to-transparent sm:w-20" /> */}
 
       <div
         ref={trackRef}
@@ -122,7 +134,7 @@ export function BrandMarquee({ brands }: BrandMarqueeProps) {
             aria-label={`${brand.persianName} — قطعات یدکی`}
             tabIndex={isDragging ? -1 : 0}
           >
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm shadow-slate-100/50 transition-all duration-300 group-hover/brand:-translate-y-1 group-hover/brand:border-slate-200 group-hover/brand:shadow-lg group-hover/brand:shadow-slate-200/60">
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-full  bg-white shadow-sm shadow-border/50 transition-all duration-300 group-hover/brand:-translate-y-1 group-hover/brand:border-border group-hover/brand:shadow-lg group-hover/brand:shadow-border/60">
               {brand.iconUrl ? (
                 <Image
                   src={brand.iconUrl}
@@ -133,13 +145,13 @@ export function BrandMarquee({ brands }: BrandMarqueeProps) {
                   loading="lazy"
                 />
               ) : (
-                <span className="text-lg font-bold text-slate-300 transition-colors group-hover/brand:text-slate-500">
+                <span className="text-lg font-bold text-text-secondary transition-colors group-hover/brand:text-text-secondary">
                   {brand.englishName?.slice(0, 3) ?? ""}
                 </span>
               )}
             </div>
 
-            <span className="max-w-[8rem] truncate text-center text-xs font-medium text-slate-500 transition-colors group-hover/brand:text-slate-800">
+            <span className="max-w-[8rem] truncate text-center text-xs font-medium text-text-secondary transition-colors group-hover/brand:text-dark">
               {brand.persianName}
             </span>
           </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import type { BrandFrontofficeResponse } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -23,25 +24,129 @@ const HERO_SECTION_HEIGHT = {
   imageLg: "lg:min-h-[500px]",
 } as const;
 
-interface AdvertisementImageProps {
+type AdvertisementPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "center-left"
+  | "bottom-left";
+type AdvertisementButtonVariant = "light" | "outline" | "accent";
+
+interface AdvertisementCardProps {
   src: string;
   alt: string;
+  text: {
+    title: string;
+    description: string;
+  };
+  position: AdvertisementPosition;
+  buttonVariant: AdvertisementButtonVariant;
   className?: string;
   imageClassName?: string;
   priority?: boolean;
+  buttonLabel?: string;
 }
 
-function AdvertisementImage({
+const advertisementPositions: Record<AdvertisementPosition, string> = {
+  "top-left": "items-start justify-end text-right",
+  "top-center": "items-start justify-center text-center",
+  "top-right": "items-start justify-start text-right",
+  "center-left": "items-center justify-end text-right",
+  "bottom-left": "items-end justify-end text-right",
+};
+
+const advertisementGradients: Record<AdvertisementPosition, string> = {
+  "top-left": "bg-gradient-to-b from-black/45 via-transparent to-transparent",
+  "top-center": "bg-gradient-to-b from-black/50 via-transparent to-transparent",
+  "top-right": "bg-gradient-to-bl from-black/45 via-transparent to-transparent",
+  "center-left": "bg-gradient-to-r from-black/50 via-black/5 to-transparent",
+  "bottom-left": "bg-gradient-to-t from-black/60 via-black/5 to-transparent",
+};
+
+const advertisementButtons: Record<AdvertisementButtonVariant, string> = {
+  light: "border-white bg-white text-primary hover:bg-white/90",
+  outline: "border-white/80 bg-black/20 text-white hover:bg-white hover:text-dark",
+  accent:
+    "border-orange-500 bg-orange-500 text-white hover:border-orange-400 hover:bg-orange-400",
+};
+
+interface AdvertisementContentProps {
+  text: AdvertisementCardProps["text"];
+  position: AdvertisementPosition;
+  buttonVariant: AdvertisementButtonVariant;
+  buttonLabel?: string;
+}
+
+function AdvertisementContent({
+  text,
+  position,
+  buttonVariant,
+  buttonLabel = "مشاهده",
+}: AdvertisementContentProps) {
+  const centered = position === "top-center";
+
+  return (
+    <div
+      dir="rtl"
+      className={cn(
+        "absolute inset-0 z-10 flex p-5 text-white sm:p-6",
+        advertisementPositions[position],
+        advertisementGradients[position],
+      )}
+    >
+      <div
+        className={cn(
+          "relative isolate flex max-w-[82%] flex-col gap-1.5 sm:max-w-[72%]",
+          centered ? "items-center text-center" : "items-start text-right",
+        )}
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-x-7 -inset-y-5 -z-10 rounded-[2rem] bg-black/80 blur-2xl"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-x-3 -inset-y-2 -z-10 rounded-2xl bg-black/35 blur-md"
+        />
+
+        <h2 className="whitespace-pre-line text-[clamp(1.125rem,4.2cqw,1.875rem)] font-black leading-[1.22] tracking-[-0.035em] text-white [text-shadow:0_3px_14px_rgba(0,0,0,1),0_1px_3px_rgba(0,0,0,1)]">
+          {text.title}
+        </h2>
+        <p className="whitespace-pre-line text-[clamp(0.7rem,2.25cqw,0.875rem)] font-semibold leading-[1.65] text-white/95 [text-shadow:0_2px_8px_rgba(0,0,0,1)]">
+          {text.description}
+        </p>
+        <Link
+          href="/parts"
+          className={cn(
+            "mt-1.5 inline-flex min-h-8 items-center justify-center gap-1.5 rounded-full border px-4 py-1.5 text-[clamp(0.675rem,1.8cqw,0.75rem)] font-bold shadow-lg backdrop-blur-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+            advertisementButtons[buttonVariant],
+          )}
+        >
+          {buttonLabel}
+          <span className="text-sm leading-none" aria-hidden="true">
+            ←
+          </span>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function AdvertisementCard({
   src,
   alt,
+  text,
+  position,
+  buttonVariant,
   className,
   imageClassName,
   priority = false,
-}: AdvertisementImageProps) {
+  buttonLabel = "مشاهده",
+}: AdvertisementCardProps) {
   return (
     <figure
       className={cn(
-        "relative isolate min-h-56 overflow-hidden rounded-2xl bg-slate-100",
+        "@container relative isolate min-h-56 overflow-hidden rounded-2xl bg-[var(--dark)]",
         className,
       )}
     >
@@ -49,20 +154,90 @@ function AdvertisementImage({
         src={src}
         alt={alt}
         fill
-        sizes="(min-width: 1024px) 50vw, 100vw"
+        sizes="(min-width: 1024px) 60vw, 100vw"
         className={cn("object-cover", imageClassName)}
         priority={priority}
+      />
+      <AdvertisementContent
+        text={text}
+        position={position}
+        buttonVariant={buttonVariant}
+        buttonLabel={buttonLabel}
       />
     </figure>
   );
 }
 
+const advertisementItems: AdvertisementCardProps[] = [
+  {
+    src: "/images/advertisements/article-brakes.webp",
+    alt: "خودروی سفید برای انتخاب قطعات بدنه",
+    text: {
+      title: "قطعه مناسب خودروی شما",
+      description: "قطعات سازگار با خودروی خود را پیدا کنید",
+    },
+    position: "bottom-left",
+    buttonVariant: "light",
+    buttonLabel: "مشاهده قطعات",
+    className: "col-span-2 aspect-[16/9] min-h-0 sm:aspect-auto",
+    imageClassName: "object-center",
+  },
+  {
+    src: "/images/advertisements/hero-brake-sale-clean.webp",
+    alt: "۳۰ درصد تخفیف دیسک ترمز",
+    text: {
+      title: "۳۰٪ تخفیف\nدیسک ترمز",
+      description: "فرصتی ویژه برای خرید مطمئن",
+    },
+    position: "center-left",
+    buttonVariant: "outline",
+    className: "col-span-2 aspect-[16/9] min-h-0 sm:aspect-auto",
+    priority: true,
+  },
+  {
+    src: "/images/advertisements/hero-brake-pads-clean.webp",
+    alt: "لنت ترمز؛ امنیت در هر مسیر",
+    text: {
+      title: "لنت ترمز",
+      description: "امنیت در هر مسیر",
+    },
+    position: "top-right",
+    buttonVariant: "outline",
+    className: "col-span-2 aspect-[16/9] min-h-0 sm:aspect-auto",
+  },
+  {
+    src: "/images/advertisements/hero-air-filter-clean.webp",
+    alt: "فیلتر هوا؛ هوای پاک و عملکرد بهتر",
+    text: {
+      title: "فیلتر هوا",
+      description: "هوای پاک، عملکرد بهتر",
+    },
+    position: "top-center",
+    buttonVariant: "accent",
+    className: "aspect-[9/16] min-h-0 sm:aspect-auto",
+  },
+  {
+    src: "/images/advertisements/hero-suspension-clean.webp",
+    alt: "قطعات جلوبندی؛ کنترل بیشتر و رانندگی مطمئن",
+    text: {
+      title: "قطعات جلوبندی",
+      description: "کنترل بیشتر، رانندگی مطمئن",
+    },
+    position: "top-left",
+    buttonVariant: "outline",
+    className: "aspect-[9/16] min-h-0 sm:aspect-auto",
+  },
+];
+
 function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
   return (
-    <section className="bg-background pb-12 pt-24 lg:pb-16 lg:pt-38">
+    <section
+      className="bg-background pb-12 pt-24 lg:pb-16 lg:pt-38"
+      aria-label="ویترین قطعات خودرو"
+    >
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-12">
-          <aside className="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-7 lg:col-span-4">
+        <div className="grid items-stretch gap-4 lg:grid-cols-12 lg:gap-5">
+          <div className="flex flex-col justify-center rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-7 lg:order-2 lg:col-span-5">
             <h1 className="mb-6 text-2xl font-black text-foreground">
               خودروی خود را انتخاب کنید
             </h1>
@@ -71,40 +246,17 @@ function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
               layout="stacked"
               searchButtonClassName="bg-primary text-primary-foreground hover:bg-primary/90"
             />
-          </aside>
-
-          <AdvertisementImage
-            src="/images/home-hero/car-innerior.png"
-            alt="نمای قطعات داخلی خودرو"
-            className="min-h-[320px] lg:col-span-8"
-            priority
-          />
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-1">
-            <AdvertisementImage
-              src="/images/home-hero/car-kapra.png"
-              alt="لوازم و قطعات خودروی کاپرا"
-              imageClassName="object-contain p-4"
-            />
-            <AdvertisementImage
-              src="/images/home-hero/car-benz.png"
-              alt="لوازم و قطعات مرسدس بنز"
-              imageClassName="object-contain p-4"
-            />
           </div>
 
-          <AdvertisementImage
-            src="/images/home-hero/car-exterior.png"
-            alt="نمای قطعات بیرونی خودرو"
-            className="min-h-[456px] lg:col-span-6"
-          />
-
-          <AdvertisementImage
-            src="/images/home-hero/car-jack.png"
-            alt="لوازم و قطعات جک"
-            className="min-h-[456px] lg:col-span-3"
-            imageClassName="object-contain p-5"
-          />
+          <div
+            dir="ltr"
+            className="grid grid-cols-2 gap-3 sm:aspect-[8/5] sm:grid-cols-4 sm:grid-rows-2 sm:gap-4 lg:order-1 lg:col-span-7"
+            aria-label="پیشنهادهای ویژه قطعات"
+          >
+            {advertisementItems.map((item) => (
+              <AdvertisementCard key={item.src} {...item} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -160,8 +312,8 @@ function FullPrimaryHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
                 HERO_SECTION_HEIGHT.imageLg,
               )}
             >
-              <div className="pointer-events-none absolute inset-[10%_8%_5%] rounded-full bg-gradient-to-br from-cyan-300/30 via-sky-300/10 to-transparent blur-3xl" />
-              <div className="pointer-events-none absolute inset-x-[8%] bottom-[7%] h-[12%] rounded-[50%] bg-slate-950/45 blur-2xl" />
+              <div className="pointer-events-none absolute inset-[10%_8%_5%] rounded-full bg-gradient-to-br from-accent/30 via-accent/10 to-transparent blur-3xl" />
+              <div className="pointer-events-none absolute inset-x-[8%] bottom-[7%] h-[12%] rounded-[50%] bg-dark/45 blur-2xl" />
 
               <div
                 role="group"

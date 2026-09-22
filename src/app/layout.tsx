@@ -14,7 +14,7 @@ import "./globals.css";
  *
  * - lang="fa" و dir="rtl" در سطح <html> (استاندارد سئوی چندزبانه)
  * - metadataBase تا همه‌ی URL های نسبی در OG/canonical مطلق شوند
- * - عنوان‌ها با template یکدست می‌شوند: «… | کارتیوو»
+ * - عنوان‌ها با template یکدست می‌شوند: «… | کارتیوُ»
  */
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),

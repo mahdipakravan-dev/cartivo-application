@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Car, Instagram, Send, Phone, Mail, MapPin } from "lucide-react";
+import Image from "next/image";
+import { Instagram, Send, Phone, Mail, MapPin } from "lucide-react";
 
 const quickLinks = [
   { label: "خانه", href: "/" },
@@ -33,14 +34,21 @@ export function SiteFooter() {
         <div className="mb-12 grid grid-cols-2 gap-8 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="col-span-2">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
-                <Car className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-black">Cartivo</span>
-            </div>
+            <Link
+              href="/"
+              aria-label="کارتیوُ، صفحه اصلی"
+              className="mb-5 inline-flex"
+            >
+              <Image
+                src="/images/brand/cartivo-logo-light-footer.webp"
+                alt="کارتیوُ"
+                width={198}
+                height={256}
+                className="h-auto w-24 object-contain"
+              />
+            </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-white/70">
-              کارتیوو، پلتفرم هوشمند خرید قطعات خودرو. با وارد کردن VIN خودرو
+              کارتیوُ، پلتفرم هوشمند خرید قطعات خودرو. با وارد کردن VIN خودرو
               خود، سریع‌ترین و دقیق‌ترین قطعات را پیدا کنید.
             </p>
             <div className="flex gap-3">
@@ -95,7 +103,7 @@ export function SiteFooter() {
 
           {/* About */}
           <div>
-            <h3 className="mb-4 text-sm font-bold">درباره کارتیوو</h3>
+            <h3 className="mb-4 text-sm font-bold">درباره کارتیوُ</h3>
             <ul className="space-y-2.5">
               {aboutLinks.map((link) => (
                 <li key={link.href}>
@@ -130,7 +138,7 @@ export function SiteFooter() {
         {/* Copyright */}
         <div className="border-t border-white/10 pt-6 text-center">
           <p className="text-xs text-white/50">
-            © ۱۴۰۳ کارتیوو. تمامی حقوق محفوظ است.
+            © ۱۴۰۳ کارتیوُ. تمامی حقوق محفوظ است.
           </p>
         </div>
       </div>

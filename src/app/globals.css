@@ -4,83 +4,83 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
-  توکن‌های رنگی shadcn/ui — سبک new-york با پایه‌ی neutral
-  پالت accent برای Cartivo کمی به سمت آبی فولادی (صنعت خودرو) تنظیم شده است.
-*/
+/* Cartivo brand palette. Keep component colors mapped to these semantic tokens. */
 :root {
   --radius: 0.625rem;
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.27 0.08 255);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #f8f9fb;
+  --foreground: #0f1a2a;
+  --card: #ffffff;
+  --card-foreground: #0f1a2a;
+  --popover: #ffffff;
+  --popover-foreground: #0f1a2a;
+  --primary: #0e2a4b;
+  --primary-foreground: #f8f9fb;
+  --secondary: #ec955c;
+  --secondary-foreground: #0f1a2a;
+  --muted: color-mix(in srgb, #b0b8c5 20%, #f8f9fb);
+  --muted-foreground: #555c68;
+  --accent: #f66b1b;
+  --accent-foreground: #ffffff;
+  --accent-light: #ec955c;
+  --dark: #0f1a2a;
+  --text-secondary: #979ca7;
+  --text-muted: #555c68;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.27 0.08 255);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.27 0.08 255);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.27 0.08 255);
-  --cartivo-container: 1400px;
+  --border: #b0b8c5;
+  --input: #b0b8c5;
+  --ring: #f66b1b;
+  --chart-1: #f66b1b;
+  --chart-2: #ec955c;
+  --chart-3: #0e2a4b;
+  --chart-4: #555c68;
+  --chart-5: #979ca7;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f1a2a;
+  --sidebar-primary: #0e2a4b;
+  --sidebar-primary-foreground: #f8f9fb;
+  --sidebar-accent: #f66b1b;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #b0b8c5;
+  --sidebar-ring: #f66b1b;
+  --cartivo-container: 1620px;
   --cartivo-hero-background-image: url("https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/8272c8ed3_generated_0cb84b85.png");
-  --cartivo-hero-background-overlay: linear-gradient(270deg, rgb(16 42 80 / 0.95), rgb(16 42 80 / 0.8), rgb(16 42 80 / 0.5));
-  --cartivo-hero-background: var(--cartivo-hero-background-overlay), var(--cartivo-hero-background-image);
+  --cartivo-hero-background-overlay: linear-gradient(
+    270deg,
+    rgb(14 42 75 / 0.95),
+    rgb(14 42 75 / 0.8),
+    rgb(14 42 75 / 0.5)
+  );
+  --cartivo-hero-background:
+    var(--cartivo-hero-background-overlay), var(--cartivo-hero-background-image);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0f1a2a;
+  --foreground: #f8f9fb;
+  --card: #0e2a4b;
+  --card-foreground: #f8f9fb;
+  --popover: #0e2a4b;
+  --popover-foreground: #f8f9fb;
+  --primary: #f66b1b;
+  --primary-foreground: #ffffff;
+  --secondary: #ec955c;
+  --secondary-foreground: #0f1a2a;
+  --muted: color-mix(in srgb, #b0b8c5 16%, #0f1a2a);
+  --muted-foreground: #979ca7;
+  --accent: #f66b1b;
+  --accent-foreground: #ffffff;
+  --border: color-mix(in srgb, #b0b8c5 45%, transparent);
+  --input: color-mix(in srgb, #b0b8c5 55%, transparent);
+  --ring: #ec955c;
+  --sidebar: #0e2a4b;
+  --sidebar-foreground: #f8f9fb;
+  --sidebar-primary: #f66b1b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ec955c;
+  --sidebar-accent-foreground: #0f1a2a;
+  --sidebar-border: color-mix(in srgb, #b0b8c5 45%, transparent);
+  --sidebar-ring: #ec955c;
 }
 
 @theme inline {
@@ -98,6 +98,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-light: var(--accent-light);
+  --color-dark: var(--dark);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -130,7 +134,6 @@
 }
 
 @keyframes pulse-slow {
-
   0%,
   100% {
     opacity: 1;

@@ -4,7 +4,7 @@ export function VinGuide() {
   return (
     <section id="vin-guide" className="py-12 lg:py-16">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-[2rem] bg-gradient-to-l from-[#102a50] to-[#1a3a6a]">
+        <div className="overflow-hidden rounded-[2rem] bg-gradient-to-l from-[var(--primary)] to-[var(--primary)]">
           <div className="grid items-center gap-8 md:grid-cols-2">
             {/* Text */}
             <div className="p-8 text-white lg:p-12">
@@ -21,7 +21,7 @@ export function VinGuide() {
                 کد، می‌توانید دقیق‌ترین قطعات سازگار با خودرو خود را پیدا کنید
                 و از خرید قطعات اشتباه جلوگیری کنید.
               </p>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#102a50] transition-colors hover:bg-gray-100">
+              <button className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[var(--primary)] transition-colors hover:bg-border/20">
                 اطلاعات بیشتر
                 <ArrowLeft className="h-4 w-4" />
               </button>
