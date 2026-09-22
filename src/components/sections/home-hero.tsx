@@ -41,7 +41,7 @@ function AdvertisementImage({
   return (
     <figure
       className={cn(
-        "relative isolate min-h-56 overflow-hidden rounded-2xl bg-slate-100",
+        "relative isolate min-h-56 overflow-hidden rounded-2xl bg-[#101e30]",
         className,
       )}
     >
@@ -50,7 +50,7 @@ function AdvertisementImage({
         alt={alt}
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
-        className={cn("object-cover", imageClassName)}
+        className={cn("object-contain", imageClassName)}
         priority={priority}
       />
     </figure>
@@ -59,10 +59,10 @@ function AdvertisementImage({
 
 function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
   return (
-    <section className="bg-background pb-12 pt-24 lg:pb-16 lg:pt-38">
+    <section className="bg-background pb-12 pt-24 lg:pb-16 lg:pt-38" aria-label="ویترین قطعات خودرو">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-12">
-          <aside className="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-7 lg:col-span-4">
+        <div className="grid items-stretch gap-4 lg:grid-cols-12">
+          <div className="flex flex-col justify-center rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-7 lg:col-span-5">
             <h1 className="mb-6 text-2xl font-black text-foreground">
               خودروی خود را انتخاب کنید
             </h1>
@@ -71,40 +71,36 @@ function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
               layout="stacked"
               searchButtonClassName="bg-primary text-primary-foreground hover:bg-primary/90"
             />
-          </aside>
-
-          <AdvertisementImage
-            src="/images/home-hero/car-innerior.png"
-            alt="نمای قطعات داخلی خودرو"
-            className="min-h-[320px] lg:col-span-8"
-            priority
-          />
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-1">
-            <AdvertisementImage
-              src="/images/home-hero/car-kapra.png"
-              alt="لوازم و قطعات خودروی کاپرا"
-              imageClassName="object-contain p-4"
-            />
-            <AdvertisementImage
-              src="/images/home-hero/car-benz.png"
-              alt="لوازم و قطعات مرسدس بنز"
-              imageClassName="object-contain p-4"
-            />
           </div>
 
-          <AdvertisementImage
-            src="/images/home-hero/car-exterior.png"
-            alt="نمای قطعات بیرونی خودرو"
-            className="min-h-[456px] lg:col-span-6"
-          />
-
-          <AdvertisementImage
-            src="/images/home-hero/car-jack.png"
-            alt="لوازم و قطعات جک"
-            className="min-h-[456px] lg:col-span-3"
-            imageClassName="object-contain p-5"
-          />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-7 lg:grid-cols-4 lg:grid-rows-2" aria-label="پیشنهادهای ویژه قطعات">
+            <AdvertisementImage
+              src="/images/advertisements/hero-brake-sale.webp"
+              alt="۳۰ درصد تخفیف دیسک ترمز"
+              className="col-span-2 aspect-[16/9] min-h-0 lg:col-span-3 lg:col-start-2 lg:row-start-1 lg:aspect-auto"
+              priority
+            />
+            <AdvertisementImage
+              src="/images/advertisements/hero-motor-oil.webp"
+              alt="روغن موتور؛ قدرت بیشتر، مسیر طولانی‌تر"
+              className="aspect-[9/16] min-h-0 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-auto"
+            />
+            <AdvertisementImage
+              src="/images/advertisements/hero-brake-pads.webp"
+              alt="لنت ترمز؛ امنیت در هر مسیر"
+              className="aspect-[16/9] min-h-0 lg:col-start-2 lg:row-start-2 lg:aspect-auto"
+            />
+            <AdvertisementImage
+              src="/images/advertisements/hero-air-filter.webp"
+              alt="فیلتر هوا؛ هوای پاک و عملکرد بهتر"
+              className="aspect-[9/16] min-h-0 lg:col-start-3 lg:row-start-2 lg:aspect-auto"
+            />
+            <AdvertisementImage
+              src="/images/advertisements/hero-suspension.webp"
+              alt="قطعات جلوبندی؛ کنترل بیشتر و رانندگی مطمئن"
+              className="aspect-[9/16] min-h-0 lg:col-start-4 lg:row-start-2 lg:aspect-auto"
+            />
+          </div>
         </div>
       </div>
     </section>
