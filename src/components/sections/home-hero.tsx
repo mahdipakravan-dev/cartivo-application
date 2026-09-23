@@ -2,7 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Cog,
+  Shield,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { BrandFrontofficeResponse } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 import { PartFinder } from "./part-finder";
@@ -229,6 +243,118 @@ const advertisementItems: AdvertisementCardProps[] = [
   },
 ];
 
+const vehicleFinderBenefits = [
+  {
+    icon: Cog,
+    title: "مشاوره تخصصی",
+    description: "و پشتیبانی",
+  },
+  {
+    icon: Truck,
+    title: "ارسال سریع",
+    description: "به سراسر کشور",
+  },
+  {
+    icon: ShieldCheck,
+    title: "تضمین اصالت",
+    description: "قطعات",
+  },
+] as const;
+
+function VehicleFinderCard({ brands }: { brands: BrandFrontofficeResponse[] }) {
+  return (
+    <Card className="isolate h-full gap-0 overflow-hidden rounded-2xl border-primary/15 bg-card py-0 shadow-[0_20px_50px_-28px_color-mix(in_srgb,var(--primary)_45%,transparent)] ring-0 [--card-spacing:0px]">
+      <CardHeader className="relative h-[170px] overflow-hidden rounded-none px-0 lg:h-40">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-accent [clip-path:polygon(0_0,100%_0,100%_62%,14%_82%,0_100%)]"
+        />
+        <div className="absolute inset-0 overflow-hidden bg-dark [clip-path:polygon(0_0,100%_0,100%_58%,14%_77%,0_94%)]">
+          <Image
+            src="/images/home-hero/vehicle-selector-banner.png"
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            aria-hidden="true"
+            className="object-cover object-left lg:origin-left lg:scale-125"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-dark/15 via-transparent to-transparent" />
+        </div>
+
+        <div className="absolute right-5 top-5 flex max-w-[58%] items-start gap-3 text-primary-foreground sm:right-7 sm:top-6 sm:gap-4">
+          <span
+            aria-hidden="true"
+            className="relative flex size-14 shrink-0 items-center justify-center sm:size-16"
+          >
+            <Shield className="absolute inset-0 size-full text-accent" strokeWidth={1.8} />
+            <Cog className="size-6 text-primary-foreground sm:size-7" strokeWidth={2.4} />
+          </span>
+          <div className="pt-1 text-right">
+            <p className="text-base font-black leading-6 text-primary-foreground sm:text-lg sm:leading-7">
+              تطابق دقیق قطعات
+              <span className="block">با خودروی شما</span>
+            </p>
+            <p className="mt-1 text-xs font-medium text-primary-foreground/65 sm:text-sm">
+              با اطمینان خرید کنید
+            </p>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="relative px-5 pb-4 pt-0 sm:px-7 sm:pb-5">
+        <div className="mb-4 text-center">
+          <CardTitle>
+            <h1 className="text-2xl font-black leading-tight tracking-[-0.025em] text-card-foreground">
+              خودروی خود را انتخاب کنید
+            </h1>
+          </CardTitle>
+          <CardDescription className="mt-2 text-sm font-medium leading-6 text-muted-foreground sm:text-base">
+            قطعات مناسب، با اطمینان و در چند ثانیه
+          </CardDescription>
+        </div>
+
+        <PartFinder
+          brands={brands}
+          layout="stacked"
+          variant="showcase"
+          searchButtonClassName="bg-primary text-primary-foreground hover:bg-primary/90"
+        />
+      </CardContent>
+
+      <CardFooter className="mt-auto border-t border-primary/10 bg-primary/[0.035] px-4 py-3 sm:px-6 sm:py-4">
+        <ul
+          className="grid w-full grid-cols-3 divide-x divide-x-reverse divide-primary/10"
+          aria-label="مزایای خرید از کارتیو"
+        >
+          {vehicleFinderBenefits.map((benefit) => {
+            const Icon = benefit.icon;
+
+            return (
+              <li
+                key={benefit.title}
+                className="flex min-w-0 flex-col items-center gap-2 px-2 text-center sm:flex-row sm:justify-center sm:gap-3 sm:px-3 sm:text-right"
+              >
+                <Icon
+                  aria-hidden="true"
+                  className="size-7 shrink-0 text-accent sm:size-8"
+                  strokeWidth={1.8}
+                />
+                <span className="min-w-0 text-[11px] font-bold leading-5 text-card-foreground sm:text-xs">
+                  {benefit.title}
+                  <span className="block font-medium text-muted-foreground">
+                    {benefit.description}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </CardFooter>
+    </Card>
+  );
+}
+
 function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
   return (
     <section
@@ -237,20 +363,13 @@ function AdvertisementHero({ brands }: { brands: BrandFrontofficeResponse[] }) {
     >
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <div className="grid items-stretch gap-4 lg:grid-cols-12 lg:gap-5">
-          <div className="flex flex-col justify-center rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-7 lg:order-2 lg:col-span-5">
-            <h1 className="mb-6 text-2xl font-black text-foreground">
-              خودروی خود را انتخاب کنید
-            </h1>
-            <PartFinder
-              brands={brands}
-              layout="stacked"
-              searchButtonClassName="bg-primary text-primary-foreground hover:bg-primary/90"
-            />
+          <div className="min-w-0 lg:order-2 lg:col-span-5">
+            <VehicleFinderCard brands={brands} />
           </div>
 
           <div
             dir="ltr"
-            className="grid grid-cols-2 gap-3 sm:aspect-[8/5] sm:grid-cols-4 sm:grid-rows-2 sm:gap-4 lg:order-1 lg:col-span-7"
+            className="grid min-w-0 grid-cols-2 gap-3 sm:aspect-[8/5] sm:grid-cols-4 sm:grid-rows-2 sm:gap-4 lg:order-1 lg:col-span-7 lg:aspect-auto"
             aria-label="پیشنهادهای ویژه قطعات"
           >
             {advertisementItems.map((item) => (

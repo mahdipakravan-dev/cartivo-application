@@ -18,6 +18,9 @@ interface SearchableSelectProps {
   disabled?: boolean;
   className?: string;
   emptyMessage?: string;
+  variant?: "default" | "showcase";
+  leadingIcon?: React.ReactNode;
+  ariaLabel?: string;
 }
 
 export function SearchableSelect({
@@ -29,6 +32,9 @@ export function SearchableSelect({
   disabled = false,
   className,
   emptyMessage = "نتیجه‌ای یافت نشد",
+  variant = "default",
+  leadingIcon,
+  ariaLabel,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -72,21 +78,37 @@ export function SearchableSelect({
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-label={ariaLabel ?? placeholder}
         className={cn(
           "flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-white/20 bg-white px-4 text-sm font-medium text-dark shadow-sm transition-all",
           "hover:border-white/30 hover:shadow-md",
           "focus:outline-none focus:ring-2 focus:ring-white/30",
           "disabled:cursor-not-allowed disabled:opacity-50",
           open && "ring-2 ring-white/30",
+          variant === "showcase" &&
+            "border-border/60 bg-card text-base font-semibold text-card-foreground shadow-md hover:border-accent/40 hover:shadow-lg focus-visible:border-ring focus-visible:ring-ring/25 disabled:bg-muted",
+          variant === "showcase" && open && "border-accent/50 ring-ring/20",
         )}
       >
-        <span
-          className={cn(
-            "flex-1 truncate text-right",
-            !selectedOption && "text-text-secondary",
-          )}
-        >
-          {selectedOption?.label ?? placeholder}
+        <span className="flex min-w-0 flex-1 items-center gap-3">
+          {leadingIcon ? (
+            <span
+              aria-hidden="true"
+              className="flex shrink-0 text-primary [&_svg]:size-5"
+            >
+              {leadingIcon}
+            </span>
+          ) : null}
+          <span
+            className={cn(
+              "flex-1 truncate text-right",
+              !selectedOption && "text-text-secondary",
+            )}
+          >
+            {selectedOption?.label ?? placeholder}
+          </span>
         </span>
         <ChevronDown
           className={cn(
@@ -97,7 +119,13 @@ export function SearchableSelect({
       </button>
 
       {open && (
-        <div className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl  bg-white shadow-xl shadow-dark/10 animate-in fade-in-0 zoom-in-95">
+        <div
+          role="listbox"
+          className={cn(
+            "absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl bg-white shadow-xl shadow-dark/10 animate-in fade-in-0 zoom-in-95",
+            variant === "showcase" && "border border-border/60 bg-popover",
+          )}
+        >
           {options.length > 5 && (
             <div className="border-b border-border p-2">
               <div className="relative">
@@ -134,6 +162,8 @@ export function SearchableSelect({
                 <button
                   key={option.value}
                   type="button"
+                  role="option"
+                  aria-selected={value === option.value}
                   onClick={() => {
                     onValueChange?.(option.value);
                     setOpen(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { CarFront, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ interface PartFinderProps {
   className?: string;
   layout?: "responsive" | "stacked";
   searchButtonClassName?: string;
+  variant?: "default" | "showcase";
 }
 
 export function PartFinder({
@@ -26,6 +27,7 @@ export function PartFinder({
   className,
   layout = "responsive",
   searchButtonClassName,
+  variant = "default",
 }: PartFinderProps) {
   const router = useRouter();
   const [selectedBrandSlug, setSelectedBrandSlug] = useState("");
@@ -92,6 +94,9 @@ export function PartFinder({
         onValueChange={setSelectedBrandSlug}
         placeholder="انتخاب برند"
         searchPlaceholder="جستجوی برند..."
+        ariaLabel="انتخاب برند خودرو"
+        variant={variant}
+        leadingIcon={variant === "showcase" ? <CarFront /> : undefined}
         className="flex-1"
       />
     ),
@@ -105,6 +110,9 @@ export function PartFinder({
         searchPlaceholder="جستجوی خودرو..."
         disabled={!selectedBrandSlug || loadingCars}
         emptyMessage={loadingCars ? "در حال بارگذاری..." : "خودرویی یافت نشد"}
+        ariaLabel="انتخاب مدل خودرو"
+        variant={variant}
+        leadingIcon={variant === "showcase" ? <CarFront /> : undefined}
         className="flex-1"
       />
     ),
@@ -129,10 +137,15 @@ export function PartFinder({
           }
           className={cn(
             "h-12 w-full rounded-xl text-sm font-semibold shadow-lg disabled:cursor-not-allowed disabled:opacity-50",
-            searchButtonClassName
+            variant === "showcase" &&
+              "border border-primary/10 text-base font-bold shadow-primary/20 hover:shadow-xl focus-visible:ring-primary/25 disabled:bg-primary disabled:text-primary-foreground disabled:opacity-100",
+            searchButtonClassName,
           )}
         >
-          <Search className="h-4 w-4" />
+          <Search
+            data-icon="inline-start"
+            className={variant === "showcase" ? "size-5" : undefined}
+          />
           جستجو
         </Button>
       </div>
