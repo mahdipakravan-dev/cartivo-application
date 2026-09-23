@@ -2,18 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Cog,
-  Shield,
-  ShieldCheck,
-  Truck,
-} from "lucide-react";
+import { Cog, Shield } from "lucide-react";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -243,28 +237,10 @@ const advertisementItems: AdvertisementCardProps[] = [
   },
 ];
 
-const vehicleFinderBenefits = [
-  {
-    icon: Cog,
-    title: "مشاوره تخصصی",
-    description: "و پشتیبانی",
-  },
-  {
-    icon: Truck,
-    title: "ارسال سریع",
-    description: "به سراسر کشور",
-  },
-  {
-    icon: ShieldCheck,
-    title: "تضمین اصالت",
-    description: "قطعات",
-  },
-] as const;
-
 function VehicleFinderCard({ brands }: { brands: BrandFrontofficeResponse[] }) {
   return (
-    <Card className="isolate h-full gap-0 overflow-hidden rounded-2xl border-primary/15 bg-card py-0 shadow-[0_20px_50px_-28px_color-mix(in_srgb,var(--primary)_45%,transparent)] ring-0 [--card-spacing:0px]">
-      <CardHeader className="relative h-[170px] overflow-hidden rounded-none px-0 lg:h-40">
+    <Card className="relative isolate z-20 h-full gap-0 overflow-visible rounded-2xl border-primary/15 bg-card py-0 shadow-[0_20px_50px_-28px_color-mix(in_srgb,var(--primary)_45%,transparent)] ring-0 [--card-spacing:0px]">
+      <CardHeader className="relative h-[170px] overflow-hidden rounded-t-2xl px-0 lg:h-40">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-accent [clip-path:polygon(0_0,100%_0,100%_62%,14%_82%,0_100%)]"
@@ -282,7 +258,7 @@ function VehicleFinderCard({ brands }: { brands: BrandFrontofficeResponse[] }) {
           <div className="absolute inset-0 bg-gradient-to-l from-dark/15 via-transparent to-transparent" />
         </div>
 
-        <div className="absolute right-5 top-5 flex max-w-[58%] items-start gap-3 text-primary-foreground sm:right-7 sm:top-6 sm:gap-4">
+        <div className="absolute right-5 top-3 flex max-w-[58%] items-start gap-3 text-primary-foreground sm:right-7 sm:top-4 sm:gap-4">
           <span
             aria-hidden="true"
             className="relative flex size-14 shrink-0 items-center justify-center sm:size-16"
@@ -321,36 +297,6 @@ function VehicleFinderCard({ brands }: { brands: BrandFrontofficeResponse[] }) {
           searchButtonClassName="bg-primary text-primary-foreground hover:bg-primary/90"
         />
       </CardContent>
-
-      <CardFooter className="mt-auto border-t border-primary/10 bg-primary/[0.035] px-4 py-3 sm:px-6 sm:py-4">
-        <ul
-          className="grid w-full grid-cols-3 divide-x divide-x-reverse divide-primary/10"
-          aria-label="مزایای خرید از کارتیو"
-        >
-          {vehicleFinderBenefits.map((benefit) => {
-            const Icon = benefit.icon;
-
-            return (
-              <li
-                key={benefit.title}
-                className="flex min-w-0 flex-col items-center gap-2 px-2 text-center sm:flex-row sm:justify-center sm:gap-3 sm:px-3 sm:text-right"
-              >
-                <Icon
-                  aria-hidden="true"
-                  className="size-7 shrink-0 text-accent sm:size-8"
-                  strokeWidth={1.8}
-                />
-                <span className="min-w-0 text-[11px] font-bold leading-5 text-card-foreground sm:text-xs">
-                  {benefit.title}
-                  <span className="block font-medium text-muted-foreground">
-                    {benefit.description}
-                  </span>
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </CardFooter>
     </Card>
   );
 }

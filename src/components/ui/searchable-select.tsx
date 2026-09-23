@@ -73,7 +73,10 @@ export function SearchableSelect({
   }, []);
 
   return (
-    <div ref={containerRef} className={cn("relative", className)}>
+    <div
+      ref={containerRef}
+      className={cn("relative", open && "z-50", className)}
+    >
       <button
         type="button"
         disabled={disabled}

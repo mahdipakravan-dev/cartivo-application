@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CarFront, Search } from "lucide-react";
+import { CalendarDays, CarFront, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,28 @@ interface PartFinderProps {
   variant?: "default" | "showcase";
 }
 
+function getVehicleKey(car: CarFrontofficeDetailResponse) {
+  if (car.variantId != null) return `variant:${car.variantId}`;
+
+  return [
+    "vehicle",
+    car.modelId ?? "",
+    car.generationId ?? "",
+    car.model ?? car.baseModelName ?? "",
+    car.trimLevel ?? "",
+  ].join(":");
+}
+
+function getVehicleLabel(car: CarFrontofficeDetailResponse) {
+  const label = [car.model || car.baseModelName, car.trimLevel]
+    .filter(Boolean)
+    .join(" — ");
+
+  if (label) return label;
+
+  return car.displayName?.replace(/\s*[-–—]?\s*[۰-۹0-9]{4}\s*$/, "") || "خودرو";
+}
+
 export function PartFinder({
   brands = [],
   className,
@@ -32,6 +54,7 @@ export function PartFinder({
   const router = useRouter();
   const [selectedBrandSlug, setSelectedBrandSlug] = useState("");
   const [selectedCarId, setSelectedCarId] = useState("");
+  const [selectedYearId, setSelectedYearId] = useState("");
   const [cars, setCars] = useState<CarFrontofficeDetailResponse[]>([]);
   const [loadingCars, setLoadingCars] = useState(false);
 
@@ -39,12 +62,14 @@ export function PartFinder({
     if (!selectedBrandSlug) {
       setCars([]);
       setSelectedCarId("");
+      setSelectedYearId("");
       return;
     }
 
     let cancelled = false;
     setLoadingCars(true);
     setSelectedCarId("");
+    setSelectedYearId("");
 
     fetchCarsByBrand(selectedBrandSlug)
       .then((response) => {
@@ -71,19 +96,70 @@ export function PartFinder({
   );
 
   const carOptions = useMemo(
-    () =>
-      cars
+    () => {
+      if (variant === "showcase") {
+        const vehicles = new Map<string, { value: string; label: string }>();
+
+        cars.forEach((car) => {
+          const value = getVehicleKey(car);
+          if (!vehicles.has(value)) {
+            vehicles.set(value, { value, label: getVehicleLabel(car) });
+          }
+        });
+
+        return [...vehicles.values()].sort((left, right) =>
+          left.label.localeCompare(right.label, "fa"),
+        );
+      }
+
+      return cars
         .filter((car) => car.id != null)
         .map((car) => ({
           value: String(car.id),
-          label: car.displayName || [
-            car.model,
-            car.trimLevel,
-            car.year?.toLocaleString("fa-IR", { useGrouping: false }),
-          ].filter(Boolean).join(" — "),
-        })),
-    [cars]
+          label:
+            car.displayName ||
+            [
+              car.model,
+              car.trimLevel,
+              car.year?.toLocaleString("fa-IR", { useGrouping: false }),
+            ]
+              .filter(Boolean)
+              .join(" — "),
+        }));
+    },
+    [cars, variant],
   );
+
+  const yearOptions = useMemo(() => {
+    if (variant !== "showcase" || !selectedCarId) return [];
+
+    const years = new Map<
+      string,
+      { value: string; label: string; year: number }
+    >();
+
+    cars.forEach((car) => {
+      const modelYearId = car.modelYearId ?? car.id;
+      if (
+        getVehicleKey(car) !== selectedCarId ||
+        modelYearId == null ||
+        car.year == null
+      ) {
+        return;
+      }
+
+      const value = String(modelYearId);
+      years.set(value, {
+        value,
+        label: car.year.toLocaleString("fa-IR", { useGrouping: false }),
+        year: car.year,
+      });
+    });
+
+    return [...years.values()]
+      .sort((left, right) => right.year - left.year)
+      .map(({ value, label }) => ({ value, label }));
+  }, [cars, selectedCarId, variant]);
 
   const fields = [
     (
@@ -105,7 +181,10 @@ export function PartFinder({
         key="car"
         options={carOptions}
         value={selectedCarId}
-        onValueChange={setSelectedCarId}
+        onValueChange={(value) => {
+          setSelectedCarId(value);
+          setSelectedYearId("");
+        }}
         placeholder="انتخاب خودرو"
         searchPlaceholder="جستجوی خودرو..."
         disabled={!selectedBrandSlug || loadingCars}
@@ -117,6 +196,25 @@ export function PartFinder({
       />
     ),
   ];
+
+  if (variant === "showcase") {
+    fields.push(
+      <SearchableSelect
+        key="year"
+        options={yearOptions}
+        value={selectedYearId}
+        onValueChange={setSelectedYearId}
+        placeholder="سال ساخت"
+        searchPlaceholder="جستجوی سال ساخت..."
+        disabled={!selectedCarId || loadingCars}
+        emptyMessage="سال ساختی یافت نشد"
+        ariaLabel="انتخاب سال ساخت"
+        variant="showcase"
+        leadingIcon={<CalendarDays />}
+        className="flex-1"
+      />,
+    );
+  }
 
   return (
     <div className={cn("w-full", className)} dir="rtl">
@@ -131,9 +229,18 @@ export function PartFinder({
         </div>
         <Button
           size="lg"
-          disabled={!selectedBrandSlug || !selectedCarId}
+          disabled={
+            !selectedBrandSlug ||
+            !selectedCarId ||
+            (variant === "showcase" && !selectedYearId)
+          }
           onClick={() =>
-            router.push(ROUTES.partsCar(selectedBrandSlug, selectedCarId))
+            router.push(
+              ROUTES.partsCar(
+                selectedBrandSlug,
+                variant === "showcase" ? selectedYearId : selectedCarId,
+              ),
+            )
           }
           className={cn(
             "h-12 w-full rounded-xl text-sm font-semibold shadow-lg disabled:cursor-not-allowed disabled:opacity-50",
