@@ -11,7 +11,11 @@ import {
   ShieldCheck,
   Truck,
 } from "lucide-react";
-import type { CarResponse, PartFrontofficeResponse } from "@/lib/api/types";
+import type {
+  CarResponse,
+  PartDetailResponse,
+  PartFrontofficeResponse,
+} from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { ProductGallery } from "./product-gallery";
@@ -19,6 +23,8 @@ import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel"
 import { getRelatedBlogs } from "@/lib/api/content";
 import { ProductReviews } from "./product-reviews";
 import { ProductRelatedBlogs } from "./product-related-blogs";
+import { GarageCompatibilityNotice } from "./garage-compatibility-notice";
+import { PartSpecifications } from "./part-specifications";
 
 const POSITION_LABEL: Record<string, string> = {
   INTERIOR: "داخلی",
@@ -29,7 +35,7 @@ const POSITION_LABEL: Record<string, string> = {
 export async function ProductDetail({
   part,
 }: {
-  part: PartFrontofficeResponse;
+  part: PartDetailResponse;
 }) {
   const name = part.name || "قطعه خودرو";
   const images = part.imageUrls?.filter(Boolean) || [];
@@ -131,6 +137,7 @@ export async function ProductDetail({
                     <span className="font-bold text-text-muted">{brand}</span>
                   </p>
                 )}
+                <GarageCompatibilityNotice fitments={part.fitments} />
                 <div className="my-6 h-px bg-border/20" />
 
                 <h2 className="text-sm font-extrabold text-dark">
@@ -255,6 +262,7 @@ export async function ProductDetail({
               </p>
             </aside>
           </section>
+          <PartSpecifications details={part.details} />
           <ProductReviews cars={compatibleCars} />
           <ProductRelatedBlogs blogs={relatedBlogs} />
         </div>

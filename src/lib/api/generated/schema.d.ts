@@ -1010,7 +1010,7 @@ export interface components {
              * @example PENDING
              * @enum {string}
              */
-            status?: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+            status?: "PENDING" | "CONFIRMED" | "PREPARING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
             /** @example 2500000 */
             subtotalAmountRial?: number;
             /** @example 250000 */

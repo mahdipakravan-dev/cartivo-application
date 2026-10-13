@@ -8,21 +8,51 @@ import { Articles } from "@/components/sections/articles";
 import { PartRequestCover } from "@/components/sections/part-request-cover";
 import { getBrands } from "@/lib/api/brands";
 import { CatalogHydrator } from "@/lib/store";
+import { PreviewEditable } from "@/components/preview/preview-editable";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await searchParams;
+  const previewValue = Array.isArray(query.preview)
+    ? query.preview[0]
+    : query.preview;
+  const preview = previewValue === "true";
   const { items: brands } = await getBrands({ size: 200 });
 
   return (
     <>
       <CatalogHydrator brands={brands} />
-      <HomeHero variant="advertisement" brands={brands} />
-      <BrandsSection />
-      <PositionTypeSection />
-      <Bestsellers />
-      <Features />
-      <PartBrandsSection />
-      <PartRequestCover />
-      <Articles />
+      <PreviewEditable
+        enabled={preview}
+        componentName="بنر اصلی"
+        overlaidHeader
+      >
+        <HomeHero variant="advertisement" brands={brands} />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="برندهای خودرو">
+        <BrandsSection />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="موقعیت قطعات">
+        <PositionTypeSection />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="پرفروش‌ترین قطعات">
+        <Bestsellers />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="مزایای کارتیو">
+        <Features />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="برندهای قطعات">
+        <PartBrandsSection />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="درخواست قطعه">
+        <PartRequestCover />
+      </PreviewEditable>
+      <PreviewEditable enabled={preview} componentName="آخرین مقالات">
+        <Articles />
+      </PreviewEditable>
     </>
   );
 }

@@ -84,19 +84,31 @@ export default async function PartsCarPage({
     brand.id == null ? [] : await getBrandTopLevelParts(brand.id);
   const rawPartId = Array.isArray(sp.partId) ? sp.partId[0] : sp.partId;
   const requestedPartId = rawPartId ? Number(rawPartId) : null;
-  const selectedPart =
-    topLevelParts.find((part) => part.id === requestedPartId) ??
-    topLevelParts[0];
-  const categories =
-    brand.id != null && car.id != null && selectedPart?.id != null
-      ? await getVehicleCategories({
-          carId: car.id,
-          brandId: brand.id,
-          partId: selectedPart.id,
-        })
+  const selectedPart = topLevelParts.find(
+    (part) => part.id === requestedPartId,
+  );
+  const visibleTopLevelParts = selectedPart ? [selectedPart] : topLevelParts;
+  const categoryGroups =
+    brand.id != null && car.id != null
+      ? await Promise.all(
+          visibleTopLevelParts.map(async (part) => ({
+            part,
+            categories:
+              part.id != null
+                ? await getVehicleCategories({
+                    carId: car.id!,
+                    brandId: brand.id!,
+                    partId: part.id,
+                  })
+                : [],
+          })),
+        )
       : [];
+  const visibleCategories = categoryGroups.flatMap(({ part, categories }) =>
+    categories.map((category) => ({ part, category })),
+  );
   const compatiblePartCount = new Set(
-    categories.flatMap((category) =>
+    visibleCategories.flatMap(({ category }) =>
       category.parts
         .map((part) => part.id)
         .filter((id): id is number => id != null),
@@ -297,6 +309,13 @@ export default async function PartsCarPage({
             ) : (
               <>
                 <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+                  <Link
+                    href={`${ROUTES.partsCar(brandSlug, carId)}#compatible-parts`}
+                    scroll={false}
+                    className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${selectedPart == null ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-text-muted hover:border-accent"}`}
+                  >
+                    همه
+                  </Link>
                   {topLevelParts.map((part) => (
                     <Link
                       key={part.id}
@@ -309,21 +328,21 @@ export default async function PartsCarPage({
                   ))}
                 </div>
 
-                {categories.length === 0 ? (
+                {visibleCategories.length === 0 ? (
                   <div className="mt-6 rounded-2xl border border-dashed border-border py-14 text-center">
                     <Package className="mx-auto size-10 text-text-secondary" />
                     <p className="mt-3 text-sm font-bold text-text-secondary">
-                      قطعه سازگاری در این گروه ثبت نشده است
+                      قطعه سازگاری برای این خودرو ثبت نشده است
                     </p>
                   </div>
                 ) : (
                   <div className="mt-7 space-y-9">
-                    {categories.map((category, index) => (
-                      <section key={category.id ?? index}>
+                    {visibleCategories.map(({ part: parentPart, category }, index) => (
+                      <section key={`${parentPart.id ?? "part"}-${category.id ?? index}`}>
                         <div className="mb-4 flex items-center justify-between gap-3">
                           <div>
                             <p className="text-xs font-bold text-accent">
-                              {selectedPart?.name}
+                              {parentPart.name || "گروه قطعه"}
                             </p>
                             <h3 className="mt-1 text-xl font-black text-dark">
                               {category.persianName ||

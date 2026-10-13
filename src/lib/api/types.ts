@@ -61,6 +61,27 @@ export interface CarResponse {
 }
 export type PartFrontofficeResponse =
   components["schemas"]["PartFrontofficeResponse"];
+export type PartDetailDataType =
+  | "TEXT"
+  | "TEXTAREA"
+  | "INTEGER"
+  | "DECIMAL"
+  | "BOOLEAN"
+  | "DATE"
+  | "SELECT"
+  | "MULTI_SELECT";
+export interface PartDetail {
+  categoryId: number;
+  key: string;
+  label: string;
+  dataType: PartDetailDataType;
+  unit: string | null;
+  sortOrder: number;
+  value: string | number | boolean | string[];
+}
+export type PartDetailResponse = PartFrontofficeResponse & {
+  details: PartDetail[];
+};
 export type CategorySummaryResponse =
   components["schemas"]["CategorySummaryResponse"];
 export type PartBrandFrontofficeResponse =

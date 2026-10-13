@@ -56,7 +56,7 @@ const localPhone = (value?: string) =>
 interface AccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAuthenticationChange: (authenticated: boolean) => void;
+  onAuthenticationChange?: (authenticated: boolean) => void;
 }
 
 export function AccountDialog({
@@ -96,7 +96,7 @@ export function AccountDialog({
       })
       .catch(() => {
         clearAccessToken();
-        onAuthenticationChange(false);
+        onAuthenticationChange?.(false);
         setStep("phone");
       })
       .finally(() => setLoadingProfile(false));
@@ -146,7 +146,7 @@ export function AccountDialog({
       );
       if (!result.accessToken) throw new Error("توکن ورود از سرور دریافت نشد.");
       setAccessToken(result.accessToken);
-      onAuthenticationChange(true);
+      onAuthenticationChange?.(true);
       setProfile(null);
       onOpenChange(false);
       const postLoginAction = window.sessionStorage.getItem(
@@ -196,7 +196,7 @@ export function AccountDialog({
 
   const logout = () => {
     clearAccessToken();
-    onAuthenticationChange(false);
+    onAuthenticationChange?.(false);
     setProfile(null);
     setPhone("");
     phoneForm.reset();

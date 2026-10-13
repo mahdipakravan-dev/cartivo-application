@@ -1,5 +1,10 @@
 import { apiClient } from "./client";
-import type { PartFrontofficeResponse, PaginatedResult, PageResponse } from "./types";
+import type {
+  PartDetailResponse,
+  PartFrontofficeResponse,
+  PaginatedResult,
+  PageResponse,
+} from "./types";
 import { collectPaginatedItems } from "../catalog-navigation";
 import { SERVER_BASE_URL } from "./config";
 
@@ -127,7 +132,7 @@ export async function searchParts(
 /** Fetch a single part by ID (SSR). */
 export async function getPartById(
   id: string | number,
-): Promise<PartFrontofficeResponse | null> {
+): Promise<PartDetailResponse | null> {
   try {
     const numericId = Number(id);
     const { data, error } = await apiClient.GET("/api/frontoffice/parts/{id}", {
@@ -136,7 +141,13 @@ export async function getPartById(
     });
 
     if (error || !data) return null;
-    return data as PartFrontofficeResponse;
+    const part = data as PartFrontofficeResponse & {
+      details?: PartDetailResponse["details"];
+    };
+    return {
+      ...part,
+      details: Array.isArray(part.details) ? part.details : [],
+    };
   } catch {
     return null;
   }

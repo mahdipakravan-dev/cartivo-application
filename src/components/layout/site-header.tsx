@@ -16,9 +16,8 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { AccountDialog } from "@/components/auth/account-dialog";
+import { useGarage } from "@/components/garage/garage-provider";
 import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
-import { getAccessToken } from "@/lib/api/auth-token";
-import { getGarageVehicles } from "@/lib/api/garage";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
 import {
   getTopLevelPartHref,
@@ -159,9 +158,11 @@ export function SiteHeader({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [categoryBarPinned, setCategoryBarPinned] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [defaultVehicleName, setDefaultVehicleName] = useState("");
+  const { authenticated, vehicles: garageVehicles } = useGarage();
+  const selectedGarageVehicle =
+    garageVehicles.find((item) => item.isDefault) ?? garageVehicles[0];
+  const defaultVehicleName = selectedGarageVehicle?.vehicle?.displayName ?? "";
   const pathname = usePathname();
   const router = useRouter();
   const quantity = useCartStore((state) =>
@@ -182,13 +183,6 @@ export function SiteHeader({
   );
 
   useEffect(() => {
-    const sync = () => setAuthenticated(Boolean(getAccessToken()));
-    sync();
-    window.addEventListener("cartivo-auth-change", sync);
-    return () => window.removeEventListener("cartivo-auth-change", sync);
-  }, []);
-
-  useEffect(() => {
     const openAccount = () => setAccountOpen(true);
     const closeAccount = () => setAccountOpen(false);
     window.addEventListener("cartivo-open-auth", openAccount);
@@ -198,33 +192,6 @@ export function SiteHeader({
       window.removeEventListener("cartivo-close-auth", closeAccount);
     };
   }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    const syncGarage = () => {
-      if (!authenticated) {
-        setDefaultVehicleName("");
-        return;
-      }
-
-      getGarageVehicles()
-        .then((garageVehicles) => {
-          if (!active) return;
-          const selected =
-            garageVehicles.find((item) => item.isDefault) ?? garageVehicles[0];
-          setDefaultVehicleName(selected?.vehicle?.displayName ?? "");
-        })
-        .catch(() => active && setDefaultVehicleName(""));
-    };
-
-    syncGarage();
-    window.addEventListener("cartivo-garage-change", syncGarage);
-    return () => {
-      active = false;
-      window.removeEventListener("cartivo-garage-change", syncGarage);
-    };
-  }, [authenticated]);
 
   const openGarage = () => {
     if (authenticated) {
@@ -369,7 +336,6 @@ export function SiteHeader({
       <AccountDialog
         open={accountOpen}
         onOpenChange={setAccountOpen}
-        onAuthenticationChange={setAuthenticated}
       />
       <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </>

@@ -8,6 +8,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import type { PartFrontofficeResponse } from "@/lib/api/types";
+import { GarageCompatibilityNotice } from "@/components/product/garage-compatibility-notice";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -98,6 +99,8 @@ export function ProductCard({
             )}
           </div>
         )}
+
+        <GarageCompatibilityNotice fitments={part.fitments} compact />
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
           <div>

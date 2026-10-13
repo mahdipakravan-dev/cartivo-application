@@ -9,6 +9,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Shield, Truck, CheckCircle } from "lucide-react";
 import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel";
+import { PartSpecifications } from "@/components/product/part-specifications";
 
 export async function generateMetadata({
   params,
@@ -280,6 +281,7 @@ export default async function PartsPartPage({
               </div>
             </div>
           </div>
+          <PartSpecifications details={part.details} />
         </div>
       </section>
     </>

@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { GarageProvider } from "@/components/garage/garage-provider";
 import { siteConfig } from "@/lib/config/site";
 import { getAllTopLevelParts } from "@/lib/api/parts";
 import { iranYekan } from "@/lib/fonts";
@@ -49,12 +50,14 @@ export default async function RootLayout({
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
       <body className="flex min-h-dvh flex-col">
         <StoreProvider>
-          <SiteHeader
-            variant="transparent-background"
-            topLevelParts={topLevelParts}
-          />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <GarageProvider>
+            <SiteHeader
+              variant="transparent-background"
+              topLevelParts={topLevelParts}
+            />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </GarageProvider>
         </StoreProvider>
       </body>
     </html>
