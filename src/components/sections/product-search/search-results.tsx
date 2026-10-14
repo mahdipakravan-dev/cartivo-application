@@ -18,24 +18,30 @@ interface SearchResultsProps {
   };
   /** Kept for compatibility with brand-filtered result pages. */
   brandSlug?: string;
+  showFilters?: boolean;
 }
 
 export function SearchResults({
   initialParams,
   cars,
   results,
+  showFilters = true,
 }: SearchResultsProps) {
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
       {/* Mobile Filter Toggle */}
-      <MobileFilterToggle initialParams={initialParams} cars={cars} />
+      {showFilters && (
+        <MobileFilterToggle initialParams={initialParams} cars={cars} />
+      )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden w-64 shrink-0 lg:block">
-        <div className="sticky top-24">
-          <FilterSidebar initialParams={initialParams} cars={cars} />
+      {showFilters && (
+        <div className="hidden w-64 shrink-0 lg:block">
+          <div className="sticky top-24">
+            <FilterSidebar initialParams={initialParams} cars={cars} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Results */}
       <div className="flex-1 min-w-0">

@@ -2,7 +2,7 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { GarageProvider } from "@/components/garage/garage-provider";
 import { siteConfig } from "@/lib/config/site";
-import { getAllTopLevelParts } from "@/lib/api/parts";
+import { getRootCategories } from "@/lib/api/categories";
 import { iranYekan } from "@/lib/fonts";
 import { StoreProvider } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const topLevelParts = await getAllTopLevelParts();
+  const categories = await getRootCategories();
 
   return (
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
@@ -53,7 +53,7 @@ export default async function RootLayout({
           <GarageProvider>
             <SiteHeader
               variant="transparent-background"
-              topLevelParts={topLevelParts}
+              rootCategories={categories.items}
             />
             <main className="flex-1">{children}</main>
             <SiteFooter />

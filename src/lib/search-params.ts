@@ -12,12 +12,14 @@ export function parseSearchParams(
   const brandIds = parseNumberArray(searchParams.brandIds);
   const carIds = parseNumberArray(searchParams.carIds);
   const partBrandIds = parseNumberArray(searchParams.partBrandIds);
-  const parentPartIds = parseNumberArray(searchParams.parentPartIds);
+  const categoryIds = parseNumberArray(searchParams.categoryIds);
+  const categoryId = parseNumber(searchParams.categoryId);
 
   if (brandIds) result.brandIds = brandIds;
   if (carIds) result.carIds = carIds;
   if (partBrandIds) result.partBrandIds = partBrandIds;
-  if (parentPartIds) result.parentPartIds = parentPartIds;
+  if (categoryIds) result.categoryIds = categoryIds;
+  if (categoryId != null) result.categoryId = categoryId;
   if (isValidPosition(searchParams.position)) result.positionType = searchParams.position as "INTERIOR" | "EXTERIOR";
 
   const minPrice = parseNumber(searchParams.minPrice);
@@ -49,7 +51,8 @@ export function buildSearchParams(
   if (Array.isArray(merged.brandIds) && merged.brandIds.length) sp.set("brandIds", (merged.brandIds as number[]).join(","));
   if (Array.isArray(merged.carIds) && merged.carIds.length) sp.set("carIds", (merged.carIds as number[]).join(","));
   if (Array.isArray(merged.partBrandIds) && merged.partBrandIds.length) sp.set("partBrandIds", (merged.partBrandIds as number[]).join(","));
-  if (Array.isArray(merged.parentPartIds) && merged.parentPartIds.length) sp.set("parentPartIds", (merged.parentPartIds as number[]).join(","));
+  if (Array.isArray(merged.categoryIds) && merged.categoryIds.length) sp.set("categoryIds", (merged.categoryIds as number[]).join(","));
+  if (merged.categoryId != null) sp.set("categoryId", String(merged.categoryId));
   if (merged.positionType) sp.set("position", merged.positionType as string);
   if (merged.minPrice != null) sp.set("minPrice", String(merged.minPrice));
   if (merged.maxPrice != null) sp.set("maxPrice", String(merged.maxPrice));

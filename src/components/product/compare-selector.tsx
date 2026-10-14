@@ -184,7 +184,11 @@ export function CompareSelector({
                       {part.name || "قطعه خودرو"}
                     </p>
                     <p className="mt-1 truncate text-xs text-text-secondary">
-                      {[part.partBrandName, part.parentPartName]
+                      {[
+                        part.partBrandName,
+                        part.categories?.[0]?.persianName ||
+                          part.categories?.[0]?.name,
+                      ]
                         .filter(Boolean)
                         .join(" • ") ||
                         part.description ||

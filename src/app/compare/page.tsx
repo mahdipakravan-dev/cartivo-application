@@ -328,13 +328,17 @@ function partBrand(part?: PartFrontofficeResponse | null) {
 }
 
 function partPosition(part?: PartFrontofficeResponse | null) {
-  if (!part?.position) return "نامشخص";
-  return POSITION_LABEL[part.position] || part.position;
+  const positions = [
+    ...new Set(part?.categories?.map((category) => category.position).filter(Boolean)),
+  ];
+  if (positions.length === 0) return "نامشخص";
+  if (positions.length > 1) return "چند موقعیت";
+  const position = positions[0]!;
+  return POSITION_LABEL[position] || position;
 }
 
 function orderState(part?: PartFrontofficeResponse | null) {
   if (!part) return "هنوز انتخاب نشده";
-  if (part.leaf === false) return "دسته‌بندی";
   return part.price != null ? "قابل سفارش" : "نیاز به استعلام";
 }
 

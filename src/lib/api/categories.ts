@@ -46,14 +46,15 @@ function parsePage(page: PageResponse): PaginatedResult<CategorySummaryResponse>
   };
 }
 
-/** Fetch all active categories belonging to one top-level part. */
-export async function getAllCategoriesByParent(
-  parentId: number,
+async function getAllCategories(
+  categoryParentId?: number,
 ): Promise<CategoriesResult> {
   try {
     const items = await collectPaginatedItems(async (page) => {
       const url = new URL("/api/frontoffice/categories", SERVER_BASE_URL);
-      url.searchParams.set("parentId", String(parentId));
+      if (categoryParentId != null) {
+        url.searchParams.set("categoryParentId", String(categoryParentId));
+      }
       url.searchParams.set("page", String(page));
       url.searchParams.set("size", "100");
       url.searchParams.set("sortBy", "name");
@@ -61,7 +62,14 @@ export async function getAllCategoriesByParent(
       const response = await fetch(url, {
         headers: { Accept: "application/json" },
         cache: "force-cache",
-        next: { tags: ["categories", `categories:${parentId}`] },
+        next: {
+          tags: [
+            "categories",
+            categoryParentId == null
+              ? "categories:root"
+              : `categories:parent:${categoryParentId}`,
+          ],
+        },
       });
 
       if (!response.ok) throw new Error(`Failed to fetch categories (${response.status})`);
@@ -74,6 +82,18 @@ export async function getAllCategoriesByParent(
   }
 }
 
+/** Fetch all active root categories. */
+export function getRootCategories(): Promise<CategoriesResult> {
+  return getAllCategories();
+}
+
+/** Fetch all active direct children of a category. */
+export function getChildCategories(
+  categoryParentId: number,
+): Promise<CategoriesResult> {
+  return getAllCategories(categoryParentId);
+}
+
 /**
  * Fetch categories and compatible purchasable parts for one exact model year.
  * `carId` is the modelYearId returned by `/api/frontoffice/cars`.
@@ -81,13 +101,15 @@ export async function getAllCategoriesByParent(
 export async function getVehicleCategories(params: {
   carId: number;
   brandId: number;
-  partId: number;
+  categoryParentId?: number;
 }): Promise<VehicleCategory[]> {
   try {
-    const url = new URL("/api/frontoffice/categories", SERVER_BASE_URL);
+    const url = new URL("/api/frontoffice/categories/navigation", SERVER_BASE_URL);
     url.searchParams.set("carId", String(params.carId));
     url.searchParams.set("brandId", String(params.brandId));
-    url.searchParams.set("partId", String(params.partId));
+    if (params.categoryParentId != null) {
+      url.searchParams.set("categoryParentId", String(params.categoryParentId));
+    }
     url.searchParams.set("page", "0");
     url.searchParams.set("size", "100");
     url.searchParams.set("sort", "name,asc");

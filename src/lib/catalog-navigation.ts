@@ -1,8 +1,7 @@
-export interface TopLevelPartNavigationSource {
+export interface CategoryNavigationSource {
   id?: number;
   name?: string;
-  businessName?: string;
-  manufacturerName?: string;
+  persianName?: string;
 }
 
 interface PaginationSlice<T> {
@@ -12,21 +11,21 @@ interface PaginationSlice<T> {
   hasNext: boolean;
 }
 
-export function getTopLevelPartHref(
-  part: TopLevelPartNavigationSource,
+export function getCategoryHref(
+  category: CategoryNavigationSource,
 ): string | null {
-  const manufacturerName = cleanText(part.manufacturerName);
-  if (typeof part.id !== "number" || !Number.isSafeInteger(part.id) ) return null;
+  if (typeof category.id !== "number" || !Number.isSafeInteger(category.id)) {
+    return null;
+  }
+  const label = getCategoryLabel(category) ?? "category";
 
-  return `/parent/${encodeURIComponent(manufacturerName || "")}?parentId=${part.id}`;
+  return `/parent/${encodeURIComponent(label)}?categoryId=${category.id}`;
 }
 
-export function getTopLevelPartLabel(
-  part: TopLevelPartNavigationSource,
+export function getCategoryLabel(
+  category: CategoryNavigationSource,
 ): string | null {
-  return cleanText(part.name)
-    ?? cleanText(part.businessName)
-    ?? cleanText(part.manufacturerName);
+  return cleanText(category.persianName) ?? cleanText(category.name);
 }
 
 export async function collectPaginatedItems<T>(

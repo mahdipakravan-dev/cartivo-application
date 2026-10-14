@@ -15,6 +15,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { getBrands } from "@/lib/api/brands";
+import { getRootCategories } from "@/lib/api/categories";
 import { getPartBrands } from "@/lib/api/content";
 import { searchParts } from "@/lib/api/parts";
 import { siteConfig } from "@/lib/config/site";
@@ -43,8 +44,9 @@ interface CategoryCardData {
 }
 
 export default async function CategoriesPage() {
-  const [interior, exterior, allParts, brandsResult, partBrands] =
+  const [rootCategories, interior, exterior, allParts, brandsResult, partBrands] =
     await Promise.all([
+      getRootCategories(),
       searchParts({
         positionType: "INTERIOR",
         size: 6,
@@ -165,6 +167,69 @@ export default async function CategoriesPage() {
           </div>
           <Sparkles className="absolute bottom-10 left-12 hidden size-16 text-accent/15 lg:block" />
         </header>
+
+        <section
+          className="pt-10 sm:pt-12"
+          aria-labelledby="catalog-categories-title"
+        >
+          <p className="text-xs font-bold text-accent">ساختار کاتالوگ</p>
+          <h2
+            id="catalog-categories-title"
+            className="mt-2 text-2xl font-black text-dark sm:text-3xl"
+          >
+            دسته‌بندی‌های اصلی قطعات
+          </h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            برای دیدن زیرمجموعه‌ها و قطعات مستقیماً وارد یک دسته شوید.
+          </p>
+          {rootCategories.status === "success" && rootCategories.items.length > 0 ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {rootCategories.items.map((category) => {
+                if (category.id == null) return null;
+                const label =
+                  category.persianName?.trim() ||
+                  category.name?.trim() ||
+                  "دسته‌بندی قطعات";
+                return (
+                  <Link
+                    key={category.id}
+                    href={ROUTES.rootCategory(label, category.id)}
+                    className="group flex min-h-24 items-center gap-4 rounded-2xl border border-border bg-white p-4 transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transform-none"
+                  >
+                    <span className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-background">
+                      {category.imageUrl ? (
+                        <Image
+                          src={category.imageUrl}
+                          alt=""
+                          fill
+                          sizes="56px"
+                          className="object-contain p-2"
+                        />
+                      ) : (
+                        <Grid2X2 className="size-6 text-text-secondary" aria-hidden="true" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <strong className="block text-sm font-black text-dark group-hover:text-primary">
+                        {label}
+                      </strong>
+                      {category.name && category.name !== label && (
+                        <span className="mt-1 block truncate text-xs text-text-secondary" dir="ltr">
+                          {category.name}
+                        </span>
+                      )}
+                    </span>
+                    <ArrowLeft className="size-4 shrink-0 text-text-secondary" aria-hidden="true" />
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-dashed border-border bg-white py-10 text-center text-sm text-text-secondary">
+              دسته‌بندی فعالی برای نمایش وجود ندارد.
+            </div>
+          )}
+        </section>
 
         <section
           className="pt-10 sm:pt-12"

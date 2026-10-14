@@ -12,7 +12,6 @@ import {
   Wrench,
 } from "lucide-react";
 import { getBrandBySlug, getCarByIdOrSlug } from "@/lib/api/brands";
-import { getBrandTopLevelParts } from "@/lib/api/parts";
 import { getVehicleCategories } from "@/lib/api/categories";
 import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
@@ -80,35 +79,27 @@ export default async function PartsCarPage({
     [brand.persianName, car.model, car.trimLevel, car.year]
       .filter(Boolean)
       .join(" ");
-  const topLevelParts =
-    brand.id == null ? [] : await getBrandTopLevelParts(brand.id);
-  const rawPartId = Array.isArray(sp.partId) ? sp.partId[0] : sp.partId;
-  const requestedPartId = rawPartId ? Number(rawPartId) : null;
-  const selectedPart = topLevelParts.find(
-    (part) => part.id === requestedPartId,
-  );
-  const visibleTopLevelParts = selectedPart ? [selectedPart] : topLevelParts;
-  const categoryGroups =
+  const rootCategories =
     brand.id != null && car.id != null
-      ? await Promise.all(
-          visibleTopLevelParts.map(async (part) => ({
-            part,
-            categories:
-              part.id != null
-                ? await getVehicleCategories({
-                    carId: car.id!,
-                    brandId: brand.id!,
-                    partId: part.id,
-                  })
-                : [],
-          })),
-        )
+      ? await getVehicleCategories({ carId: car.id, brandId: brand.id })
       : [];
-  const visibleCategories = categoryGroups.flatMap(({ part, categories }) =>
-    categories.map((category) => ({ part, category })),
+  const rawCategoryId = Array.isArray(sp.categoryId)
+    ? sp.categoryId[0]
+    : sp.categoryId;
+  const requestedCategoryId = rawCategoryId ? Number(rawCategoryId) : null;
+  const selectedCategory = rootCategories.find(
+    (category) => category.id === requestedCategoryId,
   );
+  const visibleCategories =
+    selectedCategory?.id != null && brand.id != null && car.id != null
+      ? await getVehicleCategories({
+          carId: car.id,
+          brandId: brand.id,
+          categoryParentId: selectedCategory.id,
+        })
+      : rootCategories;
   const compatiblePartCount = new Set(
-    visibleCategories.flatMap(({ category }) =>
+    visibleCategories.flatMap((category) =>
       category.parts
         .map((part) => part.id)
         .filter((id): id is number => id != null),
@@ -302,7 +293,7 @@ export default async function PartsCarPage({
               </p>
             </div>
 
-            {topLevelParts.length === 0 ? (
+            {rootCategories.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border py-14 text-center text-sm text-text-secondary">
                 گروه قطعه‌ای برای این برند یافت نشد.
               </div>
@@ -312,18 +303,18 @@ export default async function PartsCarPage({
                   <Link
                     href={`${ROUTES.partsCar(brandSlug, carId)}#compatible-parts`}
                     scroll={false}
-                    className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${selectedPart == null ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-text-muted hover:border-accent"}`}
+                    className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${selectedCategory == null ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-text-muted hover:border-accent"}`}
                   >
                     همه
                   </Link>
-                  {topLevelParts.map((part) => (
+                  {rootCategories.map((category) => (
                     <Link
-                      key={part.id}
-                      href={`${ROUTES.partsCar(brandSlug, carId)}?partId=${part.id}#compatible-parts`}
+                      key={category.id}
+                      href={`${ROUTES.partsCar(brandSlug, carId)}?categoryId=${category.id}#compatible-parts`}
                       scroll={false}
-                      className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${part.id === selectedPart?.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-text-muted hover:border-accent"}`}
+                      className={`shrink-0 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${category.id === selectedCategory?.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white text-text-muted hover:border-accent"}`}
                     >
-                      {part.name || "گروه قطعه"}
+                      {category.persianName || category.name || "دسته‌بندی"}
                     </Link>
                   ))}
                 </div>
@@ -337,13 +328,15 @@ export default async function PartsCarPage({
                   </div>
                 ) : (
                   <div className="mt-7 space-y-9">
-                    {visibleCategories.map(({ part: parentPart, category }, index) => (
-                      <section key={`${parentPart.id ?? "part"}-${category.id ?? index}`}>
+                    {visibleCategories.map((category, index) => (
+                      <section key={category.id ?? index}>
                         <div className="mb-4 flex items-center justify-between gap-3">
                           <div>
-                            <p className="text-xs font-bold text-accent">
-                              {parentPart.name || "گروه قطعه"}
-                            </p>
+                            {selectedCategory && (
+                              <p className="text-xs font-bold text-accent">
+                                {selectedCategory.persianName || selectedCategory.name}
+                              </p>
+                            )}
                             <h3 className="mt-1 text-xl font-black text-dark">
                               {category.persianName ||
                                 category.name ||

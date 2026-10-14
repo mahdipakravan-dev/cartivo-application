@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { FilterSidebar } from "./filter-sidebar";
 import type { PartSearchParams } from "@/lib/api/parts";
 import type { CarFrontofficeDetailResponse } from "@/lib/api/types";
@@ -18,7 +17,8 @@ export function MobileFilterToggle({ initialParams, cars }: MobileFilterProps) {
   const activeCount =
     (initialParams.carIds?.length ?? 0) +
     (initialParams.partBrandIds?.length ?? 0) +
-    (initialParams.parentPartIds?.length ?? 0) +
+    (initialParams.categoryIds?.length ?? 0) +
+    (initialParams.categoryId != null ? 1 : 0) +
     (initialParams.positionType ? 1 : 0) +
     (initialParams.minPrice != null ? 1 : 0) +
     (initialParams.maxPrice != null ? 1 : 0);

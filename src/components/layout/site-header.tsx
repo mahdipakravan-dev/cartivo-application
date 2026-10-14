@@ -18,10 +18,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { AccountDialog } from "@/components/auth/account-dialog";
 import { useGarage } from "@/components/garage/garage-provider";
 import { GlobalSearchDialog } from "@/components/layout/global-search-dialog";
-import type { PartFrontofficeResponse } from "@/lib/api/types";
+import type { CategorySummaryResponse } from "@/lib/api/types";
 import {
-  getTopLevelPartHref,
-  getTopLevelPartLabel,
+  getCategoryHref,
+  getCategoryLabel,
 } from "@/lib/catalog-navigation";
 import { ROUTES } from "@/lib/routes";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -150,10 +150,10 @@ type SiteHeaderVariant =
 
 export function SiteHeader({
   variant = "white",
-  topLevelParts = [],
+  rootCategories = [],
 }: {
   variant?: SiteHeaderVariant;
-  topLevelParts?: PartFrontofficeResponse[];
+  rootCategories?: CategorySummaryResponse[];
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [categoryBarPinned, setCategoryBarPinned] = useState(false);
@@ -171,13 +171,13 @@ export function SiteHeader({
   const isAbsolute =
     (variant === "transparent-background" && pathname === ROUTES.home) ||
     variant === "abslute-on-header";
-  const navigationItems = topLevelParts.flatMap<TopLevelNavigationItem>(
-    (part) => {
-      const href = getTopLevelPartHref(part);
-      const label = getTopLevelPartLabel(part);
+  const navigationItems = rootCategories.flatMap<TopLevelNavigationItem>(
+    (category) => {
+      const href = getCategoryHref(category);
+      const label = getCategoryLabel(category);
 
-      return href && label && part.id != null
-        ? [{ id: part.id, href, label }]
+      return href && label && category.id != null
+        ? [{ id: category.id, href, label }]
         : [];
     },
   );
@@ -239,7 +239,7 @@ export function SiteHeader({
             <Headphones className="size-7 text-[var(--primary)]" />
             <span className="text-right">
               <small className="block text-[11px]">مشاوره تخصصی</small>
-              <b className="block text-xs">۰۲۱-۹۱۰۰۱۲۳۴</b>
+              <b className="block text-xs">۹۹۰۱۵۵۹۰۶۶</b>
             </span>
           </button>
 

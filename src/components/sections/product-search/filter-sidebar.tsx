@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { X, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,7 +31,6 @@ export function FilterSidebar({
   className,
 }: FilterSidebarProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
   const applyFilters = useCallback(
@@ -45,7 +44,7 @@ export function FilterSidebar({
   );
 
   const toggleArrayFilter = useCallback(
-    (key: "carIds" | "partBrandIds" | "parentPartIds", id: number) => {
+    (key: "carIds" | "partBrandIds" | "categoryIds", id: number) => {
       const current = initialParams[key] ?? [];
       const next = current.includes(id)
         ? current.filter((v) => v !== id)
@@ -58,7 +57,8 @@ export function FilterSidebar({
   const activeCount =
     (initialParams.carIds?.length ?? 0) +
     (initialParams.partBrandIds?.length ?? 0) +
-    (initialParams.parentPartIds?.length ?? 0) +
+    (initialParams.categoryIds?.length ?? 0) +
+    (initialParams.categoryId != null ? 1 : 0) +
     (initialParams.positionType ? 1 : 0) +
     (initialParams.minPrice != null ? 1 : 0) +
     (initialParams.maxPrice != null ? 1 : 0);
@@ -82,7 +82,8 @@ export function FilterSidebar({
               applyFilters({
                 carIds: undefined,
                 partBrandIds: undefined,
-                parentPartIds: undefined,
+                categoryId: undefined,
+                categoryIds: undefined,
                 positionType: undefined,
                 minPrice: undefined,
                 maxPrice: undefined,

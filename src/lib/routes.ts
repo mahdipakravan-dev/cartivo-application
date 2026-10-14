@@ -9,10 +9,12 @@ export const ROUTES = {
   partBrandDetail: (slug: string) => `/parts/part-brands/${slug}`,
   brandDetail: (slug: string) => `/parts/brands/${slug}`,
 
-  // Parts hierarchy
+  // Category hierarchy and purchasable parts
   parts: "/parts",
   categories: "/categories",
+  about: "/about",
   contact: "/contact",
+  sellerJoin: "/sell-with-cartivo",
   basket: "/basket",
   profile: "/profile",
   compare: "/compare",
@@ -24,8 +26,8 @@ export const ROUTES = {
   partsCar: (brandSlug: string, carSlug: string) => `/parts/${brandSlug}/${carSlug}`,
   partsModel: (brandSlug: string, modelId: string | number) =>
     `/parts/${brandSlug}/models/${modelId}`,
-  parentPart: (manufacturerName: string, parentId: string | number) =>
-    `/parent/${encodeURIComponent(manufacturerName)}?parentId=${parentId}`,
+  rootCategory: (categoryName: string, categoryId: string | number) =>
+    `/parent/${encodeURIComponent(categoryName)}?categoryId=${categoryId}`,
   parentCategory: (
     manufacturerName: string,
     categoryId: string | number,

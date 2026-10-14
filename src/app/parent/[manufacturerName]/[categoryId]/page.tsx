@@ -6,8 +6,8 @@ import { Suspense } from "react";
 import { ChevronLeft, ImageOff, Layers3 } from "lucide-react";
 
 import { SearchResults } from "@/components/sections/product-search/search-results";
-import { getCategoryById } from "@/lib/api/categories";
-import { searchParts } from "@/lib/api/parts";
+import { getCategoryById, getChildCategories } from "@/lib/api/categories";
+import { getPartsByCategory } from "@/lib/api/parts";
 import { ROUTES } from "@/lib/routes";
 import { parseSearchParams } from "@/lib/search-params";
 
@@ -51,9 +51,10 @@ export default async function ManufacturerCategoryPage({
   if (numericCategoryId == null) notFound();
 
   const filters = parseSearchParams(rawSearchParams);
-  const [category, results] = await Promise.all([
+  const [category, children, results] = await Promise.all([
     getCategoryById(numericCategoryId),
-    searchParts({ ...filters, categoryId: numericCategoryId }),
+    getChildCategories(numericCategoryId),
+    getPartsByCategory(numericCategoryId, filters),
   ]);
   if (!category) notFound();
 
@@ -131,6 +132,52 @@ export default async function ManufacturerCategoryPage({
           </div>
         </header>
 
+        {children.status === "success" && children.items.length > 0 && (
+          <section className="pt-10 sm:pt-12" aria-labelledby="child-categories-title">
+            <p className="text-xs font-bold text-accent">زیرمجموعه‌ها</p>
+            <h2
+              id="child-categories-title"
+              className="mt-2 text-2xl font-black text-dark sm:text-3xl"
+            >
+              دسته‌بندی‌های {categoryName}
+            </h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {children.items.map((child) => {
+                if (child.id == null) return null;
+                const label =
+                  child.persianName?.trim() ||
+                  child.name?.trim() ||
+                  "دسته‌بندی قطعات";
+                return (
+                  <Link
+                    key={child.id}
+                    href={ROUTES.parentCategory(manufacturerName, child.id)}
+                    className="group flex min-h-20 items-center gap-4 rounded-2xl border border-border bg-white p-4 transition hover:border-primary/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-background">
+                      {child.imageUrl ? (
+                        <Image
+                          src={child.imageUrl}
+                          alt=""
+                          width={48}
+                          height={48}
+                          className="size-full object-contain p-1.5"
+                        />
+                      ) : (
+                        <Layers3 className="size-5 text-text-secondary" aria-hidden="true" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1 font-black text-dark group-hover:text-primary">
+                      {label}
+                    </span>
+                    <ChevronLeft className="size-4 shrink-0 text-text-secondary" aria-hidden="true" />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <section
           className="pt-10 sm:pt-12"
           aria-labelledby="category-parts-title"
@@ -155,6 +202,7 @@ export default async function ManufacturerCategoryPage({
               initialParams={filters}
               cars={[]}
               results={results}
+              showFilters={false}
             />
           </Suspense>
         </section>

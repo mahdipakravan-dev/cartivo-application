@@ -214,7 +214,11 @@ export function GlobalSearchDialog({
                         onClick={close}
                         title={part.name || "قطعه خودرو"}
                         subtitle={
-                          [part.partBrandName, part.parentPartName]
+                          [
+                            part.partBrandName,
+                            part.categories?.[0]?.persianName ||
+                              part.categories?.[0]?.name,
+                          ]
                             .filter(Boolean)
                             .join(" • ") || part.description
                         }
@@ -233,10 +237,14 @@ export function GlobalSearchDialog({
                         href={
                           category.id == null
                             ? ROUTES.parts
-                            : `${ROUTES.parts}?parentPartIds=${category.id}`
+                            : `${ROUTES.parts}?categoryId=${category.id}`
                         }
                         onClick={close}
-                        title={category.name || "دسته‌بندی قطعات"}
+                        title={
+                          category.persianName ||
+                          category.name ||
+                          "دسته‌بندی قطعات"
+                        }
                         subtitle={
                           category.position === "INTERIOR"
                             ? "قطعات داخلی"

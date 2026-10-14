@@ -40,7 +40,12 @@ export async function ProductDetail({
   const name = part.name || "قطعه خودرو";
   const images = part.imageUrls?.filter(Boolean) || [];
   const brand = part.partBrand?.persianName || part.partBrand?.englishName;
-  const positionLabel = part.position ? POSITION_LABEL[part.position] : null;
+  const categoryPositions = [
+    ...new Set(part.categories?.map((category) => category.position).filter(Boolean)),
+  ];
+  const positionLabel = categoryPositions
+    .map((position) => POSITION_LABEL[position!] || position)
+    .join("، ");
   const compatibleFitments = part.fitments?.filter(Boolean) || [];
   const compatibleCars: CarResponse[] = compatibleFitments.flatMap((fitment) =>
     fitment.variantId == null
@@ -144,18 +149,10 @@ export async function ProductDetail({
                   ویژگی‌های محصول
                 </h2>
                 <ul className="mt-3 space-y-3 text-sm text-text-muted">
-                  {part.position && (
+                  {positionLabel && (
                     <li className="flex items-center gap-2">
                       <MapPin className="size-4 text-emerald-500" />
-                      {part.position === "INTERIOR"
-                        ? "داخل خودرو"
-                        : "خارج خودرو"}
-                    </li>
-                  )}
-                  {part.leaf != null && (
-                    <li className="flex items-center gap-2">
-                      <Check className="size-4 text-emerald-500" />
-                      {part.leaf ? "قطعه نهایی (قابل سفارش)" : "دسته‌بندی"}
+                      موقعیت دسته‌بندی: {positionLabel}
                     </li>
                   )}
                   <li className="flex items-center gap-2">

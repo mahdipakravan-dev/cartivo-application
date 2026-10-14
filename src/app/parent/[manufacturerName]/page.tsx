@@ -2,14 +2,19 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  ArrowDown,
+  ArrowLeft,
+  BadgeCheck,
   ChevronLeft,
+  CircleGauge,
   ImageOff,
   Layers3,
   PackageSearch,
+  ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
-import { getAllCategoriesByParent } from "@/lib/api/categories";
-import { searchAllParts } from "@/lib/api/parts";
+import { getCategoryById, getChildCategories } from "@/lib/api/categories";
+import { getPartsByCategory } from "@/lib/api/parts";
 import type { CategorySummaryResponse } from "@/lib/api/types";
 import { ProductCard } from "@/components/product-card";
 import { ROUTES } from "@/lib/routes";
@@ -17,7 +22,7 @@ import { ROUTES } from "@/lib/routes";
 interface TopLevelCategoriesPageProps {
   params: Promise<{ manufacturerName: string }>;
   searchParams: Promise<{
-    parentId?: string | string[];
+    categoryId?: string | string[];
   }>;
 }
 
@@ -39,9 +44,9 @@ export default async function TopLevelCategoriesPage({
   const [{ manufacturerName: encodedManufacturerName }, query] =
     await Promise.all([params, searchParams]);
   const manufacturerName = decodeRouteSegment(encodedManufacturerName);
-  const parentId = parseParentId(query.parentId);
+  const categoryId = parseCategoryId(query.categoryId);
 
-  if (parentId === null) {
+  if (categoryId === null) {
     return (
       <PageState
         icon={TriangleAlert}
@@ -51,12 +56,18 @@ export default async function TopLevelCategoriesPage({
     );
   }
 
-  const [result, parts] = await Promise.all([
-    getAllCategoriesByParent(parentId),
-    searchAllParts({ parentPartIds: [parentId] }),
+  const [category, result, partsResult] = await Promise.all([
+    getCategoryById(categoryId),
+    getChildCategories(categoryId),
+    getPartsByCategory(categoryId, { size: 100 }),
   ]);
+  const parts = partsResult.items;
+  const displayName =
+    category?.persianName?.trim() || category?.name?.trim() || manufacturerName;
+  const isBrakeCategory =
+    categoryId === 7 || displayName.replace(/\s/g, "").includes("ترمز");
 
-  if (result.status === "error") {
+  if (!category || result.status === "error") {
     return (
       <PageState
         icon={TriangleAlert}
@@ -67,57 +78,115 @@ export default async function TopLevelCategoriesPage({
   }
 
   return (
-    <main className="bg-[var(--background)] pb-20 pt-12 sm:pt-28">
+    <div className="bg-[var(--background)] pb-20 pt-8 sm:pt-24">
       <div className="container-cartivo px-4 sm:px-6 lg:px-8">
         <nav
           aria-label="مسیر ناوبری"
-          className="mb-6 text-xs text-text-secondary"
+          className="mb-5 text-xs text-text-muted sm:mb-7"
         >
-          <ol className="flex items-center gap-1.5">
+          <ol className="flex flex-wrap items-center gap-1.5">
             <li>
-              <Link href={ROUTES.home} className="hover:text-[var(--primary)]">
+              <Link
+                href={ROUTES.home}
+                className="rounded-sm transition-colors hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 خانه
               </Link>
             </li>
             <li aria-hidden="true">
               <ChevronLeft className="size-3" />
             </li>
-            <li aria-current="page" className="font-bold text-text-muted">
-              {manufacturerName}
+            <li aria-current="page" className="font-bold text-dark">
+              {displayName}
             </li>
           </ol>
         </nav>
 
-        <header className="relative isolate overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white shadow-[0_24px_70px_rgb(15_23_42/0.12)] sm:px-10 lg:px-14 lg:py-16">
-          <div className="absolute -right-24 -top-32 size-80 rounded-full bg-accent/10 blur-3xl" />
-          <div className="absolute -bottom-32 left-1/4 size-72 rounded-full bg-accent/10 blur-3xl" />
-          <div className="relative z-10 max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-accent">
-              <Layers3 className="size-4" />
-              {result.items.length.toLocaleString("fa-IR")} دسته‌بندی
-            </span>
-            <h1 className="mt-6 text-3xl font-black leading-[1.45] sm:text-4xl lg:text-5xl">
-              دسته‌بندی‌های {manufacturerName}
-            </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-white/60 sm:text-base">
-              دسته‌بندی موردنظر را برای ادامه مسیر انتخاب قطعه پیدا کنید.
-            </p>
+        <header className="relative isolate min-h-[34rem] overflow-hidden rounded-[2rem] bg-[#11161d] text-white shadow-[0_28px_80px_rgb(15_23_42/0.16)] sm:min-h-[31rem] lg:min-h-[34rem]">
+          {isBrakeCategory ? (
+            <Image
+              src="/images/category-heroes/brake-system-hero.png"
+              alt="دیسک و کالیپر سیستم ترمز خودرو"
+              fill
+              priority
+              sizes="(max-width: 640px) 100vw, 1600px"
+              className="object-cover object-left"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_70%,rgb(246_107_27/0.25),transparent_38%),linear-gradient(135deg,#172433,#0b1118)]" />
+          )}
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(10_15_22/0.08)_0%,rgb(10_15_22/0.45)_44%,rgb(10_15_22/0.98)_100%)] sm:bg-[linear-gradient(90deg,rgb(10_15_22/0.02)_0%,rgb(10_15_22/0.25)_45%,rgb(10_15_22/0.98)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,rgb(10_15_22/0.86)_0%,transparent_48%)] sm:bg-none" />
+
+          <div className="relative z-10 flex min-h-[34rem] max-w-3xl flex-col justify-between px-6 py-7 sm:min-h-[31rem] sm:px-10 sm:py-10 lg:min-h-[34rem] lg:px-14 lg:py-12">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3.5 py-2 text-xs font-bold text-white backdrop-blur-md">
+                <span className="size-2 rounded-full bg-accent shadow-[0_0_0_5px_rgb(246_107_27/0.12)]" />
+                {result.items.length.toLocaleString("fa-IR")} دسته‌بندی تخصصی
+              </span>
+              <h1 className="mt-6 max-w-2xl text-3xl font-black leading-[1.5] text-balance sm:text-4xl lg:text-[3.25rem]">
+                {isBrakeCategory
+                  ? "مطمئن برانید؛ قطعه درست را پیدا کنید"
+                  : `قطعه درست برای ${displayName}`}
+              </h1>
+              <p className="mt-4 max-w-xl text-sm leading-8 text-white/75 sm:text-base">
+                از میان دسته‌های {displayName}، مستقیم به
+                قطعه‌ای برسید که با خودروی شما سازگار است.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <Link
+                href="#categories"
+                className="inline-flex min-h-12 w-fit items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-black text-white shadow-[0_12px_30px_rgb(246_107_27/0.25)] transition-colors hover:bg-[#dc5710] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#11161d]"
+              >
+                انتخاب دسته‌بندی
+                <ArrowDown className="size-4" aria-hidden="true" />
+              </Link>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-white/70">
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck
+                    className="size-4 text-accent-light"
+                    aria-hidden="true"
+                  />
+                  خرید مطمئن
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <BadgeCheck
+                    className="size-4 text-accent-light"
+                    aria-hidden="true"
+                  />
+                  بررسی سازگاری
+                </span>
+              </div>
+            </div>
           </div>
         </header>
 
         <section
-          className="pt-10 sm:pt-12"
+          id="categories"
+          className="scroll-mt-28 pt-12 sm:pt-16"
           aria-labelledby="category-list-title"
         >
-          <h2
-            id="category-list-title"
-            className="text-2xl font-black text-dark sm:text-3xl"
-          >
-            همه دسته‌بندی‌ها
-          </h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black text-accent">
+                یک مسیر کوتاه‌تر تا قطعه مناسب
+              </p>
+              <h2
+                id="category-list-title"
+                className="mt-2 text-2xl font-black text-dark sm:text-3xl"
+              >
+                دسته‌بندی‌های {displayName}
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-text-muted">
+              بخش موردنظر را انتخاب کنید تا نتایج دقیق‌تری ببینید.
+            </p>
+          </div>
 
           {result.items.length > 0 ? (
-            <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {result.items.map((category, index) => (
                 <CategoryCard
                   key={category.id ?? `${category.name}-${index}`}
@@ -140,28 +209,40 @@ export default async function TopLevelCategoriesPage({
         </section>
 
         <section
-          className="pt-14 sm:pt-16"
+          id="all-parts"
+          className="scroll-mt-28 pt-16 sm:pt-20"
           aria-labelledby="manufacturer-parts-title"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-bold text-accent">
-                قطعات {manufacturerName}
-              </p>
-              <h2
-                id="manufacturer-parts-title"
-                className="mt-2 text-2xl font-black text-dark sm:text-3xl"
-              >
-                همه قطعات
-              </h2>
-              <p className="mt-2 text-sm text-text-secondary">
-                {parts.length.toLocaleString("fa-IR")} قطعه برای نمایش پیدا شد.
-              </p>
+          <div className="rounded-[1.75rem] border border-border/60 bg-white px-5 py-6 shadow-[0_8px_30px_rgb(15_23_42/0.04)] sm:px-7 sm:py-7">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-black text-accent">آماده بررسی</p>
+                <h2
+                  id="manufacturer-parts-title"
+                  className="mt-2 text-2xl font-black text-dark sm:text-3xl"
+                >
+                  همه قطعات {displayName}
+                </h2>
+                <p className="mt-2 text-sm leading-7 text-text-muted">
+                  قیمت، برند و سازگاری هر قطعه را در یک نگاه مقایسه کنید.
+                </p>
+              </div>
+              <div className="flex min-w-36 items-center gap-3 rounded-2xl bg-background px-4 py-3">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-white">
+                  <CircleGauge className="size-5" aria-hidden="true" />
+                </span>
+                <span>
+                  <strong className="block text-xl font-black text-dark">
+                    {partsResult.totalElements.toLocaleString("fa-IR")}
+                  </strong>
+                  <span className="text-xs text-text-muted">قطعه موجود</span>
+                </span>
+              </div>
             </div>
           </div>
 
           {parts.length > 0 ? (
-            <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {parts.map((part, index) => (
                 <ProductCard
                   key={part.id ?? `${part.name}-${index}`}
@@ -182,7 +263,7 @@ export default async function TopLevelCategoriesPage({
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -199,23 +280,30 @@ function CategoryCard({
     "دسته‌بندی بدون نام";
   const content = (
     <>
-      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-background">
+      <div className="relative flex aspect-[16/10] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,#fff_0%,#f0f3f7_100%)]">
         {category.imageUrl ? (
           <Image
             src={category.imageUrl}
             alt={label}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
+            className="object-contain p-6 transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
-          <ImageOff className="size-14 text-text-secondary" strokeWidth={1.4} />
+          <span className="flex size-20 items-center justify-center rounded-2xl border border-border/50 bg-white text-text-secondary shadow-sm">
+            <ImageOff className="size-8" strokeWidth={1.4} />
+          </span>
         )}
+        <span className="absolute left-3 top-3 flex size-9 items-center justify-center rounded-xl border border-white/80 bg-white/85 text-primary shadow-sm backdrop-blur-sm transition-colors group-hover:bg-primary group-hover:text-white">
+          <ArrowLeft className="size-4" aria-hidden="true" />
+        </span>
       </div>
-      <div className="p-5">
-        <h3 className="text-base font-black text-[var(--primary)]">{label}</h3>
+      <div className="border-t border-border/50 p-5">
+        <h3 className="text-base font-black text-dark transition-colors group-hover:text-primary">
+          {label}
+        </h3>
         {category.name && category.name !== label && (
-          <p className="mt-1 text-xs text-text-secondary" dir="ltr">
+          <p className="mt-1.5 text-xs text-text-muted" dir="ltr">
             {category.name}
           </p>
         )}
@@ -226,12 +314,12 @@ function CategoryCard({
   return category.id != null ? (
     <Link
       href={ROUTES.parentCategory(manufacturerName, category.id)}
-      className="group overflow-hidden rounded-[1.5rem]  bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgb(15_48_90/0.12)]"
+      className="group overflow-hidden rounded-[1.5rem] border border-border/50 bg-white shadow-[0_8px_28px_rgb(15_23_42/0.04)] transition duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-[0_18px_45px_rgb(15_48_90/0.1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transform-none motion-reduce:transition-none"
     >
       {content}
     </Link>
   ) : (
-    <article className="group overflow-hidden rounded-[1.5rem]  bg-white shadow-sm">
+    <article className="group overflow-hidden rounded-[1.5rem] border border-border/50 bg-white shadow-sm">
       {content}
     </article>
   );
@@ -267,10 +355,10 @@ function PageState({
   );
 }
 
-function parseParentId(value: string | string[] | undefined): number | null {
+function parseCategoryId(value: string | string[] | undefined): number | null {
   if (typeof value !== "string" || !/^\d+$/.test(value)) return null;
-  const parentId = Number(value);
-  return Number.isSafeInteger(parentId) && parentId > 0 ? parentId : null;
+  const categoryId = Number(value);
+  return Number.isSafeInteger(categoryId) && categoryId > 0 ? categoryId : null;
 }
 
 function decodeRouteSegment(value: string): string {

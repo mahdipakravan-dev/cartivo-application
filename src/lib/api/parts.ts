@@ -5,7 +5,6 @@ import type {
   PaginatedResult,
   PageResponse,
 } from "./types";
-import { collectPaginatedItems } from "../catalog-navigation";
 import { SERVER_BASE_URL } from "./config";
 
 function parsePage<T>(page: PageResponse, fallback: T[] = []): PaginatedResult<T> {
@@ -25,7 +24,6 @@ export interface PartSearchParams {
   carIds?: number[];
   modelId?: number;
   partBrandIds?: number[];
-  parentPartIds?: number[];
   categoryId?: number;
   categoryIds?: number[];
   positionType?: "INTERIOR" | "EXTERIOR" | "BOTH";
@@ -41,60 +39,6 @@ export type PartSearchParamsUpdate = {
   [K in keyof PartSearchParams]: PartSearchParams[K] | undefined;
 };
 
-/** Fetch top-level parts that have compatible children for a vehicle brand. */
-export async function getBrandTopLevelParts(
-  brandId: number,
-): Promise<PartFrontofficeResponse[]> {
-  try {
-    const url = new URL("/api/frontoffice/parts", SERVER_BASE_URL);
-    url.searchParams.set("brandId", String(brandId));
-    url.searchParams.set("page", "0");
-    url.searchParams.set("size", "100");
-    url.searchParams.set("sort", "name,asc");
-    const response = await fetch(url, {
-      headers: { Accept: "application/json" },
-      cache: "force-cache",
-      next: { tags: ["frontoffice-catalog", `vehicle-brand-parts:${brandId}`] },
-    });
-    if (!response.ok) throw new Error(`Failed to fetch brand parts (${response.status})`);
-    const page = await response.json() as PageResponse;
-    return (page.content ?? []) as PartFrontofficeResponse[];
-  } catch {
-    return [];
-  }
-}
-
-/** Fetch every purchasable part matching the supplied catalog filters. */
-export async function searchAllParts(
-  params: Omit<PartSearchParams, "page" | "size">,
-): Promise<PartFrontofficeResponse[]> {
-  return collectPaginatedItems((page) => searchParts({
-    ...params,
-    page,
-    size: 100,
-  }));
-}
-
-/** Fetch every active top-level part for global catalog navigation. */
-export async function getAllTopLevelParts(): Promise<PartFrontofficeResponse[]> {
-  try {
-    return await collectPaginatedItems(async (page) => {
-      const { data, error } = await apiClient.GET("/api/frontoffice/parts/top-level", {
-        params: {
-          query: { page, size: 100, sortBy: "name", sortDir: "ASC" },
-        },
-        cache: "force-cache",
-        next: { tags: ["top-level-parts"] },
-      });
-
-      if (error || !data) throw new Error("Failed to fetch top-level parts");
-      return parsePage<PartFrontofficeResponse>(data);
-    });
-  } catch {
-    return [];
-  }
-}
-
 export async function searchParts(
   params: PartSearchParams,
 ): Promise<PaginatedResult<PartFrontofficeResponse>> {
@@ -108,7 +52,6 @@ export async function searchParts(
     if (params.carIds?.length) query.carIds = params.carIds;
     if (params.modelId != null) query.modelId = params.modelId;
     if (params.partBrandIds?.length) query.partBrandIds = params.partBrandIds;
-    if (params.parentPartIds?.length) query.parentPartIds = params.parentPartIds;
     if (params.categoryId != null) query.categoryId = params.categoryId;
     if (params.categoryIds?.length) query.categoryIds = params.categoryIds;
     if (params.positionType) query.positionType = params.positionType;
@@ -126,6 +69,42 @@ export async function searchParts(
     return parsePage<PartFrontofficeResponse>(data);
   } catch {
     return { items: [], totalElements: 0, totalPages: 0, page: 0, size: 20, hasNext: false, hasPrevious: false };
+  }
+}
+
+/** Fetch directly assigned purchasable parts for one category. */
+export async function getPartsByCategory(
+  categoryId: number,
+  params: Pick<PartSearchParams, "carIds" | "page" | "size"> = {},
+): Promise<PaginatedResult<PartFrontofficeResponse>> {
+  try {
+    const url = new URL(
+      `/api/frontoffice/parts/category/${categoryId}`,
+      SERVER_BASE_URL,
+    );
+    const carId = params.carIds?.[0];
+    if (carId != null) url.searchParams.set("carId", String(carId));
+    url.searchParams.set("page", String(params.page ?? 0));
+    url.searchParams.set("size", String(params.size ?? 20));
+
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch category parts (${response.status})`);
+    }
+    return parsePage<PartFrontofficeResponse>(await response.json() as PageResponse);
+  } catch {
+    return {
+      items: [],
+      totalElements: 0,
+      totalPages: 0,
+      page: params.page ?? 0,
+      size: params.size ?? 20,
+      hasNext: false,
+      hasPrevious: false,
+    };
   }
 }
 

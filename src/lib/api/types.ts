@@ -59,8 +59,31 @@ export interface CarResponse {
     countryCode?: string;
   };
 }
-export type PartFrontofficeResponse =
+type GeneratedPartFrontofficeResponse =
   components["schemas"]["PartFrontofficeResponse"];
+
+export type CategoryPosition = "INTERIOR" | "EXTERIOR" | "BOTH";
+
+/**
+ * Current front-office category contract. The generated schema can briefly lag
+ * behind the deployed category-hierarchy API, so keep this public shape here.
+ */
+export interface CategorySummaryResponse {
+  id?: number;
+  name?: string;
+  persianName?: string;
+  imageUrl?: string;
+  categoryParentId?: number | null;
+  position?: CategoryPosition | null;
+}
+
+/** Parts are purchasable catalog items; classification lives in categories. */
+export type PartFrontofficeResponse = Omit<
+  GeneratedPartFrontofficeResponse,
+  "leaf" | "position" | "categories"
+> & {
+  categories?: CategorySummaryResponse[];
+};
 export type PartDetailDataType =
   | "TEXT"
   | "TEXTAREA"
@@ -82,8 +105,6 @@ export interface PartDetail {
 export type PartDetailResponse = PartFrontofficeResponse & {
   details: PartDetail[];
 };
-export type CategorySummaryResponse =
-  components["schemas"]["CategorySummaryResponse"];
 export type PartBrandFrontofficeResponse =
   components["schemas"]["PartBrandFrontofficeResponse"];
 export type BlogDetailResponse = components["schemas"]["BlogDetailResponse"];
