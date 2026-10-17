@@ -217,7 +217,7 @@ function ReviewCard({ review }: { review: Review }) {
             <UserRound className="size-4 text-text-secondary" />
           </span>
           <div>
-            <p className="text-xs font-bold text-text-muted">کاربر کارتیوُ</p>
+            <p className="text-xs font-bold text-text-muted">کاربر کارتیو</p>
             <p className="mt-0.5 text-[10px] text-text-secondary">
               {formatDate(review.createdAt)}
             </p>

@@ -124,3 +124,20 @@ export async function getVehicleCategories(params: {
     return [];
   }
 }
+
+/**
+ * Walk up `categoryParentId` to the root category (max 8 levels).
+ * Category URLs are `/parent/{rootLabel}/{id}`, so the canonical URL of any
+ * category depends on its real root — not on whatever label is in the URL.
+ */
+export async function getCategoryRoot(
+  id: number,
+): Promise<CategorySummaryResponse | null> {
+  let current = await getCategoryById(id);
+  for (let depth = 0; current && depth < 8; depth += 1) {
+    const parentId = current.categoryParentId;
+    if (parentId == null) return current;
+    current = await getCategoryById(parentId);
+  }
+  return null;
+}

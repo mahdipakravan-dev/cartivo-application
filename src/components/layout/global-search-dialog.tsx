@@ -263,7 +263,7 @@ export function GlobalSearchDialog({
         </div>
 
         <footer className="flex items-center justify-between border-t border-border bg-white px-5 py-3 text-[10px] text-text-secondary">
-          <span>جست‌وجوی هوشمند در کاتالوگ کارتیوُ</span>
+          <span>جست‌وجوی هوشمند در کاتالوگ کارتیو</span>
           <button
             onClick={close}
             className="rounded-lg bg-background px-2 py-1 font-bold text-text-secondary"

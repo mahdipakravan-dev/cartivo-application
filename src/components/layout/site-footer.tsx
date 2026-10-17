@@ -1,29 +1,30 @@
+import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import Image from "next/image";
 import { Instagram, Send, Phone, Mail, MapPin } from "lucide-react";
 
+/*
+ * فقط به صفحاتی لینک بدهید که واقعاً وجود دارند. لینک‌های سراسری فوتر به
+ * صفحات ۴۰۴ (bestsellers ،deals ،faq ،guide ،returns ،track-order ،terms،
+ * privacy ،careers ،blog) حذف شدند؛ پس از ساخت هر صفحه دوباره اضافه شوند.
+ * صفحات faq ،returns ،terms و privacy برای اعتماد و سئو اولویت ساخت دارند.
+ */
 const quickLinks = [
-  { label: "خانه", href: "/" },
-  { label: "قطعات", href: "/parts" },
-  { label: "برندها", href: "/brands" },
-  { label: "پرفروش‌ترین‌ها", href: "/bestsellers" },
-  { label: "تخفیف‌ها", href: "/deals" },
+  { label: "خانه", href: ROUTES.home },
+  { label: "قطعات", href: ROUTES.parts },
+  { label: "برندهای خودرو", href: ROUTES.brands },
+  { label: "دسته‌بندی‌ها", href: ROUTES.categories },
+  { label: "برندهای قطعه", href: ROUTES.partBrands },
 ];
 
 const customerService = [
-  { label: "تماس با ما", href: "/contact" },
-  { label: "سوالات متداول", href: "/faq" },
-  { label: "راهنمای خرید", href: "/guide" },
-  { label: "شرایط بازگشت", href: "/returns" },
-  { label: "پیگیری سفارش", href: "/track-order" },
+  { label: "تماس با ما", href: ROUTES.contact },
+  { label: "مقایسه قطعات", href: ROUTES.compare },
 ];
 
 const aboutLinks = [
-  { label: "درباره ما", href: "/about" },
-  { label: "قوانین و مقررات", href: "/terms" },
-  { label: "حریم خصوصی", href: "/privacy" },
-  { label: "فرصت‌های شغلی", href: "/careers" },
-  { label: "وبلاگ", href: "/blog" },
+  { label: "درباره ما", href: ROUTES.about },
+  { label: "فروشنده شوید", href: ROUTES.sellerJoin },
 ];
 
 export function SiteFooter() {
@@ -36,19 +37,19 @@ export function SiteFooter() {
           <div className="col-span-2">
             <Link
               href="/"
-              aria-label="کارتیوُ، صفحه اصلی"
+              aria-label="کارتیو، صفحه اصلی"
               className="mb-5 inline-flex"
             >
               <Image
                 src="/images/brand/cartivo-logo-light-footer.webp"
-                alt="کارتیوُ"
+                alt="کارتیو"
                 width={198}
                 height={256}
                 className="h-auto w-24 object-contain"
               />
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed text-white/70">
-              کارتیوُ، پلتفرم هوشمند خرید قطعات خودرو. با وارد کردن VIN خودرو
+              کارتیو، پلتفرم هوشمند خرید قطعات خودرو. با وارد کردن VIN خودرو
               خود، سریع‌ترین و دقیق‌ترین قطعات را پیدا کنید.
             </p>
             <div className="flex gap-3">
@@ -103,7 +104,7 @@ export function SiteFooter() {
 
           {/* About */}
           <div>
-            <h3 className="mb-4 text-sm font-bold">درباره کارتیوُ</h3>
+            <h3 className="mb-4 text-sm font-bold">درباره کارتیو</h3>
             <ul className="space-y-2.5">
               {aboutLinks.map((link) => (
                 <li key={link.href}>
@@ -138,7 +139,7 @@ export function SiteFooter() {
         {/* Copyright */}
         <div className="border-t border-white/10 pt-6 text-center">
           <p className="text-xs text-white/50">
-            © ۱۴۰۳ کارتیوُ. تمامی حقوق محفوظ است.
+            © ۱۴۰۳ کارتیو. تمامی حقوق محفوظ است.
           </p>
         </div>
       </div>

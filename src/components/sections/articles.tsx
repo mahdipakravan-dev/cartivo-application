@@ -44,7 +44,7 @@ function ArticleCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-dark/65 via-transparent to-transparent" />
         <span className="absolute right-4 top-4 rounded-full border border-white/20 bg-dark/30 px-3 py-1 text-[10px] font-bold text-white backdrop-blur-md">
-          {article.category || "مجله کارتیوُ"}
+          {article.category || "مجله کارتیو"}
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">

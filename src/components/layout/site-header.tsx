@@ -38,11 +38,11 @@ function CartivoLogo({ compact = false }: { compact?: boolean }) {
     <Link
       href={ROUTES.home}
       className="flex shrink-0 items-center"
-      aria-label="کارتیوُ، صفحه اصلی"
+      aria-label="کارتیو، صفحه اصلی"
     >
       <Image
         src="/images/brand/cartivo-logo-dark-horizontal-header.webp"
-        alt="کارتیوُ"
+        alt="کارتیو"
         width={238}
         height={112}
         priority

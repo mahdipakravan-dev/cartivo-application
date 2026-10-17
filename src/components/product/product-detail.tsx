@@ -18,6 +18,8 @@ import type {
 } from "@/lib/api/types";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, productSchema } from "@/lib/seo/schema";
+import { getSellerOffersForSeo } from "@/lib/seo/part-seo";
 import { ProductGallery } from "./product-gallery";
 import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel";
 import { getRelatedBlogs } from "@/lib/api/content";
@@ -59,31 +61,19 @@ export async function ProductDetail({
         ],
   );
   const relatedBlogs = part.id != null ? await getRelatedBlogs(part.id, 3) : [];
-  const productUrl = ROUTES.partDetail(String(part.id));
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name,
-    ...(part.description ? { description: part.description } : {}),
-    ...(images.length ? { image: images } : {}),
-    ...(brand ? { brand: { "@type": "Brand", name: brand } } : {}),
-    ...(part.price != null
-      ? {
-          offers: {
-            "@type": "Offer",
-            url: productUrl,
-            priceCurrency: "IRR",
-            price: part.price,
-            availability: "https://schema.org/InStock",
-            itemCondition: "https://schema.org/NewCondition",
-          },
-        }
-      : {}),
-  };
+  const productPath = ROUTES.partDetail(String(part.id));
+  const offers = part.id != null ? await getSellerOffersForSeo(part.id) : [];
+  const jsonLd = productSchema({ part, path: productPath, offers });
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "خانه", path: ROUTES.home },
+    { name: "قطعات", path: ROUTES.parts },
+    { name, path: productPath },
+  ]);
 
   return (
     <>
       <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <main className="bg-[var(--background)] pb-20 pt-24 sm:pt-28">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <nav
@@ -254,7 +244,7 @@ export async function ProductDetail({
                 برای انتخاب قطعه کمک می‌خواهید؟
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/65">
-                کارشناسان کارتیوُ برای بررسی سازگاری قطعه با خودروی شما در
+                کارشناسان کارتیو برای بررسی سازگاری قطعه با خودروی شما در
                 کنارتان هستند.
               </p>
             </aside>

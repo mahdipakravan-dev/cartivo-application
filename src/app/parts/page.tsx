@@ -58,7 +58,7 @@ export default async function PartsPage({
             <div className="relative z-10 flex items-center px-6 py-11 sm:px-10 lg:px-14 lg:py-14">
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-accent">
-                  <PackageSearch className="size-4" /> بازار قطعات یدکی کارتیوُ
+                  <PackageSearch className="size-4" /> بازار قطعات یدکی کارتیو
                 </div>
                 <h1 className="mt-5 text-3xl font-black leading-[1.35] text-white sm:text-4xl lg:text-5xl">
                   قطعه‌ی مناسب خودرو را

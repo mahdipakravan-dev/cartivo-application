@@ -18,6 +18,8 @@ import { getPartsByCategory } from "@/lib/api/parts";
 import type { CategorySummaryResponse } from "@/lib/api/types";
 import { ProductCard } from "@/components/product-card";
 import { ROUTES } from "@/lib/routes";
+import { getCategoryHref, getCategoryLabel } from "@/lib/catalog-navigation";
+import { siteConfig } from "@/lib/config/site";
 
 interface TopLevelCategoriesPageProps {
   params: Promise<{ manufacturerName: string }>;
@@ -27,13 +29,32 @@ interface TopLevelCategoriesPageProps {
 }
 
 export async function generateMetadata({
-  params,
+  searchParams,
 }: TopLevelCategoriesPageProps): Promise<Metadata> {
-  const { manufacturerName: encodedManufacturerName } = await params;
-  const manufacturerName = decodeRouteSegment(encodedManufacturerName);
+  const categoryId = parseCategoryId((await searchParams).categoryId);
+  const category = categoryId == null ? null : await getCategoryById(categoryId);
+  const name = category ? getCategoryLabel(category) : null;
+  const canonical = category ? getCategoryHref(category) : null;
+
+  // شناسه‌ی نامعتبر یا دسته‌ی ناموجود صفحه‌ی خطا با کد ۲۰۰ می‌دهد؛
+  // نباید ایندکس شود.
+  if (!category || !name || !canonical) {
+    return { title: "دسته‌بندی یافت نشد", robots: { index: false, follow: true } };
+  }
+
+  const title = `خرید قطعات ${name} خودرو — انواع و قیمت`;
+  const description = `انواع قطعات ${name} خودرو را بر اساس زیرشاخه و خودروی خود پیدا کنید؛ مقایسه قیمت فروشندگان و خرید آنلاین از ${siteConfig.name}.`;
   return {
-    title: `دسته‌بندی‌های ${manufacturerName}`,
-    description: `مشاهده دسته‌بندی‌های قطعات ${manufacturerName} در کارتیوُ`,
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: `${title} | ${siteConfig.name}`,
+      description,
+      url: canonical,
+      type: "website",
+      ...(category.imageUrl ? { images: [{ url: category.imageUrl }] } : {}),
+    },
   };
 }
 

@@ -19,7 +19,7 @@ build) سرو می‌کند و همه‌ی سیگنال‌های سئو را ا�
 
 | سیگنال                        | محل پیاده‌سازی                                                                               |
 | ----------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------- |
-| `<title>` و description یکتا  | `metadata` بالای `page.tsx` (با template سراسری `%s                                          | کارتیوُ` از layout ترکیب می‌شود) |
+| `<title>` و description یکتا  | `metadata` بالای `page.tsx` (با template سراسری `%s                                          | کارتیو` از layout ترکیب می‌شود) |
 | Canonical                     | `alternates.canonical: "/brands"` — با `metadataBase` مطلق می‌شود                            |
 | Open Graph                    | `metadata.openGraph`                                                                         |
 | JSON-LD `BreadcrumbList`      | داخل `page.tsx` از طریق کامپوننت Shared `lib/seo/json-ld.tsx`                                |
