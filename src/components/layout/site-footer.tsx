@@ -124,7 +124,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-4 border-t border-white/10 py-6 sm:flex-row">
           <div className="flex items-center gap-2 text-sm text-white/70">
             <Phone className="h-4 w-4" />
-            <span dir="ltr">۰۲۱-۱۲۳۴۵۶۷۸</span>
+            <span dir="ltr">-</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-white/70">
             <Mail className="h-4 w-4" />
@@ -132,7 +132,7 @@ export function SiteFooter() {
           </div>
           <div className="flex items-center gap-2 text-sm text-white/70">
             <MapPin className="h-4 w-4" />
-            <span>تهران، خیابان ولیعصر</span>
+            <span>-</span>
           </div>
         </div>
 

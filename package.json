@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "openapi": "openapi-typescript http://localhost:8080/v3/api-docs/02-frontoffice -o src/lib/api/generated/schema.d.ts",
-    "openapi:prod": "openapi-typescript $NEXT_PUBLIC_API_BASE_URL/v3/api-docs -o src/lib/api/generated/schema.d.ts"
+    "openapi:prod": "openapi-typescript $NEXT_PUBLIC_API_BASE_URL/v3/api-docs -o src/lib/api/generated/schema.d.ts",
+    "deploy": "liara deploy --team-id 6ace47e2a7a0a8faa9486a65"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

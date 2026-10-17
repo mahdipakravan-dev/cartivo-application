@@ -239,7 +239,7 @@ export function SiteHeader({
             <Headphones className="size-7 text-[var(--primary)]" />
             <span className="text-right">
               <small className="block text-[11px]">مشاوره تخصصی</small>
-              <b className="block text-xs">۹۹۰۱۵۵۹۰۶۶</b>
+              <b className="block text-xs">-</b>
             </span>
           </button>
 
