@@ -59,7 +59,7 @@ export function PartRequestCover() {
                 <span className="block text-accent">درخواست قطعه ثبت کن</span>
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/60">
-                مشخصات قطعه را برای ما بنویس؛ کارشناسان کارتیوُ نتیجه بررسی را
+                مشخصات قطعه را برای ما بنویس؛ کارشناسان کارتیو نتیجه بررسی را
                 از طریق پیامک و پروفایل به شما اطلاع می‌دهند.
               </p>
               <Button

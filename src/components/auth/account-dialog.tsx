@@ -240,7 +240,7 @@ export function AccountDialog({
                 id="account-dialog-title"
                 className="text-xl font-extrabold text-dark"
               >
-                ورود به حساب کارتیوُ
+                ورود به حساب کارتیو
               </h2>
               <p className="mt-2 text-sm leading-6 text-text-secondary">
                 سریع و امن، فقط با شماره موبایل شما
@@ -302,7 +302,7 @@ export function AccountDialog({
                 )}
               </Button>
               <p className="mt-4 text-center text-xs leading-5 text-text-secondary">
-                با ورود، قوانین و شرایط استفاده از کارتیوُ را می‌پذیرید.
+                با ورود، قوانین و شرایط استفاده از کارتیو را می‌پذیرید.
               </p>
             </form>
           )}

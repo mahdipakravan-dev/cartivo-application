@@ -6,7 +6,9 @@ import { getRootCategories } from "@/lib/api/categories";
 import { iranYekan } from "@/lib/fonts";
 import { StoreProvider } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schema";
 import type { ReactNode } from "react";
 import "./globals.css";
 
@@ -15,7 +17,7 @@ import "./globals.css";
  *
  * - lang="fa" و dir="rtl" در سطح <html> (استاندارد سئوی چندزبانه)
  * - metadataBase تا همه‌ی URL های نسبی در OG/canonical مطلق شوند
- * - عنوان‌ها با template یکدست می‌شوند: «… | کارتیوُ»
+ * - عنوان‌ها با template یکدست می‌شوند: «… | کارتیو»
  */
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -38,7 +40,34 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
+  icons: {
+    icon: siteConfig.logoPath,
+    apple: siteConfig.logoPath,
+  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+  process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+    ? {
+        verification: {
+          ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+            ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+            : {}),
+          ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+            ? { other: { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+            : {}),
+        },
+      }
+    : {}),
+};
+
+export const viewport: Viewport = {
+  themeColor: siteConfig.colors.black,
 };
 
 export default async function RootLayout({
@@ -49,6 +78,8 @@ export default async function RootLayout({
   return (
     <html lang="fa" dir="rtl" className={cn("font-sans", iranYekan.variable)}>
       <body className="flex min-h-dvh flex-col">
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
         <StoreProvider>
           <GarageProvider>
             <SiteHeader

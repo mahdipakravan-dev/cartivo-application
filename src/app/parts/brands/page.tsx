@@ -18,7 +18,7 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "برندهای خودرو — لیست کامل برندها و قطعات یدکی",
   description:
-    "لیست کامل برندهای خودرو در کارتیوُ؛ سایپا، ایران‌خودرو، کیا، هیوندای و… . برند خودروی خود را انتخاب کنید و قطعات یدکی سازگار با مدل و سال ساخت را با مقایسه قیمت فروشندگان بخرید.",
+    "لیست کامل برندهای خودرو در کارتیو؛ سایپا، ایران‌خودرو، کیا، هیوندای و… . برند خودروی خود را انتخاب کنید و قطعات یدکی سازگار با مدل و سال ساخت را با مقایسه قیمت فروشندگان بخرید.",
   alternates: { canonical: ROUTES.brands },
   openGraph: {
     title: `برندهای خودرو | ${siteConfig.name}`,
@@ -49,7 +49,7 @@ export default async function BrandsPage() {
   const itemListJsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "برندهای خودرو در کارتیوُ",
+    name: "برندهای خودرو در کارتیو",
     numberOfItems: brands.length,
     itemListElement: brands.map((brand, index) => ({
       "@type": "ListItem",

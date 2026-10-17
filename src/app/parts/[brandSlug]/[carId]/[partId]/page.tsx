@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBrandBySlug, getCarByIdOrSlug } from "@/lib/api/brands";
 import { getPartById } from "@/lib/api/parts";
-import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, productSchema } from "@/lib/seo/schema";
+import { buildPartMetadata, getSellerOffersForSeo } from "@/lib/seo/part-seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Shield, Truck, CheckCircle } from "lucide-react";
 import { SellerPurchasePanel } from "@/components/product/seller-purchase-panel";
@@ -23,20 +24,16 @@ export async function generateMetadata({
     getPartById(partId),
   ]);
 
-  if (!brand || !car || !part) return { title: "قطعه یافت نشد" };
+  if (!brand || !car || !part || part.id == null) {
+    return { title: "قطعه یافت نشد", robots: { index: false, follow: true } };
+  }
 
+  // این صفحه نمای «قطعه در زمینه‌ی یک خودرو» است؛ نسخه‌ی مرجع هر قطعه
+  // /parts/{partId} است تا یک محصول چند URL رقیب در ایندکس نداشته باشد.
+  const metadata = buildPartMetadata(part, await getSellerOffersForSeo(part.id));
   return {
-    title: `${part.name} — ${car.brand} ${car.model} | ${siteConfig.name}`,
-    description: `خرید ${part.name} مناسب ${car.brand} ${car.model} با بهترین قیمت از فروشندگان معتبر.`,
-    alternates: {
-      canonical: ROUTES.partsPart(brandSlug, carId, partId),
-    },
-    openGraph: {
-      title: `${part.name} — ${car.brand} ${car.model} | ${siteConfig.name}`,
-      description: `خرید ${part.name} مناسب ${car.brand} ${car.model}.`,
-      url: ROUTES.partsPart(brandSlug, carId, partId),
-      type: "website",
-    },
+    ...metadata,
+    title: `${part.name} مناسب ${car.brand} ${car.model}`,
   };
 }
 
@@ -55,30 +52,25 @@ export default async function PartsPartPage({
 
   if (!brand || !car || !part) notFound();
 
-  const partJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: part.name,
-    description: `${part.name} مناسب ${car.brand} ${car.model}`,
-    brand: {
-      "@type": "Brand",
-      name: brand.persianName,
-    },
-    ...(part.price != null
-      ? {
-          offers: {
-            "@type": "Offer",
-            price: part.price,
-            priceCurrency: "IRR",
-            availability: "https://schema.org/InStock",
-          },
-        }
-      : {}),
-  };
+  const partPath = ROUTES.partDetail(String(part.id));
+  const offers = part.id != null ? await getSellerOffersForSeo(part.id) : [];
+  const partJsonLd = productSchema({
+    part,
+    path: partPath,
+    offers,
+    description: part.description || `${part.name} مناسب ${car.brand} ${car.model}`,
+  });
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: "خانه", path: ROUTES.home },
+    { name: brand.persianName || "برند", path: ROUTES.brandDetail(brandSlug) },
+    { name: `${car.brand ?? ""} ${car.model ?? ""}`.trim() || "خودرو", path: ROUTES.partsCar(brandSlug, carId) },
+    { name: part.name || "قطعه", path: ROUTES.partsPart(brandSlug, carId, partId) },
+  ]);
 
   return (
     <>
       <JsonLd data={partJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
 
       <section className="py-8 sm:py-12">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">

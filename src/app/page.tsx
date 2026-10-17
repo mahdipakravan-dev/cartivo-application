@@ -9,6 +9,22 @@ import { PartRequestCover } from "@/components/sections/part-request-cover";
 import { getBrands } from "@/lib/api/brands";
 import { CatalogHydrator } from "@/lib/store";
 import { PreviewEditable } from "@/components/preview/preview-editable";
+import { siteConfig } from "@/lib/config/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  // absolute: عنوان صفحه‌ی خانه خودش نام برند را دارد و template لازم نیست
+  title: { absolute: siteConfig.homeTitle },
+  description: siteConfig.description,
+  // canonical بدون پارامتر تا نسخه‌های ?preview=… و مشابه ایندکس جدا نشوند
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: siteConfig.homeTitle,
+    description: siteConfig.description,
+    url: "/",
+    type: "website",
+  },
+};
 
 export default async function HomePage({
   searchParams,

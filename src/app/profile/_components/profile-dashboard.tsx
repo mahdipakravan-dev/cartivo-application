@@ -210,7 +210,7 @@ export function ProfileDashboard() {
 
   const displayName =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") ||
-    "کاربر کارتیوُ";
+    "کاربر کارتیو";
 
   return (
     <main className="bg-[var(--background)] pb-20 pt-24 sm:pt-28">

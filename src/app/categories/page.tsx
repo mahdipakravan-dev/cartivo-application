@@ -24,7 +24,7 @@ import { ROUTES } from "@/lib/routes";
 export const metadata: Metadata = {
   title: `دسته‌بندی قطعات خودرو | ${siteConfig.name}`,
   description:
-    "دسترسی تصویری به قطعات داخلی و بیرونی، برندهای خودرو، تولیدکنندگان قطعه و تمام محصولات کارتیوُ.",
+    "دسترسی تصویری به قطعات داخلی و بیرونی، برندهای خودرو، تولیدکنندگان قطعه و تمام محصولات کارتیو.",
   alternates: { canonical: ROUTES.categories },
 };
 
@@ -88,7 +88,7 @@ export default async function CategoriesPage() {
     },
     {
       title: "تمام قطعات یدکی",
-      subtitle: "جست‌وجو و فیلتر میان همه محصولات فعال کارتیوُ",
+      subtitle: "جست‌وجو و فیلتر میان همه محصولات فعال کارتیو",
       eyebrow: "کاتالوگ کامل",
       href: ROUTES.parts,
       images: productImages(allParts.items),
@@ -119,7 +119,7 @@ export default async function CategoriesPage() {
     },
     {
       title: "قطعه‌ات را پیدا نکردی؟",
-      subtitle: "درخواست خود را ثبت کن تا کارشناسان کارتیوُ بررسی کنند",
+      subtitle: "درخواست خود را ثبت کن تا کارشناسان کارتیو بررسی کنند",
       eyebrow: "درخواست اختصاصی",
       href: "/#part-request",
       images: [],

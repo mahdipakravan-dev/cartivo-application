@@ -31,7 +31,7 @@ export async function generateMetadata({
     alternates: { canonical: ROUTES.brandDetail(slug) },
     openGraph: {
       title: `قطعات یدکی ${brand.persianName} | ${siteConfig.name}`,
-      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیوُ.`,
+      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیو.`,
       url: ROUTES.brandDetail(slug),
       type: "website",
       ...(brand.iconUrl ? { images: [{ url: brand.iconUrl }] } : {}),

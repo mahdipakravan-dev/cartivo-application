@@ -22,9 +22,9 @@ import { ROUTES } from "@/lib/routes";
 import { SellerLeadForm } from "./_components/seller-lead-form";
 
 export const metadata: Metadata = {
-  title: "فروشنده کارتیوُ شوید",
+  title: "فروشنده کارتیو شوید",
   description:
-    "به جمع فروشندگان قطعات خودرو در کارتیوُ بپیوندید و فروش آنلاین خود را گسترش دهید.",
+    "به جمع فروشندگان قطعات خودرو در کارتیو بپیوندید و فروش آنلاین خود را گسترش دهید.",
 };
 
 const benefits = [
@@ -50,7 +50,7 @@ const benefits = [
     icon: Headphones,
     title: "پشتیبانی در مسیر",
     description:
-      "از راه‌اندازی فروشگاه تا ثبت محصول و بهبود فروش، کارشناسان کارتیوُ کنار شما هستند.",
+      "از راه‌اندازی فروشگاه تا ثبت محصول و بهبود فروش، کارشناسان کارتیو کنار شما هستند.",
   },
 ] as const;
 
@@ -93,7 +93,7 @@ export default function SellWithCartivoPage() {
               <ChevronLeft className="size-3" />
             </li>
             <li aria-current="page" className="font-bold text-dark">
-              همکاری با کارتیوُ
+              همکاری با کارتیو
             </li>
           </ol>
         </nav>
@@ -112,7 +112,7 @@ export default function SellWithCartivoPage() {
                 فروشگاه شما، در مسیر هزاران خریدار قطعات خودرو
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-white/70">
-                به جمع فروشندگان کارتیوُ بپیوندید؛ بازار آنلاین خود را گسترش دهید و با
+                به جمع فروشندگان کارتیو بپیوندید؛ بازار آنلاین خود را گسترش دهید و با
                 ابزارهای مدیریتی و پشتیبانی تخصصی، متمرکزتر بفروشید.
               </p>
               <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-white/75 sm:text-sm">
@@ -143,7 +143,7 @@ export default function SellWithCartivoPage() {
       <section className="py-16 sm:py-20" aria-labelledby="seller-benefits-title">
         <div className="container-cartivo px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-black text-accent">چرا کارتیوُ؟</p>
+            <p className="text-xs font-black text-accent">چرا کارتیو؟</p>
             <h2 id="seller-benefits-title" className="mt-3 text-2xl font-black text-dark sm:text-4xl">
               زیرساخت فروش آنلاین، بدون پیچیدگی اضافی
             </h2>
@@ -177,7 +177,7 @@ export default function SellWithCartivoPage() {
                 مسیر همکاری
               </span>
               <h2 id="seller-flow-title" className="mt-4 text-2xl font-black leading-[1.5] text-dark sm:text-4xl">
-                سه قدم تا شروع فروش در کارتیوُ
+                سه قدم تا شروع فروش در کارتیو
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-8 text-text-muted">
                 فرآیند اولیه کوتاه است. کارشناس ما اطلاعات دقیق‌تر و شرایط همکاری را در تماس توضیح می‌دهد.
@@ -236,7 +236,7 @@ export default function SellWithCartivoPage() {
                   از قفسه فروشگاه تا درِ خانه مشتری
                 </h2>
                 <p className="mt-4 text-sm leading-8 text-white/65">
-                  موجودی و اطلاعات محصول را به‌روز نگه دارید؛ کارتیوُ به ساختن یک تجربه خرید شفاف و قابل‌اعتماد کمک می‌کند.
+                  موجودی و اطلاعات محصول را به‌روز نگه دارید؛ کارتیو به ساختن یک تجربه خرید شفاف و قابل‌اعتماد کمک می‌کند.
                 </p>
                 <div className="mt-7 grid gap-3 sm:grid-cols-2">
                   {[

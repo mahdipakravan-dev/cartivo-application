@@ -8,7 +8,7 @@ import { PartBrandGrid } from "./_components/part-brand-grid";
 export const metadata: Metadata = {
   title: "برندهای تولیدکننده قطعه",
   description:
-    "فهرست برندهای تولیدکننده قطعات یدکی و محصولات موجود هر برند در کارتیوُ.",
+    "فهرست برندهای تولیدکننده قطعات یدکی و محصولات موجود هر برند در کارتیو.",
   alternates: { canonical: ROUTES.partBrands },
 };
 

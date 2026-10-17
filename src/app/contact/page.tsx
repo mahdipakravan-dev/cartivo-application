@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { siteConfig } from "@/lib/config/site";
+import { absoluteUrl, siteConfig } from "@/lib/config/site";
+import { ORGANIZATION_ID } from "@/lib/seo/schema";
 import { ROUTES } from "@/lib/routes";
 import { JsonLd } from "@/lib/seo/json-ld";
 
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `تماس با ${siteConfig.name}`,
     description:
-      "کارشناسان کارتیوُ برای انتخاب قطعه، پیگیری سفارش و راهنمایی خرید در کنار شما هستند.",
+      "کارشناسان کارتیو برای انتخاب قطعه، پیگیری سفارش و راهنمایی خرید در کنار شما هستند.",
     url: ROUTES.contact,
     type: "website",
   },
@@ -36,41 +37,30 @@ export const metadata: Metadata = {
 const gallery = [
   {
     src: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/8272c8ed3_generated_0cb84b85.png",
-    alt: "تیم و خدمات خودرویی کارتیوُ",
+    alt: "تیم و خدمات خودرویی کارتیو",
     className: "sm:col-span-2 sm:row-span-2",
   },
   {
     src: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/7634c3849_generated_b7167273.png",
-    alt: "فناوری انتخاب قطعه کارتیوُ",
+    alt: "فناوری انتخاب قطعه کارتیو",
     className: "",
   },
   {
     src: "https://media.base44.com/images/public/6a4ca7e91f5491d8941f034f/10877c212_generated_4caa0b9b.png",
-    alt: "قطعات یدکی بررسی‌شده در کارتیوُ",
+    alt: "قطعات یدکی بررسی‌شده در کارتیو",
     className: "",
   },
 ];
 
 export default function ContactPage() {
   const { contact } = siteConfig;
+  // Organization سراسری در layout منتشر می‌شود؛ این صفحه فقط ContactPage است
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteConfig.name,
-    url: siteConfig.url,
-    email: contact.email,
-    telephone: contact.phone,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: contact.address,
-      addressCountry: "IR",
-    },
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: contact.phone,
-      contactType: "customer service",
-      availableLanguage: "Persian",
-    },
+    "@type": "ContactPage",
+    url: absoluteUrl(ROUTES.contact),
+    name: `تماس با ${siteConfig.name}`,
+    about: { "@id": ORGANIZATION_ID },
   };
 
   return (
@@ -114,7 +104,7 @@ export default function ContactPage() {
                   </h1>
                   <p className="mt-5 max-w-xl text-sm leading-8 text-white/60 sm:text-base">
                     برای انتخاب قطعه، بررسی سازگاری، پیگیری سفارش یا هر پرسش
-                    دیگری با کارشناسان کارتیوُ در ارتباط باشید.
+                    دیگری با کارشناسان کارتیو در ارتباط باشید.
                   </p>
                   <div className="mt-8 flex flex-wrap gap-3">
                     <a
@@ -184,7 +174,7 @@ export default function ContactPage() {
 
           <section className="grid gap-6 py-12 lg:grid-cols-[.9fr_1.1fr] lg:py-16">
             <div className="rounded-[1.75rem]  bg-white p-6 shadow-sm sm:p-8">
-              <p className="text-xs font-bold text-accent">پشتیبانی کارتیوُ</p>
+              <p className="text-xs font-bold text-accent">پشتیبانی کارتیو</p>
               <h2 className="mt-2 text-2xl font-black text-dark sm:text-3xl">
                 چطور می‌توانیم کمک کنیم؟
               </h2>
@@ -206,7 +196,7 @@ export default function ContactPage() {
                 <SupportRow
                   icon={MessageCircleMore}
                   title="پیشنهاد و بازخورد"
-                  description="شنیدن تجربه شما برای بهتر شدن کارتیوُ"
+                  description="شنیدن تجربه شما برای بهتر شدن کارتیو"
                 />
               </div>
               <div className="mt-7 rounded-2xl bg-primary p-5 text-white">
@@ -222,7 +212,7 @@ export default function ContactPage() {
             <div>
               <div className="mb-5">
                 <p className="text-xs font-bold text-accent">
-                  نگاهی به کارتیوُ
+                  نگاهی به کارتیو
                 </p>
                 <h2 className="mt-2 text-2xl font-black text-dark">
                   فناوری در کنار تخصص خودرو

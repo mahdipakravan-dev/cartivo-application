@@ -20,9 +20,9 @@ import {
 import { ROUTES } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "درباره کارتیوُ",
+  title: "درباره کارتیو",
   description:
-    "با داستان، ماموریت و ارزش‌های کارتیوُ؛ همراه مسیر خرید هوشمند قطعات خودرو، آشنا شوید.",
+    "با داستان، ماموریت و ارزش‌های کارتیو؛ همراه مسیر خرید هوشمند قطعات خودرو، آشنا شوید.",
 };
 
 const values = [
@@ -88,7 +88,7 @@ export default function AboutPage() {
               <ChevronLeft className="size-3" />
             </li>
             <li aria-current="page" className="font-bold text-dark">
-              درباره کارتیوُ
+              درباره کارتیو
             </li>
           </ol>
         </nav>
@@ -108,13 +108,13 @@ export default function AboutPage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/25 px-3.5 py-2 text-xs font-bold text-white backdrop-blur-md">
                 <Route className="size-4 text-accent-light" aria-hidden="true" />
-                داستان کارتیوُ
+                داستان کارتیو
               </span>
               <h1 className="mt-6 max-w-2xl text-3xl font-black leading-[1.5] text-balance sm:text-4xl lg:text-[3.25rem]">
                 همراه مسیر شما، در هر انتخاب و هر کیلومتر
               </h1>
               <p className="mt-4 max-w-xl text-sm leading-8 text-white/75 sm:text-base">
-                کارتیوُ برای ساده‌تر کردن بازار قطعات خودرو شکل گرفته است؛ جایی که انتخاب درست، اطلاعات شفاف و فروشنده مطمئن به هم می‌رسند.
+                کارتیو برای ساده‌تر کردن بازار قطعات خودرو شکل گرفته است؛ جایی که انتخاب درست، اطلاعات شفاف و فروشنده مطمئن به هم می‌رسند.
               </p>
             </div>
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
@@ -166,7 +166,7 @@ export default function AboutPage() {
                   بازار قطعات خودرو پر از انتخاب است، اما اطلاعات پراکنده، نگرانی از سازگاری و مسیر پیچیده خرید، تصمیم‌گیری را دشوار می‌کند.
                 </p>
                 <p>
-                  کارتیوُ می‌خواهد این فاصله را کم کند؛ با یک تجربه یکپارچه که خودرو، قطعه و فروشنده را دقیق‌تر به هم متصل می‌کند.
+                  کارتیو می‌خواهد این فاصله را کم کند؛ با یک تجربه یکپارچه که خودرو، قطعه و فروشنده را دقیق‌تر به هم متصل می‌کند.
                 </p>
               </div>
               <div className="mt-7 flex flex-wrap gap-3">
@@ -181,7 +181,7 @@ export default function AboutPage() {
             <figure className="relative aspect-[16/10] overflow-hidden rounded-[1.75rem] bg-muted shadow-[0_24px_70px_rgb(15_23_42/0.12)]">
               <Image
                 src="/images/about/cartivo-team.webp"
-                alt="تیم کارتیوُ در حال بررسی قطعات و اطلاعات محصول"
+                alt="تیم کارتیو در حال بررسی قطعات و اطلاعات محصول"
                 fill
                 sizes="(max-width: 1024px) 100vw, 46vw"
                 className="object-cover"
@@ -199,7 +199,7 @@ export default function AboutPage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-black text-accent">آنچه راه را نشانمان می‌دهد</p>
             <h2 id="values-title" className="mt-3 text-2xl font-black text-dark sm:text-4xl">
-              ارزش‌هایی که تجربه کارتیوُ را می‌سازند
+              ارزش‌هایی که تجربه کارتیو را می‌سازند
             </h2>
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -222,7 +222,7 @@ export default function AboutPage() {
             <div className="absolute -left-24 -top-24 size-72 rounded-full bg-accent/15 blur-3xl" />
             <div className="relative">
               <div className="max-w-3xl">
-                <p className="text-xs font-black text-accent-light">کارتیوُ یک پل است</p>
+                <p className="text-xs font-black text-accent-light">کارتیو یک پل است</p>
                 <h2 id="connection-title" className="mt-3 text-2xl font-black leading-[1.5] sm:text-4xl">
                   نزدیک‌تر کردن آدم‌ها، اطلاعات و قطعات
                 </h2>

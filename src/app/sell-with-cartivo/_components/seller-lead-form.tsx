@@ -81,7 +81,7 @@ export function SellerLeadForm() {
       </div>
       <h2 className="mt-5 text-2xl font-black text-dark">برای شروع، فقط شماره شما را می‌خواهیم</h2>
       <p className="mt-3 text-sm leading-7 text-text-muted">
-        شماره خود را بگذارید؛ کارشناس کارتیوُ در اولین فرصت با شما
+        شماره خود را بگذارید؛ کارشناس کارتیو در اولین فرصت با شما
         تماس می‌گیرد.
       </p>
 

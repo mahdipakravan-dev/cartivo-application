@@ -6,7 +6,12 @@ import { Suspense } from "react";
 import { ChevronLeft, ImageOff, Layers3 } from "lucide-react";
 
 import { SearchResults } from "@/components/sections/product-search/search-results";
-import { getCategoryById, getChildCategories } from "@/lib/api/categories";
+import {
+  getCategoryById,
+  getCategoryRoot,
+  getChildCategories,
+} from "@/lib/api/categories";
+import { siteConfig } from "@/lib/config/site";
 import { getPartsByCategory } from "@/lib/api/parts";
 import { ROUTES } from "@/lib/routes";
 import { parseSearchParams } from "@/lib/search-params";
@@ -19,21 +24,41 @@ interface ManufacturerCategoryPageProps {
 export async function generateMetadata({
   params,
 }: ManufacturerCategoryPageProps): Promise<Metadata> {
-  const { manufacturerName: encodedManufacturerName, categoryId } =
-    await params;
-  const manufacturerName = decodeRouteSegment(encodedManufacturerName);
+  const { categoryId } = await params;
   const numericCategoryId = parseId(categoryId);
-  const category =
-    numericCategoryId == null ? null : await getCategoryById(numericCategoryId);
-  const categoryName = category?.persianName || category?.name;
+  const [category, root] =
+    numericCategoryId == null
+      ? [null, null]
+      : await Promise.all([
+          getCategoryById(numericCategoryId),
+          getCategoryRoot(numericCategoryId),
+        ]);
+  const categoryName = category?.persianName?.trim() || category?.name?.trim();
+  const rootName = root?.persianName?.trim() || root?.name?.trim();
 
-  if (!categoryName) return { title: "دسته‌بندی یافت نشد" };
+  if (!categoryName || numericCategoryId == null) {
+    return { title: "دسته‌بندی یافت نشد", robots: { index: false, follow: true } };
+  }
+
+  // canonical از ریشه‌ی واقعی دسته ساخته می‌شود، نه از متن داخل URL؛
+  // در غیر این صورت هر برچسب دلخواه یک URL تکراری قابل‌ایندکس می‌ساخت.
+  const canonical = rootName
+    ? ROUTES.parentCategory(rootName, numericCategoryId)
+    : undefined;
+  const context = rootName && rootName !== categoryName ? ` (${rootName})` : "";
+  const title = `خرید ${categoryName} خودرو${context} — قیمت و مشخصات`;
+  const description = `لیست ${categoryName}${context} با شماره فنی، برند سازنده و خودروهای سازگار؛ مقایسه قیمت فروشندگان و خرید آنلاین از ${siteConfig.name}.`;
 
   return {
-    title: `${categoryName} — قطعات ${manufacturerName}`,
-    description: `مشاهده و خرید قطعات دسته‌بندی ${categoryName} از ${manufacturerName} در کارتیوُ`,
-    alternates: {
-      canonical: ROUTES.parentCategory(manufacturerName, numericCategoryId!),
+    title,
+    description,
+    ...(canonical ? { alternates: { canonical } } : {}),
+    openGraph: {
+      title: `${title} | ${siteConfig.name}`,
+      description,
+      ...(canonical ? { url: canonical } : {}),
+      type: "website",
+      ...(category?.imageUrl ? { images: [{ url: category.imageUrl }] } : {}),
     },
   };
 }

@@ -27,7 +27,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const blog = await getBlogDetail(slug);
   if (!blog) return { title: "مقاله یافت نشد" };
-  const title = blog.title || "مقاله کارتیوُ";
+  const title = blog.title || "مقاله کارتیو";
   const description = blog.excerpt || excerptFromContent(blog.content);
   return {
     title,
@@ -53,7 +53,7 @@ export default async function BlogDetailPage({
   const blog = await getBlogDetail(slug);
   if (!blog) notFound();
 
-  const title = blog.title || "مقاله کارتیوُ";
+  const title = blog.title || "مقاله کارتیو";
   const body = plainText(blog.content || blog.excerpt || "");
   const paragraphs = body
     .split(/\n{2,}/)
@@ -103,7 +103,7 @@ export default async function BlogDetailPage({
               <li>
                 <ChevronLeft className="size-3" />
               </li>
-              <li className="text-text-secondary">مجله کارتیوُ</li>
+              <li className="text-text-secondary">مجله کارتیو</li>
               <li>
                 <ChevronLeft className="size-3" />
               </li>
@@ -117,7 +117,7 @@ export default async function BlogDetailPage({
               <div className="relative z-10 flex items-center px-6 py-12 sm:px-10 lg:px-14">
                 <div>
                   <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-accent">
-                    <BookOpen className="size-4" /> مجله کارتیوُ
+                    <BookOpen className="size-4" /> مجله کارتیو
                   </span>
                   <h1 className="mt-6 text-3xl font-black leading-[1.55] text-white sm:text-4xl lg:text-5xl">
                     {title}
@@ -330,7 +330,7 @@ function excerptFromContent(value?: string) {
   const text = plainText(value || "");
   return text.length > 160
     ? `${text.slice(0, 157)}...`
-    : text || "مطالب تخصصی خودرو و قطعات یدکی در مجله کارتیوُ.";
+    : text || "مطالب تخصصی خودرو و قطعات یدکی در مجله کارتیو.";
 }
 function formatDate(value: string) {
   const date = new Date(value);

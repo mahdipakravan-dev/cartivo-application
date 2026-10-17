@@ -17,6 +17,7 @@ import { siteConfig } from "@/lib/config/site";
 import { ROUTES } from "@/lib/routes";
 import { parseSearchParams } from "@/lib/search-params";
 import { JsonLd } from "@/lib/seo/json-ld";
+import { buildPartMetadata, getSellerOffersForSeo } from "@/lib/seo/part-seo";
 import { SectionHeader } from "@/components/ui/section-header";
 import { SearchResults } from "@/components/sections/product-search/search-results";
 import { ProductDetail } from "@/components/product/product-detail";
@@ -31,22 +32,10 @@ export async function generateMetadata({
   const { brandSlug } = await params;
   if (isPartId(brandSlug)) {
     const part = await getPartById(brandSlug);
-    if (!part) return { title: "قطعه یافت نشد" };
-    const title = `${part.name || "قطعه خودرو"} — خرید و قیمت`;
-    const description = `مشاهده مشخصات و قیمت ${part.name || "قطعه خودرو"}، تضمین اصالت و ارسال سریع از کارتیوُ.`;
-    return {
-      title,
-      description,
-      alternates: { canonical: ROUTES.partDetail(brandSlug) },
-      openGraph: {
-        title: `${title} | ${siteConfig.name}`,
-        description,
-        url: ROUTES.partDetail(brandSlug),
-        type: "website",
-      },
-      twitter: { card: "summary_large_image", title, description },
-      robots: { index: true, follow: true },
-    };
+    if (!part || part.id == null) {
+      return { title: "قطعه یافت نشد", robots: { index: false, follow: true } };
+    }
+    return buildPartMetadata(part, await getSellerOffersForSeo(part.id));
   }
   const brand = await getBrandBySlug(brandSlug);
   if (!brand) return { title: "برند یافت نشد" };
@@ -57,7 +46,7 @@ export async function generateMetadata({
     alternates: { canonical: ROUTES.partsBrand(brandSlug) },
     openGraph: {
       title: `قطعات یدکی ${brand.persianName} | ${siteConfig.name}`,
-      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیوُ.`,
+      description: `لیست خودروها و قطعات یدکی ${brand.persianName} در کارتیو.`,
       url: ROUTES.partsBrand(brandSlug),
       type: "website",
       ...(brand.iconUrl ? { images: [{ url: brand.iconUrl }] } : {}),

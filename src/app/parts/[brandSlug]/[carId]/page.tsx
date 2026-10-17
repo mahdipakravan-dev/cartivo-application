@@ -48,7 +48,7 @@ export async function generateMetadata({
     alternates: { canonical: ROUTES.partsCar(brandSlug, carId) },
     openGraph: {
       title: `قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} | ${siteConfig.name}`,
-      description: `لیست قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} در کارتیوُ.`,
+      description: `لیست قطعات یدکی ${car.displayName || `${car.brand} ${car.model}`} در کارتیو.`,
       url: ROUTES.partsCar(brandSlug, carId),
       type: "website",
       ...(car.imageUrls?.[0] ? { images: [{ url: car.imageUrls[0] }] } : {}),

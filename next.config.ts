@@ -33,6 +33,22 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: true,
   },
 
+  async redirects() {
+    return [
+      // مسیر اصلی صفحه‌ی برندها /parts/brands است؛ /brands قبلاً در فوتر لینک
+      // شده بود و صفحه‌ای نداشت (۴۰۴).
+      { source: "/brands", destination: "/parts/brands", permanent: true },
+      { source: "/brands/:slug", destination: "/parts/brands/:slug", permanent: true },
+      // یکپارچه‌سازی دامنه: www به دامنه‌ی اصلی بدون www
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.cartivo.ir" }],
+        destination: "https://cartivo.ir/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
